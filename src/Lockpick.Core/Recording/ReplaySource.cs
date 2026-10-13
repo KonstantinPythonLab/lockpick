@@ -72,17 +72,19 @@ public sealed class ReplaySource(RecordingHeader header, IReadOnlyList<RecordedF
                     return;
                 }
 
-                // Re-stamp so the UI shows live-looking times; the detector only uses the order.
-                var snapshot = frame.Snapshot with { CapturedAt = DateTimeOffset.UtcNow };
+                // Detect on the recorded timestamps (the detector compares game time with wall time, which must not
+                // be distorted by the playback speed), then re-stamp so the UI shows live-looking times.
+                var now = DateTimeOffset.UtcNow;
+                var snapshot = frame.Snapshot with { CapturedAt = now };
                 Latest = snapshot;
                 Interlocked.Increment(ref _played);
                 SnapshotChanged?.Invoke(this, snapshot);
-                foreach (var gameEvent in detector.Detect(previous, snapshot))
+                foreach (var gameEvent in detector.Detect(previous, frame.Snapshot))
                 {
-                    EventRaised?.Invoke(this, gameEvent);
+                    EventRaised?.Invoke(this, gameEvent with { Timestamp = now });
                 }
 
-                previous = snapshot;
+                previous = frame.Snapshot;
             }
 
             EventRaised?.Invoke(this, new GameStopped(DateTimeOffset.UtcNow, "Replay finished"));

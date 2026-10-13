@@ -79,4 +79,50 @@ public class RecordingTests
         // After the restart, camera cuts in the main hall are tracked again.
         Assert.Equal("Camera 1 → 5 in room 106", described[^1]);
     }
+
+    [Fact]
+    public void Chris_fixture_detects_the_new_game_after_death()
+    {
+        var events = Events("re1-live-chris-death-and-restart");
+        Assert.Equal(["New game started"], events.OfType<GameLoaded>().Select(e => e.Describe()));
+    }
+
+    /// <summary>
+    /// Jill session (2026-10-12): bitten to death in the corridor, New Game, a long route through the mansion
+    /// including 2F, healed with a first aid spray, then back to the title and a save loaded.
+    /// </summary>
+    [Fact]
+    public void Jill_fixture_plays_back_into_reliable_events()
+    {
+        var events = Events("re1-live-jill-death-load");
+
+        Assert.Equal(
+            ["New game started", "Save loaded (in-game time 00:13:59)"],
+            events.OfType<GameLoaded>().Select(e => e.Describe()));
+
+        // The load is detected when the save's time appears, not on the load-file screen (which still shows the
+        // previous game's timer).
+        var load = events.OfType<GameLoaded>().Single(e => !e.IsNewGame);
+        Assert.Equal(TimeSpan.FromSeconds(0x6253 / 30.0), load.GameTime);
+
+        Assert.Equal(
+            ["105 → 104", "106 → 105", "105 → 104", "104 → 105", "105 → 106", "106 → 203", "203 → 106", "106 → 107",
+             "107 → 108", "108 → 109", "109 → 113", "113 → 109", "109 → 115", "115 → 116", "116 → 115", "115 → 109",
+             "109 → 108", "108 → 107", "107 → 106"],
+            events.OfType<RoomChanged>().Select(e => $"{e.From} → {e.To}"));
+
+        // 9 + 5 bites of 10 from zombies and one 12-point hit; the fatal bite and the first aid spray (46 → 96)
+        // are not damage.
+        var damage = events.OfType<PlayerDamaged>().Select(d => d.Amount).ToList();
+        Assert.Equal(15, damage.Count);
+        Assert.Equal(14, damage.Count(d => d == 10));
+        Assert.Contains(12, damage);
+        Assert.Contains(events, e => e is PlayerHealthChanged { From: 46, To: 96 });
+    }
+
+    private static IReadOnlyList<GameEvent> Events(string fixture)
+    {
+        var (_, frames) = SessionRecording.ReadFile(Path.Combine(AppContext.BaseDirectory, "Fixtures", fixture + ".jsonl"));
+        return SessionRecording.DetectEvents(frames);
+    }
 }

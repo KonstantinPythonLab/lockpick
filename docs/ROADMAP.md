@@ -100,9 +100,9 @@ Acceptance criteria:
 
 ## Event candidates found in live traces
 
-- `GameLoaded`: the in-game timer moves backwards while a session is active (a save restores its saved time).
-- New game: timer reset to 0 with HP = max HP in room 106.
-Both need a fixture-backed test before being emitted.
+- ~~`GameLoaded` / new game~~ — implemented (timer discontinuities), tested against both live fixtures.
+- `ItemCollected` / `ItemUsed`: inventory slot diffs (runtime-verified layout) — 0.2.
+- `PlayerDied`: `stateFlags & 0x01000000` with HP ≤ 0 — needs a gated raw-field path.
 
 ## 0.8.0 — Speedrun and challenges
 

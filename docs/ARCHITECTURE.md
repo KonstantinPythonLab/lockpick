@@ -64,14 +64,17 @@ and max), `Location` (stage + room), `Camera`, `Position`, `GameTime`, plus `Raw
 
 ## Events
 
-`GameStarted`/`GameStopped` (attach/detach), `RoomChanged`, `CameraChanged`, `PlayerHealthChanged`,
-`PlayerDamaged`. Rules (all derived from live RE1 observations):
+`GameStarted`/`GameStopped` (attach/detach), `GameLoaded` (new game or save loaded), `RoomChanged`,
+`CameraChanged`, `PlayerHealthChanged`, `PlayerDamaged`. Rules (all derived from live RE1 observations):
 - Only Valid→Valid transitions produce events.
 - `CameraChanged` is suppressed after a room change until the in-game timer advances again: RE1 updates
   the room id before the camera id and assigns the new camera during the door animation with the timer frozen.
 - `PlayerDamaged` requires the same room in both snapshots (a load is not damage).
+- `GameLoaded` fires when the in-game timer restarts: below 2 s = new game, otherwise a save. Backwards jumps and
+  forward jumps larger than elapsed real time count; the last timer is kept across title gaps so the load-file
+  screen (still showing the old timer) does not fire. Attaching mid-game never fires.
 
-Events listed in the product brief but not yet reliably derivable (`GameLoaded`, `ItemCollected`,
+Events listed in the product brief but not yet reliably derivable (`ItemCollected`,
 `ItemUsed`, `EnemySpawned`, `EnemyDied`, `DoorEntered`, `TrainerActionExecuted`, `RunInvalidated`) are
 not emitted yet; they arrive with the milestone that verifies their data.
 

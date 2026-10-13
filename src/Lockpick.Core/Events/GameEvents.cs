@@ -10,6 +10,7 @@ namespace Lockpick.Core.Events;
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
 [JsonDerivedType(typeof(GameStarted), nameof(GameStarted))]
 [JsonDerivedType(typeof(GameStopped), nameof(GameStopped))]
+[JsonDerivedType(typeof(GameLoaded), nameof(GameLoaded))]
 [JsonDerivedType(typeof(RoomChanged), nameof(RoomChanged))]
 [JsonDerivedType(typeof(CameraChanged), nameof(CameraChanged))]
 [JsonDerivedType(typeof(PlayerHealthChanged), nameof(PlayerHealthChanged))]
@@ -29,6 +30,14 @@ public sealed record GameStarted(DateTimeOffset Timestamp, string GameName, stri
 public sealed record GameStopped(DateTimeOffset Timestamp, string Reason) : GameEvent(Timestamp)
 {
     public override string Describe() => $"Detached: {Reason}";
+}
+
+/// <summary>A new game began or a save was loaded, detected from discontinuities in the in-game timer.</summary>
+public sealed record GameLoaded(DateTimeOffset Timestamp, TimeSpan GameTime, bool IsNewGame) : GameEvent(Timestamp)
+{
+    public override string Describe() => IsNewGame
+        ? "New game started"
+        : $"Save loaded (in-game time {(int)GameTime.TotalHours:D2}:{GameTime.Minutes:D2}:{GameTime.Seconds:D2})";
 }
 
 public sealed record RoomChanged(DateTimeOffset Timestamp, RoomLocation From, RoomLocation To) : GameEvent(Timestamp)

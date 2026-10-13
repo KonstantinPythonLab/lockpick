@@ -15,21 +15,42 @@ public sealed class EventDetector
     private bool _roomLoading;
     private TimeSpan? _roomLoadTime;
 
+    // New game / load detection works on the in-game timer, which only runs during play: a new game resets
+    // it to ~0 and loading a save restores the saved value. The last valid value is kept across title-screen
+    // gaps so the load screen (which still shows the previous game's timer) does not count as a load.
+    private TimeSpan? _lastGameTime;
+    private DateTimeOffset _lastGameTimeAt;
+
+    /// <summary>A timer value below this when a session (re)starts means a new game rather than a save.</summary>
+    public static readonly TimeSpan NewGameThreshold = TimeSpan.FromSeconds(2);
+
+    /// <summary>Extra slack when deciding that the timer advanced faster than real time (i.e. a load).</summary>
+    public static readonly TimeSpan ForwardJumpTolerance = TimeSpan.FromSeconds(2);
+
     public void Reset()
     {
         _roomLoading = false;
         _roomLoadTime = null;
+        _lastGameTime = null;
+        _lastGameTimeAt = default;
     }
 
     public IReadOnlyList<GameEvent> Detect(GameSnapshot? previous, GameSnapshot current)
     {
         if (previous is null)
         {
+            // First snapshot after attaching: remember the timer, but a game already in progress is not a load.
+            RememberGameTime(current);
             return [];
         }
 
         var events = new List<GameEvent>(2);
         var at = current.CapturedAt;
+
+        if (DetectLoad(current) is { } loaded)
+        {
+            events.Add(loaded);
+        }
 
         bool sameRoom = previous.Location.TryGet(out var fromRoom)
             && current.Location.TryGet(out var toRoom)
@@ -79,6 +100,53 @@ public sealed class EventDetector
         }
 
         return events;
+    }
+
+    private GameLoaded? DetectLoad(GameSnapshot current)
+    {
+        if (!current.GameTime.TryGet(out var time))
+        {
+            return null;
+        }
+
+        var last = _lastGameTime;
+        var lastAt = _lastGameTimeAt;
+        RememberGameTime(current);
+
+        bool restarted;
+        if (last is null)
+        {
+            // Attached before any game was running (boot/title); the first in-game time starts a session.
+            restarted = true;
+        }
+        else if (time < last.Value)
+        {
+            restarted = true;
+        }
+        else
+        {
+            // The timer can't run faster than real time; a bigger forward jump is a later save being loaded.
+            var wall = current.CapturedAt - lastAt;
+            restarted = time - last.Value > wall + ForwardJumpTolerance;
+        }
+
+        if (!restarted)
+        {
+            return null;
+        }
+
+        // A new room-load cycle starts with the new session.
+        _roomLoading = false;
+        return new GameLoaded(current.CapturedAt, time, IsNewGame: time < NewGameThreshold);
+    }
+
+    private void RememberGameTime(GameSnapshot snapshot)
+    {
+        if (snapshot.GameTime.TryGet(out var time))
+        {
+            _lastGameTime = time;
+            _lastGameTimeAt = snapshot.CapturedAt;
+        }
     }
 
     private void UpdateRoomLoading(GameSnapshot current)

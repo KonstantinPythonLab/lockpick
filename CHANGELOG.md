@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- `GameLoaded` event (new game / save loaded), derived from in-game timer discontinuities and tested against two live
+  recordings; replay now detects events on recorded timestamps so playback speed can't fake a load.
+- Second live fixture: Jill session with death, New Game, a route through 1F/2F, healing and loading a save.
+- Profile: runtime-verified inventory slots, equipped slot and inventory pointer (read-only diagnostics).
+
 ## [0.1.0] - 2026-10-12
 
 **Foundation.** Verified live against GOG `ResidentEvil.exe` 1.0 hotfix4 in Chris and Jill games.
