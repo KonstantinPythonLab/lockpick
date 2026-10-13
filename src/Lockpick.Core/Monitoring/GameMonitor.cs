@@ -38,6 +38,7 @@ public sealed class GameMonitor : IGameStateSource
     private double _totalPollMs;
     private double _maxPollMs;
     private long _firstPollTimestamp;
+    private long _lastPollTimestamp;
 
     public GameMonitor(
         IGameAdapter adapter,
@@ -74,7 +75,8 @@ public sealed class GameMonitor : IGameStateSource
         {
             lock (_gate)
             {
-                var elapsed = _firstPollTimestamp == 0 ? 0 : Stopwatch.GetElapsedTime(_firstPollTimestamp).TotalSeconds;
+                // Measured between the first and last poll, so time spent detached doesn't dilute the rate.
+                var elapsed = _firstPollTimestamp == 0 ? 0 : Stopwatch.GetElapsedTime(_firstPollTimestamp, _lastPollTimestamp).TotalSeconds;
                 return new MonitorStatistics(
                     _polls,
                     _failedPolls,
@@ -353,9 +355,10 @@ public sealed class GameMonitor : IGameStateSource
     {
         lock (_gate)
         {
+            _lastPollTimestamp = Stopwatch.GetTimestamp();
             if (_polls == 0)
             {
-                _firstPollTimestamp = Stopwatch.GetTimestamp();
+                _firstPollTimestamp = _lastPollTimestamp;
             }
 
             _polls++;
@@ -375,7 +378,7 @@ public sealed class GameMonitor : IGameStateSource
         {
             _polls = _failedPolls = 0;
             _lastPollMs = _totalPollMs = _maxPollMs = 0;
-            _firstPollTimestamp = 0;
+            _firstPollTimestamp = _lastPollTimestamp = 0;
         }
     }
 }

@@ -7,6 +7,7 @@ was measured, with the method stated.
 |---|---|---|---|
 | State polling rate | ~30 Hz | **29.9 Hz** | `lockpick-probe watch`, live GOG game, 119 polls |
 | Poll cost (14 fields, cross-process) | small | **0.095 ms avg**, 6 ms max (first poll) | same run |
+| Long-run polling stability | no failures | **18,572 polls in ~625 s attached, 0 failed, 0.043 ms avg, 1.6 ms max** | `lockpick-probe watch`, 40-min session incl. game exit/restart |
 | Adapter + normalization per poll | — | **1.22 µs**, 1.2 KB allocated | BenchmarkDotNet `Re1SessionRead` (in-process memory) |
 | `ReadProcessMemory` (4 bytes) | — | **0.36 µs** | `Win32ReadBenchmarks` (self process) |
 | Exit check per poll | — | **0.23 µs** | `HasExitedCheck` |

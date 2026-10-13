@@ -186,6 +186,11 @@ public sealed class GameMonitorTests : IAsyncDisposable
         await monitor.StopAsync();
 
         Assert.Equal(ConnectionState.Stopped, monitor.Status.State);
-        Assert.True(monitor.Statistics.Polls > 1);
+        var stats = monitor.Statistics;
+        Assert.True(stats.Polls > 1);
+
+        // The rate must not decay after polling stops (it is measured between first and last poll).
+        await Task.Delay(200);
+        Assert.Equal(stats.MeasuredPollHz, monitor.Statistics.MeasuredPollHz, 3);
     }
 }
