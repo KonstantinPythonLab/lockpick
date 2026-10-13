@@ -90,7 +90,7 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `ci.yml` | push to main, PRs | Release build (warnings as errors), all tests, test results artifact; profile JSON validation; check no game binaries are tracked |
-| `codeql.yml` | push, PRs, weekly | CodeQL security analysis for C# |
+| `codeql.yml` | push, PRs, weekly | CodeQL security analysis for C# (skipped while the repository is private) |
 | `benchmarks.yml` | manual, weekly | BenchmarkDotNet short run, results artifact |
 | `release.yml` | tag `v*.*.*` or manual | Test, publish self-contained win-x64 app + probe, zip + SHA-256, GitHub release with CHANGELOG notes |
 | `dependabot.yml` | weekly | NuGet and GitHub Actions updates |
