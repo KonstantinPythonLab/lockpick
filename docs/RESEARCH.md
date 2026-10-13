@@ -32,6 +32,15 @@ Research date: 2026-10-12. No third-party code was copied into Lockpick.
   Black Tiger › Underground › Loud Room › (Lab) Tyrant › [Orgy Room, good ending] › End; the first split is
   "King Henry" (Jill NMG), "Rebecca Piano" (Chris NMG) or "Chemical Skip" (MG). A lead for route/split features (0.8+).
 
+## 0a. Voice and video
+
+`USA\Voice` holds the English voice-over as 563 plain WAV files (40.7 min, 22 kHz mono 16-bit; two 44.1 kHz stereo),
+named `vSSS_LL.wav` (31 groups; the group looks like a story scene, LL a line, hex). `USA\Movie` holds 27 AVI videos
+(Capcom logo, intro, endings). Only one room script plays a voice directly (`xa_on` in 704); cutscene voices come from
+the event scripts (`offsets[8]`, not parsed yet) — or can be identified in captures if the playing sound shows in the
+system block's 0x24-stride arrays. Plan: transcribe locally (speech-to-text) into the player's data folder; transcripts
+are the game's script, so like the game's text they stay local and are never committed (CI rejects audio/video files).
+
 ## 0b. Room files (RDT) — what each game flag means
 
 The game's room files (`USA\Stage1..7\ROOMsrrv.RDT`, s = stage, rr = room, v = 0 Chris / 1 Jill) contain init and

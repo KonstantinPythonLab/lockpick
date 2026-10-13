@@ -75,6 +75,6 @@ jobs:
 
       - name: No game binaries or assets are committed
         run: |
-          bad=$(git ls-files | grep -iE '\.(exe|dll|rdt|pak|pix|tim|emd|emw|tmd|bss|dat)$' || true)
+          bad=$(git ls-files | grep -iE '\.(exe|dll|rdt|pak|pix|tim|emd|emw|tmd|bss|dat|wav|avi|xa|vh|vb|bmp)$' || true)
           if [ -n "$bad" ]; then echo "Game/binary files must not be committed:"; echo "$bad"; exit 1; fi
           echo "No game binaries tracked."
