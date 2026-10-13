@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Lockpick.App.ViewModels"
+        xmlns:c="using:Lockpick.App.Controls"
+        x:Class="Lockpick.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Lockpick Trainer"
+        Width="1180" Height="780" MinWidth="380" MinHeight="480"
+        WindowStartupLocation="CenterScreen">
+
+  <Window.Styles>
+    <Style Selector="Border.navpane"><Setter Property="Width" Value="180" /></Style>
+    <Style Selector="ContentControl.page"><Setter Property="Margin" Value="16" /></Style>
+    <Style Selector="Border.header"><Setter Property="Padding" Value="18,12" /></Style>
+    <Style Selector="TextBlock.wordmark"><Setter Property="FontSize" Value="22" /><Setter Property="LetterSpacing" Value="6" /></Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected c|LucideIcon"><Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" /></Style>
+    <!-- Compact layout for narrow/portrait windows: icon-only navigation rail, no tagline. -->
+    <Style Selector="Grid#Shell.compact TextBlock.tagline"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="Grid#Shell.compact Border.navpane"><Setter Property="Width" Value="56" /></Style>
+    <Style Selector="Grid#Shell.compact TextBlock.navlabel"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="Grid#Shell.compact TextBlock.version"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="Grid#Shell.compact ListBox.nav ListBoxItem"><Setter Property="Padding" Value="10,10" /></Style>
+    <Style Selector="Grid#Shell.compact ContentControl.page"><Setter Property="Margin" Value="8" /></Style>
+    <Style Selector="Grid#Shell.compact TextBlock.wordmark"><Setter Property="FontSize" Value="18" /><Setter Property="LetterSpacing" Value="4" /></Style>
+    <Style Selector="Grid#Shell.compact Border.header"><Setter Property="Padding" Value="12,10" /></Style>
+  </Window.Styles>
+
+  <Grid x:Name="Shell" RowDefinitions="Auto,*" c:Responsive.CompactBelow="760">
+    <!-- Header -->
+    <Border Grid.Row="0" Classes="header" Background="{StaticResource LpPanelBrush}" BorderBrush="{StaticResource LpBorderBrush}" BorderThickness="0,0,0,1">
+      <DockPanel>
+        <Border DockPanel.Dock="Right" VerticalAlignment="Center" CornerRadius="2" Padding="10,4"
+                Background="{StaticResource LpPanelAltBrush}"
+                Classes.connected="{Binding IsConnected}" Classes.unsupported="{Binding IsUnsupported}" Classes.replay="{Binding IsReplaying}">
+          <Border.Styles>
+            <Style Selector="Border.connected"><Setter Property="Background" Value="{StaticResource LpGreenDimBrush}" /></Style>
+            <Style Selector="Border.connected TextBlock"><Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" /></Style>
+            <Style Selector="Border.connected Ellipse"><Setter Property="Fill" Value="{StaticResource LpGreenBrush}" /></Style>
+            <Style Selector="Border.unsupported"><Setter Property="Background" Value="{StaticResource LpRedDimBrush}" /></Style>
+            <Style Selector="Border.unsupported TextBlock"><Setter Property="Foreground" Value="{StaticResource LpRedBrush}" /></Style>
+            <Style Selector="Border.unsupported Ellipse"><Setter Property="Fill" Value="{StaticResource LpRedBrush}" /></Style>
+            <Style Selector="Border.replay"><Setter Property="Background" Value="{StaticResource LpAmberDimBrush}" /></Style>
+            <Style Selector="Border.replay TextBlock"><Setter Property="Foreground" Value="{StaticResource LpAmberBrush}" /></Style>
+            <Style Selector="Border.replay Ellipse"><Setter Property="Fill" Value="{StaticResource LpAmberBrush}" /></Style>
+          </Border.Styles>
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Ellipse Width="8" Height="8" Fill="{StaticResource LpMutedBrush}" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding HeaderStatus}" FontSize="11" FontWeight="SemiBold" LetterSpacing="1.4" Foreground="{StaticResource LpMutedBrush}" />
+          </StackPanel>
+        </Border>
+        <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+          <TextBlock Classes="wordmark" Text="LOCKPICK" FontWeight="Black" Foreground="{StaticResource LpGreenBrush}" VerticalAlignment="Center" />
+          <TextBlock Classes="tagline" Text="Master of Unlocking." FontStyle="Italic" Foreground="{StaticResource LpMutedBrush}" VerticalAlignment="Center" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+      <!-- Navigation -->
+      <Border Grid.Column="0" Classes="navpane" Background="{StaticResource LpPanelBrush}" BorderBrush="{StaticResource LpBorderBrush}" BorderThickness="0,0,1,0" Padding="8,12">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Bottom" Text="{Binding Version}" Classes="label version" Margin="10,0" FontSize="11" TextTrimming="CharacterEllipsis" />
+          <ListBox Classes="nav" ItemsSource="{Binding Pages}" SelectedItem="{Binding SelectedPage}">
+            <ListBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:PageViewModel">
+                <StackPanel Orientation="Horizontal" Spacing="10" ToolTip.Tip="{Binding Title}">
+                  <c:LucideIcon Data="{Binding IconKey, Converter={x:Static c:IconKeyConverter.Instance}}" Width="18" Height="18" VerticalAlignment="Center" />
+                  <TextBlock Classes="navlabel" Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+      </Border>
+
+      <!-- Page content -->
+      <ContentControl Grid.Column="1" Classes="page" Content="{Binding SelectedPage}" />
+    </Grid>
+  </Grid>
+</Window>

@@ -1,0 +1,25 @@
+name: Bug report
+description: Something in Lockpick behaves incorrectly.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce (in game and in Lockpick)
+  - type: input
+    id: version
+    attributes:
+      label: Lockpick version
+      placeholder: shown at the bottom of the navigation bar, e.g. v0.1.0
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt
+      description: From %LOCALAPPDATA%\Lockpick\logs (Diagnostics page shows the path). A session recording (Diagnostics → Start recording) helps a lot.
+      render: text

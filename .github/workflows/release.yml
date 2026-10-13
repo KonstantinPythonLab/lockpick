@@ -1,0 +1,77 @@
+name: Release
+
+# Push a tag like v0.1.0 to build, test and publish a GitHub release.
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to build (without the leading v), e.g. 0.1.0
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $v = if ('${{ github.event_name }}' -eq 'workflow_dispatch') { '${{ inputs.version }}' } else { '${{ github.ref_name }}'.TrimStart('v') }
+          "value=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Test
+        run: dotnet test tests/Lockpick.Tests -c Release -p:Version=${{ steps.version.outputs.value }}
+
+      - name: Publish app (self-contained, win-x64)
+        run: >
+          dotnet publish src/Lockpick.App -c Release -r win-x64 --self-contained true
+          -p:Version=${{ steps.version.outputs.value }}
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish/Lockpick
+
+      - name: Publish probe tool
+        run: >
+          dotnet publish tools/Lockpick.Probe -c Release -r win-x64 --self-contained false
+          -p:Version=${{ steps.version.outputs.value }} -o publish/Lockpick/tools
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Copy-Item README.md, LICENSE, CHANGELOG.md, THIRD_PARTY_NOTICES.md publish/Lockpick/
+          Compress-Archive -Path publish/Lockpick/* -DestinationPath "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip"
+          (Get-FileHash "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip" -Algorithm SHA256).Hash | Out-File -Encoding ascii "Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256"
+
+      - name: Extract release notes
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.value }}'
+          $text = Get-Content CHANGELOG.md -Raw
+          $m = [regex]::Match($text, "(?ms)^## \[$([regex]::Escape($v))\].*?(?=^## \[|\z)")
+          ($(if ($m.Success) { $m.Value } else { "Lockpick $v" })) | Out-File -Encoding utf8 release-notes.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.value }}
+          name: Lockpick ${{ steps.version.outputs.value }}
+          body_path: release-notes.md
+          prerelease: ${{ startsWith(steps.version.outputs.value, '0.') }}
+          files: |
+            Lockpick-${{ steps.version.outputs.value }}-win-x64.zip
+            Lockpick-${{ steps.version.outputs.value }}-win-x64.zip.sha256

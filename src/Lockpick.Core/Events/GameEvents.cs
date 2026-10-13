@@ -1,0 +1,54 @@
+using System.Text.Json.Serialization;
+using Lockpick.Core.State;
+
+namespace Lockpick.Core.Events;
+
+/// <summary>
+/// Base type for typed game events. Events are only raised when they can be derived from
+/// verified (<see cref="FieldStatus.Valid"/>) data on both sides of a change.
+/// </summary>
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(GameStarted), nameof(GameStarted))]
+[JsonDerivedType(typeof(GameStopped), nameof(GameStopped))]
+[JsonDerivedType(typeof(RoomChanged), nameof(RoomChanged))]
+[JsonDerivedType(typeof(CameraChanged), nameof(CameraChanged))]
+[JsonDerivedType(typeof(PlayerHealthChanged), nameof(PlayerHealthChanged))]
+[JsonDerivedType(typeof(PlayerDamaged), nameof(PlayerDamaged))]
+public abstract record GameEvent(DateTimeOffset Timestamp)
+{
+    public abstract string Describe();
+}
+
+/// <summary>Lockpick attached to a running, supported game process.</summary>
+public sealed record GameStarted(DateTimeOffset Timestamp, string GameName, string ProfileId, int ProcessId) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"Attached to {GameName} (profile {ProfileId}, PID {ProcessId})";
+}
+
+/// <summary>The attached game process exited or Lockpick detached from it.</summary>
+public sealed record GameStopped(DateTimeOffset Timestamp, string Reason) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"Detached: {Reason}";
+}
+
+public sealed record RoomChanged(DateTimeOffset Timestamp, RoomLocation From, RoomLocation To) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"Room {From} → {To}";
+}
+
+/// <summary>Camera (cut) changed while the player stayed in the same room.</summary>
+public sealed record CameraChanged(DateTimeOffset Timestamp, RoomLocation Room, int From, int To) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"Camera {From} → {To} in room {Room}";
+}
+
+public sealed record PlayerHealthChanged(DateTimeOffset Timestamp, int From, int To) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"HP {From} → {To}";
+}
+
+/// <summary>Health dropped while the player stayed in the same room.</summary>
+public sealed record PlayerDamaged(DateTimeOffset Timestamp, int Amount, int Remaining) : GameEvent(Timestamp)
+{
+    public override string Describe() => $"Damaged for {Amount} (HP {Remaining})";
+}

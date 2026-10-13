@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Lockpick.GameAdapter.RE1</RootNamespace>
+    <Description>Resident Evil (1996, PC) game adapter: build profiles and state interpretation.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lockpick.Core\Lockpick.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- data/ is the source of truth; profiles are embedded so the app works without loose files. -->
+    <EmbeddedResource Include="..\..\data\games\re1\profiles\*.json" LogicalName="Lockpick.GameAdapter.RE1.Profiles.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Lockpick.Tests" />
+  </ItemGroup>
+</Project>

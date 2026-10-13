@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build-test:
+    name: Build and test (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Lockpick.sln
+
+      - name: Build (warnings are errors)
+        run: dotnet build Lockpick.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test tests/Lockpick.Tests -c Release --no-build --logger "trx;LogFileName=results.trx" --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/
+
+  data:
+    name: Validate data and repository hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Profiles are valid JSON (comments allowed)
+        run: |
+          python3 - <<'EOF'
+          import glob, json, re, sys
+          ok = True
+          for path in glob.glob("data/games/**/*.json", recursive=True):
+              text = re.sub(r"^\s*//.*$", "", open(path, encoding="utf-8").read(), flags=re.M)
+              try:
+                  json.loads(text)
+                  print(f"ok   {path}")
+              except json.JSONDecodeError as e:
+                  ok = False
+                  print(f"FAIL {path}: {e}")
+          sys.exit(0 if ok else 1)
+          EOF
+
+      - name: No game binaries or assets are committed
+        run: |
+          bad=$(git ls-files | grep -iE '\.(exe|dll|rdt|pak|pix|tim|emd|emw|tmd|bss|dat)$' || true)
+          if [ -n "$bad" ]; then echo "Game/binary files must not be committed:"; echo "$bad"; exit 1; fi
+          echo "No game binaries tracked."

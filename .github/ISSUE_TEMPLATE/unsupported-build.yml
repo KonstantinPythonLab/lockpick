@@ -1,0 +1,32 @@
+name: Unsupported game build
+description: Lockpick says your game build is unsupported or failed verification.
+labels: [compatibility]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Lockpick only reads builds it has a verified address profile for. Run
+        `lockpick-probe identify "<path to game exe>"` and paste the output below.
+        Never attach game files to an issue.
+  - type: textarea
+    id: identify
+    attributes:
+      label: lockpick-probe identify output
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: store
+    attributes:
+      label: Store / edition and version
+      placeholder: e.g. GOG 1.0 hotfix5, Steam, original CD (EU), Classic REbirth
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Game language
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else (patches, wrappers, mods installed)

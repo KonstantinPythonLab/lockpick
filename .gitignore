@@ -1,0 +1,33 @@
+# Build output
+bin/
+obj/
+artifacts/
+publish/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+
+# Test / benchmark output
+TestResults/
+BenchmarkDotNet.Artifacts/
+*.trx
+coverage*/
+
+# Runtime output written next to the app
+logs/
+recordings/
+*.log
+
+# Never commit game data or binaries
+*.RDT
+*.rdt
+*.pak
+*.PAK
+*.exe
+*.dll
+*.pix
+*.tim
+*.emd
+savedat*.dat

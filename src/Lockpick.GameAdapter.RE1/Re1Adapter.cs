@@ -1,0 +1,69 @@
+using System.Reflection;
+using Lockpick.Core.Adapters;
+using Lockpick.Core.Fingerprinting;
+using Lockpick.Core.Memory;
+using Lockpick.Core.Processes;
+using Lockpick.Core.Profiles;
+
+namespace Lockpick.GameAdapter.RE1;
+
+/// <summary>Adapter for the original Resident Evil (1996) PC release.</summary>
+public sealed class Re1Adapter : IGameAdapter
+{
+    public const string Id = "re1";
+
+    /// <summary>GOG product id of "Resident Evil" (used to locate the install via the registry).</summary>
+    public const string GogProductId = "1580232252";
+
+    private const string ResourcePrefix = "Lockpick.GameAdapter.RE1.Profiles.";
+
+    public Re1Adapter(IEnumerable<VersionProfile>? additionalProfiles = null)
+    {
+        var profiles = LoadEmbeddedProfiles().ToList();
+        foreach (var extra in additionalProfiles ?? [])
+        {
+            if (extra.GameId != Id)
+            {
+                continue;
+            }
+
+            // A user-supplied profile with the same id overrides the built-in one.
+            profiles.RemoveAll(p => p.Id == extra.Id);
+            profiles.Add(extra);
+        }
+
+        Profiles = profiles;
+    }
+
+    public string GameId => Id;
+
+    public string DisplayName => "Resident Evil";
+
+    public IReadOnlyCollection<string> ExecutableNames { get; } = ["ResidentEvil.exe"];
+
+    public IReadOnlyList<VersionProfile> Profiles { get; }
+
+    public ProfileMatch Identify(ExecutableFingerprint fingerprint) => ProfileMatcher.Match(Profiles, fingerprint);
+
+    public IGameSession Attach(IAttachedProcess process, VersionProfile profile)
+    {
+        var problems = ImageVerifier.Verify(process, profile);
+        if (problems.Count > 0)
+        {
+            throw new AttachRejectedException($"Running image does not match profile {profile.Id}: {string.Join("; ", problems)}");
+        }
+
+        return new Re1Session(new ValidatedMemory(process, ImageVerifier.AllowedRanges(profile)), profile);
+    }
+
+    public static IEnumerable<VersionProfile> LoadEmbeddedProfiles()
+    {
+        var assembly = typeof(Re1Adapter).Assembly;
+        foreach (var name in assembly.GetManifestResourceNames().Where(n => n.StartsWith(ResourcePrefix, StringComparison.Ordinal)).Order(StringComparer.Ordinal))
+        {
+            using var stream = assembly.GetManifestResourceStream(name)
+                ?? throw new InvalidOperationException($"Missing embedded profile {name}.");
+            yield return ProfileLoader.Load(stream);
+        }
+    }
+}

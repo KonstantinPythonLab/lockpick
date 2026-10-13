@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>Lockpick.Probe</RootNamespace>
+    <AssemblyName>lockpick-probe</AssemblyName>
+    <Description>Headless detection, monitoring and recording tool for validating Lockpick against a live game.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Lockpick.Core\Lockpick.Core.csproj" />
+    <ProjectReference Include="..\..\src\Lockpick.Platform.Windows\Lockpick.Platform.Windows.csproj" />
+    <ProjectReference Include="..\..\src\Lockpick.GameAdapter.RE1\Lockpick.GameAdapter.RE1.csproj" />
+  </ItemGroup>
+</Project>

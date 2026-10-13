@@ -1,0 +1,161 @@
+{
+  // Resident Evil (1996) PC — GOG release, USA/English data, GOG build "1.0 hotfix4" (GOG build id 59172465945261369).
+  // Addresses are absolute VAs (image base 0x400000, no ASLR: DllCharacteristics = 0).
+  // Verification levels: "static" = confirmed by disassembling this exact executable;
+  // "runtime" = additionally observed behaving correctly in the live game; "unverified" = lead only, never shown as game state.
+  "schemaVersion": 1,
+  "id": "re1-gog-usa-hotfix4",
+  "gameId": "re1",
+  "displayName": "Resident Evil (GOG, USA, 1.0 hotfix4)",
+  "executable": {
+    "fileName": "ResidentEvil.exe",
+    "fileSize": 1004112,
+    "sha256": "205BD6FED6E080A38823958E5C3306CACC86A18FF9A2758179E8D33CAEEE4A78",
+    "machine": "x86",
+    "timeDateStamp": "0x33FD5643",
+    "imageBase": "0x400000",
+    "sizeOfImage": "0x49B2000"
+  },
+  "anchors": [
+    { "name": "room loader reads stage", "address": "0x477DA4", "bytes": "A0 20 98 BE 00", "evidence": "mov al,[0xBE9820] feeding the './usa/stage /room    .rdt' filename template" },
+    { "name": "room loader reads room", "address": "0x477DBB", "bytes": "A0 21 98 BE 00", "evidence": "mov al,[0xBE9821] split into the two room hex digits of the RDT filename" },
+    { "name": "background loader reads camera", "address": "0x462A4C", "bytes": "A0 22 98 BE 00", "evidence": "mov al,[0xBE9822] written into the cut digit of the 'RC' background filename" },
+    { "name": "frame loop increments game timer", "address": "0x4810D1", "bytes": "FF 05 30 27 D2 00", "evidence": "inc dword [0xD22730]" },
+    { "name": "death check reads HP", "address": "0x40615E", "bytes": "66 83 3D 6C 63 BE 00 00", "evidence": "cmp word [0xBE636C],0" },
+    { "name": "heal clamp reads max HP", "address": "0x401285", "bytes": "66 0F B6 35 59 64 BE 00", "evidence": "movzx si,byte [0xBE6459] then compared with HP" },
+    { "name": "new game stores character", "address": "0x4817B1", "bytes": "88 15 E5 62 BE 00", "evidence": "mov [0xBE62E5],dl (selected character)" },
+    { "name": "game start sets state flag 0x2000000", "address": "0x480B53", "bytes": "81 0D C0 41 BE 00 00 00 00 02", "evidence": "or dword [0xBE41C0],0x2000000" },
+    { "name": "player X read", "address": "0x40582E", "bytes": "A1 18 63 BE 00", "evidence": "mov eax,[0xBE6318]" }
+  ],
+  "fields": [
+    {
+      "name": "stage",
+      "address": "0xBE9820",
+      "type": "u8",
+      "verification": "runtime",
+      "description": "Current stage, 0-based (0 = STAGE1).",
+      "evidence": "Live GOG session 2026-10-12: 0 while in the main hall and dining room (STAGE1). Static: Room loader at 0x477DA4 indexes '0123456789abcdef' with stage+1 and writes the digit into './usa/stage /room    .rdt' (0x4C44F8) at both stage positions. Byte-width access at all 122 references.",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp BioCard.h g_stageId", "deserteagle417/RE1-Autosplitter stageID (EnglishGOG)"]
+    },
+    {
+      "name": "room",
+      "address": "0xBE9821",
+      "type": "u8",
+      "verification": "runtime",
+      "description": "Current room number within the stage (the two hex digits of ROOMsRRp.RDT).",
+      "evidence": "Live GOG session 2026-10-12: 0x06 in the main hall, 0x05 after walking through the dining-room door (ROOM106x/ROOM105x). Static: Room loader at 0x477DBB splits the byte into high/low nibbles and writes them into the RDT filename template.",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter roomID"]
+    },
+    {
+      "name": "camera",
+      "address": "0xBE9822",
+      "type": "u8",
+      "verification": "runtime",
+      "description": "Current camera (cut) number in the room.",
+      "evidence": "Live GOG session 2026-10-12: cycled 0,1,2,5,6 in room 106 and 0..4 in room 105 as the player walked between fixed cameras. Static: Background loader at 0x462A4C writes the value into the cut digit of '.\\usa\\stageS\\rcSRRC.pak' (0x4C2078); files RC1000..RC1005 exist for room 00.",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp BioCard.h", "Gemini-Loboto3/RE1-Mod-SDK Cut_no (layout)"]
+    },
+    {
+      "name": "hp",
+      "address": "0xBE636C",
+      "type": "i16",
+      "verification": "runtime",
+      "description": "Player current HP (player entity +0x88).",
+      "evidence": "Live GOG session 2026-10-12: 140 at New Game as Chris; zombie bites in room 104 lowered it 140 -> 130 -> ... -> 10 -> 0 -> -10 (signed, overshoots below zero at death). Static: 154 word-width references; death checks 'cmp word [0xBE636C],0' (e.g. 0x40615E); heal clamp at 0x401285 compares it with max HP.",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Entities.h health @0x88", "deserteagle417/RE1-Autosplitter hp"]
+    },
+    {
+      "name": "maxHp",
+      "address": "0xBE6459",
+      "type": "u8",
+      "verification": "runtime",
+      "description": "Player maximum HP (player entity +0x175).",
+      "evidence": "Live GOG session 2026-10-12: 0 at boot, 140 after starting a Chris game. Static: Heal clamp at 0x401285 loads it and compares with HP; partner-swap code writes 0x8C (140) at 0x477938.",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h g_PlayerMaxHealth"]
+    },
+    {
+      "name": "character",
+      "address": "0xBE62E5",
+      "type": "u8",
+      "mask": "0x03",
+      "verification": "runtime",
+      "description": "Player character id (player entity +0x01). After masking: 0 Chris, 1 Jill, 3 Rebecca. Bit 0x08 = alternate costume.",
+      "evidence": "Live GOG session 2026-10-12: 0 (Chris) in a Chris game; Jill/Rebecca values not yet observed live. Static: New-game setup at 0x4817B1 stores the select-screen choice here; the room loader copies the character byte from 0xBE9829 (0x4778BD); id 3 triggers the Rebecca swap path (cmp al,3 at 0x4778C2).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Types.h CHAR_CHRIS/CHAR_JILL/CHAR_REBECCA"]
+    },
+    {
+      "name": "gameTimer",
+      "address": "0xD22730",
+      "type": "u32",
+      "verification": "runtime",
+      "description": "In-game time in frames at 30 per second.",
+      "evidence": "Live GOG session 2026-10-12: advanced at 30.2 frames/s of wall time during free movement; frozen during menus and door transitions. Static: Incremented by 'inc dword [0xD22730]' at 0x4810D1 and 0x4AEFC8; zeroed on new game (0x48090A); restored from the save copy 0xBE9844 on load (0x430695). The results screen divides the saved copy by 0x1A5E0 (108000 = 1 h at 30/s) and 0x708 (1800 = 1 min).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h Game_timer"]
+    },
+    {
+      "name": "stateFlags",
+      "address": "0xBE41C0",
+      "type": "u32",
+      "verification": "static",
+      "description": "Main state bitfield (diagnostics only). 0x00800000 = Jill RDT variant. 0x02000000 is NOT a gameplay flag: live it is set only around game start and door transitions. 0x04000000 is set during door transitions, 0x00008000 while menus are open.",
+      "evidence": "0x2000000 is OR-ed in by game start (0x480B53, 0x41B5AA); 0x1000000 at 0x481906; 0x800000 selects ROOMxxx1.RDT in the room loader (0x477DE6) and is set when a non-Chris character is chosen (0x4817CE). Live 2026-10-12: free movement 0x8011000C/0x8013000C (room 106) and 0x80000000 (room 105); menus 0x80400000 -> 0x60400000 -> 0x80008000 -> 0x40000000; door 0x6601000C -> 0x46010000; title 0x0/0x40000000/0x80000000; death 0x8100000C (0x01000000 set at HP -10).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h g_main_state_flags", "Gemini-Loboto3/RE1-Mod-SDK STFLG_JILL"]
+    },
+    {
+      "name": "positionX",
+      "address": "0xBE6318",
+      "type": "i32",
+      "verification": "runtime",
+      "description": "Player world X (player entity +0x34).",
+      "evidence": "Live GOG session 2026-10-12: changed continuously while walking; jumps to (2400, -700) while menus are open. Static: Dword reads/writes (e.g. 0x40582E); part of the player entity at 0xBE62E4 (+0x34).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Entities.h", "Gemini-Loboto3/RE1-Mod-SDK Pos_x (layout)"]
+    },
+    {
+      "name": "positionY",
+      "address": "0xBE631C",
+      "type": "i32",
+      "verification": "static",
+      "description": "Player world Y (vertical, player entity +0x38).",
+      "evidence": "Dword reads/writes (e.g. 0x4123FB, 0x413D14).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Entities.h"]
+    },
+    {
+      "name": "positionZ",
+      "address": "0xBE6320",
+      "type": "i32",
+      "verification": "runtime",
+      "description": "Player world Z (player entity +0x3C).",
+      "evidence": "Live GOG session 2026-10-12: changed continuously while walking. Static: Dword reads (e.g. 0x405816).",
+      "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Entities.h"]
+    },
+    {
+      "name": "yaw",
+      "address": "0xBE6358",
+      "type": "i16",
+      "verification": "unverified",
+      "description": "Player facing (player entity +0x74). Units not confirmed.",
+      "sources": ["ecruells/resident-evil-pc-decomp Entities.h", "Gemini-Loboto3/RE1-Mod-SDK Cdir_y (layout)"]
+    },
+    {
+      "name": "mainMenu",
+      "address": "0xD22777",
+      "type": "u8",
+      "verification": "runtime",
+      "description": "1 while the title/main menu is shown, 0 during a game.",
+      "evidence": "Live GOG session 2026-10-12: 1 at the title menu, 0 throughout gameplay, 0 during boot logos. Static: 4 byte-width references including 'mov byte [0xD22777],1'. After dying, it became 1 at the title and returned to 0 on New Game.",
+      "sources": ["deserteagle417/RE1-Autosplitter mainMenu (EnglishGOG)"]
+    },
+    {
+      "name": "enemyCount",
+      "address": "0xBE41E2",
+      "type": "u8",
+      "verification": "unverified",
+      "description": "Active enemy count (enemy array of 30 x 0x18C at 0xBE6464).",
+      "sources": ["ecruells/resident-evil-pc-decomp Globals.h", "Gemini-Loboto3/RE1-Mod-SDK Enemy_count (layout)"]
+    }
+  ],
+  "notes": [
+    "The RE1-Autosplitter EnglishGOG block expects ModuleMemorySize 0x49B3000; this build's SizeOfImage is 0x49B2000, so it is a different GOG revision. Its 'time' (0x4D46D4) is only a copy written at 0x4298AB; the live timer is 0xD22730.",
+    "Classic REbirth targets the Japanese Mediakite build and is not used by this GOG install (ddraw.dll is the GOG DirectX wrapper)."
+  ]
+}

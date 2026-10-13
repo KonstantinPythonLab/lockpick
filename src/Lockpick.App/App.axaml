@@ -1,0 +1,182 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Lockpick.App.ViewModels"
+             xmlns:views="using:Lockpick.App.Views"
+             xmlns:c="using:Lockpick.App.Controls"
+             x:Class="Lockpick.App.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="avares://Lockpick/Assets/Icons.axaml" />
+      </ResourceDictionary.MergedDictionaries>
+    <!-- Palette: dark laboratory terminal, restrained green status, red warnings. -->
+    <Color x:Key="LpBg">#0A0D0B</Color>
+    <Color x:Key="LpPanel">#111612</Color>
+    <Color x:Key="LpPanelAlt">#151C17</Color>
+    <Color x:Key="LpBorder">#223027</Color>
+    <Color x:Key="LpText">#D4DCD6</Color>
+    <Color x:Key="LpMuted">#7B897F</Color>
+    <Color x:Key="LpGreen">#4FBF78</Color>
+    <Color x:Key="LpGreenDim">#173323</Color>
+    <Color x:Key="LpAmber">#D6A23E</Color>
+    <Color x:Key="LpAmberDim">#3A2D12</Color>
+    <Color x:Key="LpRed">#D9474B</Color>
+    <Color x:Key="LpRedDim">#3B1517</Color>
+    <SolidColorBrush x:Key="LpBgBrush" Color="{StaticResource LpBg}" />
+    <SolidColorBrush x:Key="LpPanelBrush" Color="{StaticResource LpPanel}" />
+    <SolidColorBrush x:Key="LpPanelAltBrush" Color="{StaticResource LpPanelAlt}" />
+    <SolidColorBrush x:Key="LpBorderBrush" Color="{StaticResource LpBorder}" />
+    <SolidColorBrush x:Key="LpTextBrush" Color="{StaticResource LpText}" />
+    <SolidColorBrush x:Key="LpMutedBrush" Color="{StaticResource LpMuted}" />
+    <SolidColorBrush x:Key="LpGreenBrush" Color="{StaticResource LpGreen}" />
+    <SolidColorBrush x:Key="LpGreenDimBrush" Color="{StaticResource LpGreenDim}" />
+    <SolidColorBrush x:Key="LpAmberBrush" Color="{StaticResource LpAmber}" />
+    <SolidColorBrush x:Key="LpAmberDimBrush" Color="{StaticResource LpAmberDim}" />
+    <SolidColorBrush x:Key="LpRedBrush" Color="{StaticResource LpRed}" />
+    <SolidColorBrush x:Key="LpRedDimBrush" Color="{StaticResource LpRedDim}" />
+    <FontFamily x:Key="LpMono">Cascadia Mono, Consolas, Courier New</FontFamily>
+    </ResourceDictionary>
+  </Application.Resources>
+
+  <Application.DataTemplates>
+    <DataTemplate DataType="vm:DashboardViewModel">
+      <views:DashboardView />
+    </DataTemplate>
+    <DataTemplate DataType="vm:DiagnosticsViewModel">
+      <views:DiagnosticsView />
+    </DataTemplate>
+    <DataTemplate DataType="vm:SettingsViewModel">
+      <views:SettingsView />
+    </DataTemplate>
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <FluentTheme />
+
+    <Style Selector="Window">
+      <Setter Property="Background" Value="{StaticResource LpBgBrush}" />
+      <Setter Property="Foreground" Value="{StaticResource LpTextBrush}" />
+    </Style>
+
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="{StaticResource LpPanelBrush}" />
+      <Setter Property="BorderBrush" Value="{StaticResource LpBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Padding" Value="14,12" />
+    </Style>
+
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="1.6" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+    <Style Selector="StackPanel.cardhead">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="Spacing" Value="8" />
+      <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+    <Style Selector="StackPanel.cardhead > TextBlock.caption">
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="StackPanel.cardhead > c|LucideIcon">
+      <Setter Property="Width" Value="14" />
+      <Setter Property="Height" Value="14" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.mono, SelectableTextBlock.mono">
+      <Setter Property="FontFamily" Value="{StaticResource LpMono}" />
+      <Setter Property="FontSize" Value="12.5" />
+    </Style>
+    <Style Selector="TextBlock.value">
+      <Setter Property="FontFamily" Value="{StaticResource LpMono}" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBlock.headline">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="LetterSpacing" Value="2" />
+    </Style>
+
+    <!-- Field quality chips -->
+    <Style Selector="Border.chip">
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Padding" Value="6,1" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="Background" Value="{StaticResource LpPanelAltBrush}" />
+    </Style>
+    <Style Selector="Border.chip > TextBlock">
+      <Setter Property="FontSize" Value="10" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="1.2" />
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+    <Style Selector="Border.chip.valid">
+      <Setter Property="Background" Value="{StaticResource LpGreenDimBrush}" />
+    </Style>
+    <Style Selector="Border.chip.valid > TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" />
+    </Style>
+    <Style Selector="Border.chip.stale">
+      <Setter Property="Background" Value="{StaticResource LpAmberDimBrush}" />
+    </Style>
+    <Style Selector="Border.chip.stale > TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource LpAmberBrush}" />
+    </Style>
+    <Style Selector="Border.chip.bad">
+      <Setter Property="Background" Value="{StaticResource LpRedDimBrush}" />
+    </Style>
+    <Style Selector="Border.chip.bad > TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource LpRedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.inactive">
+      <Setter Property="Foreground" Value="{StaticResource LpMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.warning, SelectableTextBlock.warning">
+      <Setter Property="Foreground" Value="{StaticResource LpRedBrush}" />
+    </Style>
+
+    <!-- Navigation -->
+    <Style Selector="ListBox.nav">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem">
+      <Setter Property="Padding" Value="14,9" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Margin" Value="0,1" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource LpGreenDimBrush}" />
+    </Style>
+    <Style Selector="ListBox.nav ListBoxItem:selected TextBlock">
+      <Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" />
+    </Style>
+
+    <Style Selector="ProgressBar.health">
+      <Setter Property="Foreground" Value="{StaticResource LpGreenBrush}" />
+      <Setter Property="Background" Value="{StaticResource LpPanelAltBrush}" />
+      <Setter Property="MinHeight" Value="6" />
+      <Setter Property="Height" Value="6" />
+      <Setter Property="CornerRadius" Value="1" />
+    </Style>
+    <Style Selector="ProgressBar.health.low">
+      <Setter Property="Foreground" Value="{StaticResource LpAmberBrush}" />
+    </Style>
+    <Style Selector="ProgressBar.health.critical">
+      <Setter Property="Foreground" Value="{StaticResource LpRedBrush}" />
+    </Style>
+  </Application.Styles>
+</Application>

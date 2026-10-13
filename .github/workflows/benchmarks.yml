@@ -1,0 +1,35 @@
+name: Benchmarks
+
+# Manual and weekly. Hosted runners are noisy: use the trend, not single numbers, and record
+# authoritative measurements from a local machine in docs/PERFORMANCE.md.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  bench:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Run benchmarks
+        run: dotnet run -c Release --project benchmarks/Lockpick.Benchmarks -- --filter "*" --job short --artifacts bench-results
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: bench-results/results/
