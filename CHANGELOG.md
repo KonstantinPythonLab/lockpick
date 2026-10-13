@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-10-13
+
 ### Added
 - Bounty automation: `data/bounties.json` is the source of truth and `docs/CAPTURE_BOUNTIES.md` is generated;
   `tools/bounties/bounties.py` analyzes capture zips and records findings (only unambiguous ones verify a bounty
