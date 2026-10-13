@@ -39,13 +39,15 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--movies", action="store_true", help="also transcribe the AVI videos")
     parser.add_argument("--model", default="large-v3")
     parser.add_argument("--out", type=Path, default=OUT)
+    parser.add_argument("--beam", type=int, default=0, help="beam search width (e.g. 5): slower, more accurate")
+    parser.add_argument("--name", default="transcripts", help="output file name (to keep several passes side by side)")
     args = parser.parse_args(argv)
 
     import torch  # noqa: PLC0415 - heavy imports only when transcribing
     import whisper  # noqa: PLC0415
 
     args.out.mkdir(parents=True, exist_ok=True)
-    jsonl = args.out / "transcripts.jsonl"
+    jsonl = args.out / f"{args.name}.jsonl"
     done = set()
     if jsonl.exists():
         done = {json.loads(line)["file"] for line in jsonl.read_text(encoding="utf-8").splitlines() if line.strip()}
@@ -53,7 +55,7 @@ def main(argv: list[str]) -> int:
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"{len(todo)} files to transcribe on {device} ({torch.cuda.get_device_name(0) if device == 'cuda' else 'CPU'})")
     if not todo:
-        write_markdown(jsonl, args.out / "transcripts.md")
+        write_markdown(jsonl, args.out / f"{args.name}.md")
         return 0
 
     model = whisper.load_model(args.model, device=device)
@@ -61,8 +63,9 @@ def main(argv: list[str]) -> int:
     with jsonl.open("a", encoding="utf-8") as out:
         for n, path in enumerate(todo, 1):
             audio = whisper.load_audio(str(path))
+            options = {"beam_size": args.beam, "best_of": args.beam} if args.beam > 1 else {}
             result = model.transcribe(audio, language="en", initial_prompt=PROMPT, condition_on_previous_text=False,
-                                      fp16=device == "cuda", verbose=None)
+                                      fp16=device == "cuda", verbose=None, **options)
             m = VOICE_NAME.match(path.name)
             entry = {
                 "file": f"{path.parent.name}/{path.name}",
@@ -71,13 +74,14 @@ def main(argv: list[str]) -> int:
                 "seconds": round(len(audio) / whisper.audio.SAMPLE_RATE, 2),
                 "text": result["text"].strip(),
                 "segments": [{"start": round(s["start"], 2), "end": round(s["end"], 2), "text": s["text"].strip(),
-                              "noSpeech": round(s.get("no_speech_prob", 0), 2)} for s in result["segments"]],
+                              "noSpeech": round(s.get("no_speech_prob", 0), 2),
+                              "logProb": round(s.get("avg_logprob", 0), 2)} for s in result["segments"]],
             }
             out.write(json.dumps(entry, ensure_ascii=False) + "\n")
             out.flush()
             if n % 25 == 0 or n == len(todo):
                 print(f"{n}/{len(todo)} ({time.time() - started:.0f} s) {path.name}: {entry['text'][:70]}", flush=True)
-    write_markdown(jsonl, args.out / "transcripts.md")
+    write_markdown(jsonl, args.out / f"{args.name}.md")
     print(f"done in {time.time() - started:.0f} s -> {args.out}")
     return 0
 
