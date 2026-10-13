@@ -128,7 +128,7 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **Enemy slots** decode consistently: zombies type 0 and 17, crows type 5; HP drops 12 per Beretta round and 201 per
   bazooka hit, and a dead enemy's HP is set to −1 (crows −50). For about one frame after a room loads the slots still
   hold the previous room's values (types 34, 37, 38 appeared only then) — readers must let the room settle.
-  Type 15 (six slots at HP 1 in 10C, player took 2-HP hits there) is not identified.
+  Type 15 is the mansion plant: six of them in 10C (HP 1 each), slapping for 2 HP — the damage chart's value.
 - **`flagEnemies`**: each of 13 zombie kills set exactly one new bit; killing crows set none.
 - **`flagRoomItems`**: each pickup cleared exactly one bit as the item entered the inventory (1 = still in the world).
 - **`flagRoom0`/`flagRoom1`**: rooms visited, one word per stage, room *n* = bit 31 − *n* (e.g. 100 → `0x80000000`,
@@ -140,6 +140,9 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **Stairs push (107)** to reach the map, by both characters: push bit `0x40` per push; taking the map cleared
   `flagRoomItems4` bit `0x4000` and set `flagRoom3` bit `0x8` (maps don't enter the inventory). No word in the
   recorded regions moves with a pushed object, so object positions live elsewhere.
+- **Damage per hit** matches SHiiDO's RE1 damage chart (speedrun.com, JP PC new game) in every case seen: zombie
+  bite 10, ankle bite 6 (also from a zombie that got back up with 1 HP), crow peck 6 then 3 per hit, mansion plant
+  slap 2. The timeline names attacks from it.
 - **Zombie getting up:** HP ≤ 0, kill flag set, then active again with HP 1 (204, both sessions).
 - **Room 206** (Jill): the timer paused 4.5 s, `flagRoom4` bit `0x4000` set and `flagRoomItems7` bit `0x100` cleared, with
   no inventory change — probably reading a document (not identified).

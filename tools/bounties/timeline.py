@@ -33,6 +33,14 @@ KNOWN_FLAGS = {
 }
 FLAG_BANKS = ("flagScenarioA", "flagScenarioB", "flagRoom")
 
+# Damage per hit by enemy type and attack, from SHiiDO's RE1 damage chart (speedrun.com guides; JP PC, new game).
+# Every value seen in GOG captures so far matches it, so a hit's damage names the attack.
+ATTACKS = {
+    0: {10: "bite", 6: "ankle bite", 5: "vomit"}, 1: {10: "bite", 6: "ankle bite", 5: "vomit"},
+    17: {10: "bite", 6: "ankle bite", 5: "vomit"},
+    2: {12: "jump attack"}, 5: {6: "peck", 3: "peck"}, 15: {2: "slap"},
+}
+
 
 def flag_index(word: int, bit: int) -> int:
     """Game flag number: bit 31 of the bank's first word is flag 0."""
@@ -213,11 +221,13 @@ class Timeline:
             # Player HP: damage is grouped per attack burst; heals are reported with the item used.
             hp, php = bounties.signed(s.get("hp", 0), 16), bounties.signed(prev.get("hp", 0), 16)
             if hp < php:
+                attack = self.attack(s, php - hp)
                 if damage and t - damage[0].get("gameTimer", 0) < 150:  # same attack burst (5 s)
-                    damage = [damage[0], damage[1], hp, damage[3] + 1]
+                    damage[2] = hp
+                    damage[3][attack] += 1
                 else:
                     self.flush_damage(damage)
-                    damage = [s, php, hp, 1]
+                    damage = [s, php, hp, Counter({attack: 1})]
 
             # Inventory and item box.
             self.inventory_changes(prev, s, fired, hp - php, picked, 8 if char == 1 else 6)
@@ -238,8 +248,18 @@ class Timeline:
 
     def flush_damage(self, damage) -> None:
         if damage:
-            first, before, after, hits = damage
-            self.emit(first, f"took damage: HP {before} → {after} ({hits} hit{'s' if hits > 1 else ''})")
+            first, before, after, attacks = damage
+            what = ", ".join(f"{a} ×{n}" if n > 1 else a for a, n in attacks.most_common())
+            self.emit(first, f"took damage: HP {before} → {after} ({what})")
+
+    def attack(self, state: dict, amount: int) -> str:
+        """Names a hit from its damage and the enemies in the room ('Zombie ankle bite')."""
+        present = {state.get(f"enemy{i}Type", -1) for i in range(8) if state.get(f"enemy{i}Flags", 0) & 1}
+        matches = sorted({(self.names.enemy(e), ATTACKS[e][amount]) for e in present if amount in ATTACKS.get(e, {})})
+        if len(matches) == 1:
+            enemy, attack = matches[0]
+            return f"{enemy.split(' (')[0]} {attack} ({amount})"
+        return f"{amount} HP"
 
     def flush_fired(self, state: dict, fired: Counter) -> None:
         for weapon, rounds in fired.items():

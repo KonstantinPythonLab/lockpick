@@ -300,7 +300,8 @@
           "status": "done",
           "evidence": [
             "2026-10-13 (live session 4, Jill, memory log): enemy slots decode as flags/type/HP — zombies type 0 (rooms 101 103 10E 201 202) and type 17 (204 207); HP drops 12 per Beretta round, 201 per bazooka hit, slot HP set to -1 once a zombie is dead. A zombie getting up again not yet seen",
-            "2026-10-13 (live session 5: new Jill game, then new Chris game): a zombie getting back up (owner + capture) — type 17 in 204 fell to HP -2, its kill flag was set, 7 s later it was active again with HP 1, bit Jill four times (6 HP each) and went down for good after one more round. The same thing shows in session 4 (204, -3 → 1)"
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): a zombie getting back up (owner + capture) — type 17 in 204 fell to HP -2, its kill flag was set, 7 s later it was active again with HP 1, bit Jill four times (6 HP each) and went down for good after one more round. The same thing shows in session 4 (204, -3 → 1)",
+            "2026-10-13 (live session 5): ankle bites (6 HP per hit, the damage chart's footbite) — Jill from the zombie that got back up with 1 HP (204), Chris from a zombie in 107; normal bites are 10"
           ],
           "detector": "enemies_zombie"
         },

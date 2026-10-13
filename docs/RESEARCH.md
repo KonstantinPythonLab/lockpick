@@ -17,7 +17,7 @@ Research date: 2026-10-12. No third-party code was copied into Lockpick.
 | [biorand/classic](https://github.com/biorand/classic) | Randomizer for RE1–3 | RE1: Sourcenext/Mediakite JP exe + Classic REbirth | MIT | RDT format notes, item/enemy ids (future, with attribution) |
 | [IntelOrca/biorand](https://github.com/IntelOrca/biorand), [IntelOrca/biohazard-utils](https://github.com/IntelOrca/biohazard-utils) | Randomizer / RE file library | RE1 PC data files | MIT | Item and enemy id names (`data/games/re1/names.json`), RDT script format for `tools/rdt` (credited in THIRD_PARTY_NOTICES) |
 | [pmandin/reevengi](https://github.com/pmandin/reevengi) | RE engine re-implementation | PC data files | GPL-2.0 | Opcode list cross-check only (it differs on 0x17/0x28/0x33; the fixed sizes parse every retail room) |
-| [speedrun.com guides](https://www.speedrun.com/residentevil/guides) | Speedrun community guides | JP PC / PS1 mostly | none stated | Leads: green herb heals 32 (Jill) / 46 (Chris), G+G 64 / 93; zombie HP rerolled 18–99 on room entry; Richard's 421 s timer |
+| [speedrun.com guides](https://www.speedrun.com/residentevil/guides) | Speedrun community guides | JP PC / PS1 mostly | none stated | Leads: green herb heals 32 (Jill) / 46 (Chris), G+G 64 / 93; zombie HP rerolled 18–99 on room entry; Richard's 421 s timer. SHiiDO's damage chart matches the GOG build live (zombie bite 10 / ankle bite 6, crow 6 + 3s, plant slap 2, green herb +32 for Jill) |
 
 ## 0. Areas, rooms and routes
 
