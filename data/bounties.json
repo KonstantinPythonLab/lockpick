@@ -1,0 +1,490 @@
+{
+  "schemaVersion": 1,
+  "releases": [
+    {
+      "release": "0.1.x",
+      "title": "Foundation",
+      "bounties": [
+        {
+          "id": "B001",
+          "task": "New Game as **Chris**, walk around the main hall",
+          "verifies": "Character id 0, HP/max HP 140, stage/room/camera, position, timer",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "chris_game"
+        },
+        {
+          "id": "B002",
+          "task": "New Game as **Jill**",
+          "verifies": "Character id 1, max HP 96, Jill room-file bit",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "jill_game"
+        },
+        {
+          "id": "B003",
+          "task": "Walk through several doors and camera angles",
+          "verifies": "Room/camera changes, door-transition timing",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "room_changes"
+        },
+        {
+          "id": "B004",
+          "task": "Take damage until you die",
+          "verifies": "HP decreases, death flag, HP below zero",
+          "status": "done",
+          "evidence": [
+            "2026-10-12 (Chris and Jill)"
+          ],
+          "detector": "death"
+        },
+        {
+          "id": "B005",
+          "task": "After dying, return to the title and start a New Game",
+          "verifies": "Title flag, session gating, new-game detection",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "new_game_after_death"
+        },
+        {
+          "id": "B006",
+          "task": "Load a save from the title screen",
+          "verifies": "Save-load detection (timer restores)",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "save_loaded"
+        },
+        {
+          "id": "B007",
+          "task": "Play the **Rebecca** section (Chris scenario)",
+          "verifies": "Character id 3, Rebecca's inventory pointer `0xBE9950`",
+          "status": "needed",
+          "detector": "rebecca"
+        },
+        {
+          "id": "B008",
+          "task": "Go upstairs from the main hall",
+          "verifies": "Stage 2 = mansion 2F (room 203)",
+          "status": "done",
+          "evidence": [
+            "2026-10-12"
+          ],
+          "detector": "second_floor"
+        }
+      ]
+    },
+    {
+      "release": "0.2.0",
+      "title": "Core trainer (inventory, items, ammo)",
+      "bounties": [
+        {
+          "id": "B101",
+          "task": "Pick up items, fire the Beretta, reload",
+          "verifies": "Inventory slots (id + quantity), rounds per shot, reload from bullets",
+          "status": "done",
+          "evidence": [
+            "2026-10-12 (Jill)"
+          ],
+          "detector": "fire_and_reload"
+        },
+        {
+          "id": "B102",
+          "task": "Put items **into** and take them **out of** the item box",
+          "verifies": "Item box layout `0xBE98E4`",
+          "status": "needed",
+          "detector": "item_box_changed"
+        },
+        {
+          "id": "B103",
+          "task": "Pick up, fire and reload the **shotgun**",
+          "verifies": "Shotgun id, shell ammo id, capacity",
+          "status": "partial",
+          "evidence": [
+            "picked up (id 0x03, 7 shells); not fired"
+          ]
+        },
+        {
+          "id": "B104",
+          "task": "Same for the **Colt Python / magnum**",
+          "verifies": "Magnum + magnum rounds ids",
+          "status": "needed"
+        },
+        {
+          "id": "B105",
+          "task": "Same for the **bazooka** with each round type (explosive, acid, flame)",
+          "verifies": "Bazooka ids and round types",
+          "status": "needed"
+        },
+        {
+          "id": "B106",
+          "task": "Use the **flamethrower** (Chris)",
+          "verifies": "Flamethrower id and fuel",
+          "status": "needed"
+        },
+        {
+          "id": "B107",
+          "task": "Use the **rocket launcher** (ending)",
+          "verifies": "Rocket launcher id",
+          "status": "needed"
+        },
+        {
+          "id": "B108",
+          "task": "Use each healing item: green, red+green, blue herb, mixed herbs, first aid spray",
+          "verifies": "Item ids, heal amounts, herb combining",
+          "status": "partial",
+          "evidence": [
+            "first aid spray (full heal) seen"
+          ],
+          "detector": "healing"
+        },
+        {
+          "id": "B109",
+          "task": "Get **poisoned** (snake/Yawn/spider) and cure it with a blue herb or serum",
+          "verifies": "Status flags (player +0xDC)",
+          "status": "needed"
+        },
+        {
+          "id": "B110",
+          "task": "Combine items (herbs; anything else combinable)",
+          "verifies": "Combine results and slot changes",
+          "status": "needed"
+        },
+        {
+          "id": "B111",
+          "task": "Pick up each **key item** (keys, crests, MO disk, emblems, etc.)",
+          "verifies": "Key item ids → item name table",
+          "status": "needed"
+        },
+        {
+          "id": "B112",
+          "task": "Use an ink ribbon to save at a typewriter",
+          "verifies": "Ink ribbon id and count",
+          "status": "needed"
+        },
+        {
+          "id": "B113",
+          "task": "Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots)",
+          "verifies": "Slot limits per character",
+          "status": "needed",
+          "detector": "full_inventory"
+        },
+        {
+          "id": "B114",
+          "task": "Switch equipped weapon between several weapons",
+          "verifies": "Equipped-slot behavior per weapon",
+          "status": "partial",
+          "evidence": [
+            "knife/Beretta seen"
+          ],
+          "detector": "weapon_switching"
+        }
+      ]
+    },
+    {
+      "release": "0.3.0",
+      "title": "Overlay and HUD",
+      "bounties": [
+        {
+          "id": "B201",
+          "task": "Play windowed at a few window sizes and positions; alt-tab away and back",
+          "verifies": "Game window tracking, focus handling",
+          "status": "blocked",
+          "evidence": [
+            "needs window geometry in captures"
+          ]
+        },
+        {
+          "id": "B202",
+          "task": "Play in fullscreen",
+          "verifies": "Overlay behavior in fullscreen",
+          "status": "blocked"
+        }
+      ]
+    },
+    {
+      "release": "0.4.0",
+      "title": "World database (rooms, cameras, items, enemies)",
+      "bounties": [
+        {
+          "id": "B301",
+          "task": "Visit every reachable room in **stage 1** (mansion 1F)",
+          "verifies": "Room ids, cameras per room, door connections",
+          "status": "partial",
+          "evidence": [
+            "rooms seen: 106 105 104 107 108 109 113 115 116"
+          ],
+          "detector": "rooms_stage_1"
+        },
+        {
+          "id": "B302",
+          "task": "Visit every reachable room in **stage 2** (mansion 2F)",
+          "verifies": "Same",
+          "status": "partial",
+          "evidence": [
+            "rooms seen: 203"
+          ],
+          "detector": "rooms_stage_2"
+        },
+        {
+          "id": "B303",
+          "task": "Visit every reachable room in **stage 3**",
+          "verifies": "Same; stage identity",
+          "status": "needed",
+          "detector": "rooms_stage_3"
+        },
+        {
+          "id": "B304",
+          "task": "Visit every reachable room in **stage 4**",
+          "verifies": "Same; stage identity",
+          "status": "needed",
+          "detector": "rooms_stage_4"
+        },
+        {
+          "id": "B305",
+          "task": "Visit every reachable room in **stage 5**",
+          "verifies": "Same; stage identity",
+          "status": "needed",
+          "detector": "rooms_stage_5"
+        },
+        {
+          "id": "B306",
+          "task": "Visit every reachable room in **stages 6 and 7**",
+          "verifies": "Same; which rooms are revisits",
+          "status": "needed",
+          "detector": "rooms_stage_6_7"
+        },
+        {
+          "id": "B307",
+          "task": "Both scenarios start to finish (Chris and Jill)",
+          "verifies": "Scenario room differences (ROOMxxx0 vs xxx1)",
+          "status": "needed"
+        },
+        {
+          "id": "B310",
+          "task": "Encounter **zombies** (and let one get up again)",
+          "verifies": "Enemy array `0xBE6464`, enemy type id, HP",
+          "status": "partial",
+          "evidence": [
+            "zombie damage seen; enemy array not yet read"
+          ]
+        },
+        {
+          "id": "B311",
+          "task": "Encounter **dogs (Cerberus)** and **crows**",
+          "verifies": "Enemy type ids",
+          "status": "needed"
+        },
+        {
+          "id": "B312",
+          "task": "Encounter **Hunters** and **Chimeras**",
+          "verifies": "Enemy type ids",
+          "status": "needed"
+        },
+        {
+          "id": "B313",
+          "task": "Encounter **spiders**, **wasps** and **sharks**",
+          "verifies": "Enemy type ids",
+          "status": "needed"
+        },
+        {
+          "id": "B314",
+          "task": "Boss fights: **Yawn** (both), **Plant 42**, **Neptune**, **Black Tiger**, **Tyrant** (both)",
+          "verifies": "Boss ids and HP",
+          "status": "needed"
+        }
+      ]
+    },
+    {
+      "release": "0.5.0",
+      "title": "Object highlighting and ESP",
+      "bounties": [
+        {
+          "id": "B401",
+          "task": "Stand still in a few rooms for a few seconds per camera angle",
+          "verifies": "Camera projection (world → screen)",
+          "status": "blocked",
+          "evidence": [
+            "needs synced screenshots in captures"
+          ]
+        },
+        {
+          "id": "B402",
+          "task": "Walk past items and doors in view of the camera",
+          "verifies": "On-screen positions of objects",
+          "status": "blocked"
+        }
+      ]
+    },
+    {
+      "release": "0.6.0",
+      "title": "Advanced trainer (flags, enemies, events)",
+      "bounties": [
+        {
+          "id": "B501",
+          "task": "Unlock doors with keys and the lockpick",
+          "verifies": "Lock flags bank `0xBE9874`",
+          "status": "needed"
+        },
+        {
+          "id": "B502",
+          "task": "Solve puzzles (piano, statues, armor room, crests, V-Jolt, computer/MO disk)",
+          "verifies": "Scenario flag banks",
+          "status": "needed"
+        },
+        {
+          "id": "B503",
+          "task": "Kill each enemy type",
+          "verifies": "Enemy death, kill flags",
+          "status": "needed"
+        },
+        {
+          "id": "B504",
+          "task": "Push/move objects (statues, shelves, boxes)",
+          "verifies": "Object state",
+          "status": "needed"
+        }
+      ]
+    },
+    {
+      "release": "0.7.0",
+      "title": "Guidance and warnings",
+      "bounties": [
+        {
+          "id": "B601",
+          "task": "Pick up items, leave the room and come back",
+          "verifies": "Per-room item pickup flags `0xBE989C`",
+          "status": "needed"
+        },
+        {
+          "id": "B602",
+          "task": "Trigger partner/cutscene events (Barry, Rebecca, Richard, Wesker)",
+          "verifies": "Event flags and cutscene detection",
+          "status": "needed"
+        },
+        {
+          "id": "B603",
+          "task": "Skip vs. watch cutscenes",
+          "verifies": "Cutscene state",
+          "status": "needed"
+        }
+      ]
+    },
+    {
+      "release": "0.8.0",
+      "title": "Speedrun and challenge suite",
+      "bounties": [
+        {
+          "id": "B701",
+          "task": "Full **any%** run, Chris",
+          "verifies": "Split points, final timer",
+          "status": "needed"
+        },
+        {
+          "id": "B702",
+          "task": "Full **any%** run, Jill",
+          "verifies": "Split points, final timer",
+          "status": "needed"
+        },
+        {
+          "id": "B703",
+          "task": "Reach each **ending** and the results screen",
+          "verifies": "End-of-game detection, final IGT, rank",
+          "status": "needed"
+        },
+        {
+          "id": "B704",
+          "task": "Knife-only section",
+          "verifies": "Weapon-use tracking",
+          "status": "needed"
+        },
+        {
+          "id": "B705",
+          "task": "Resets mid-run (quit to title; restart the game)",
+          "verifies": "Reset detection",
+          "status": "partial",
+          "evidence": [
+            "quit to title and game restart seen"
+          ],
+          "detector": "resets"
+        }
+      ]
+    },
+    {
+      "release": "0.9.0",
+      "title": "Compatibility (other builds)",
+      "bounties": [
+        {
+          "id": "B801",
+          "task": "Capture with this build running: GOG in **French** or **German**",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B802",
+          "task": "Capture with this build running: Earlier GOG English revision (before hotfix4)",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B803",
+          "task": "Capture with this build running: GOG **Japanese** (`Biohazard.exe`)",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B804",
+          "task": "Capture with this build running: Sourcenext/Mediakite Japanese + **Classic REbirth**",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B805",
+          "task": "Capture with this build running: Original 1996/1997 **CD release** (US or EU)",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B806",
+          "task": "Capture with this build running: **Director's Cut** PC (if one exists for your region)",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed",
+          "detector": "other_build"
+        },
+        {
+          "id": "B807",
+          "task": "Capture with this build running: Windows 10 (not 11), different GPUs, multi-monitor/high-DPI setups",
+          "verifies": "Build fingerprint (and a profile, with a short play session)",
+          "status": "needed"
+        }
+      ]
+    },
+    {
+      "release": "1.0.0",
+      "title": "Stable release",
+      "bounties": [
+        {
+          "id": "B901",
+          "task": "Full playthrough per supported build with every Lockpick feature on",
+          "verifies": "Final regression pass",
+          "status": "needed"
+        }
+      ]
+    }
+  ]
+}

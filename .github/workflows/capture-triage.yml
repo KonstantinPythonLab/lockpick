@@ -1,0 +1,41 @@
+name: Capture triage
+
+# Analyzes capture zips attached to Capture submission issues and comments with what they show.
+# It never changes the repository: a maintainer applies results with `tools/bounties/bounties.py apply`.
+# The issue body is untrusted: it is passed only through an environment variable, URLs are restricted to GitHub
+# attachments, downloads and zip contents are size-limited, and zips are read in memory (never extracted or run).
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: capture-triage-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    if: contains(github.event.issue.labels.*.name, 'capture')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Analyze attached captures
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python3 tools/bounties/bounties.py triage --body-env ISSUE_BODY --out report.md
+
+      - name: Comment (once per set of attachments)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE: ${{ github.event.issue.number }}
+        run: |
+          marker="$(head -n 1 report.md)"
+          if gh api "repos/${GITHUB_REPOSITORY}/issues/${ISSUE}/comments" --paginate --jq '.[].body' | grep -qxF -- "$marker"; then
+            echo "These attachments were already analyzed."
+          else
+            gh issue comment "$ISSUE" --repo "$GITHUB_REPOSITORY" --body-file report.md
+          fi

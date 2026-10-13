@@ -1,5 +1,7 @@
 # Capture bounties
 
+<!-- Generated from data/bounties.json by tools/bounties/bounties.py — edit the JSON, then run `render`. -->
+
 > **Unpaid, captures only, no bots** — see the rules below.
 
 ## Bounty rules
@@ -12,20 +14,21 @@
 3. **No automated or AI-generated replies.** Comments, issues or pull requests produced by bots or AI tools are hidden
    as spam and the account may be blocked and reported. Payment requests are ignored.
 
+## How it works
 
 Everything Lockpick needs to see the real game do, grouped by the release that needs it. Each bounty is a short
 thing to do in-game while a capture is running (**Debug → Start capture**, see [CAPTURE.md](CAPTURE.md)). One capture
-can cover many bounties — just play and note which IDs you hit when you send the zip
-([Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue).
+can cover many bounties — just play and send the zip with a
+[Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue.
 
-Open bounties for the next release are also GitHub issues with the
-[`bounty` label](https://github.com/mscrnt/lockpick/issues?q=is%3Aissue+label%3Abounty) — comment on one to claim
-it. This file stays the source of truth.
+Submitted captures are analyzed automatically: unambiguous results (for example Rebecca's character id appearing)
+are checked off, and everything else is marked as evidence for a maintainer to review. Open bounties for the next
+release are also GitHub issues with the [`bounty` label](https://github.com/mscrnt/lockpick/issues?q=is%3Aissue+label%3Abounty).
 
-Status: ✅ verified from a capture · 🟡 partly verified · ⬜ needed · 🛠️ needs a Lockpick feature first
+Status: ✅ verified from a capture · 🟡 partly verified / evidence to review · ⬜ needed · 🛠️ needs a Lockpick feature first
 
-Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4). Maintainers update this file when a
-capture verifies something (and the profile/memory map with the evidence).
+Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
+
 
 ---
 
@@ -41,6 +44,8 @@ capture verifies something (and the profile/memory map with the evidence).
 | B006 | Load a save from the title screen | Save-load detection (timer restores) | ✅ 2026-10-12 |
 | B007 | Play the **Rebecca** section (Chris scenario) | Character id 3, Rebecca's inventory pointer `0xBE9950` | ⬜ |
 | B008 | Go upstairs from the main hall | Stage 2 = mansion 2F (room 203) | ✅ 2026-10-12 |
+
+---
 
 ## 0.2.0 — Core trainer (inventory, items, ammo)
 
@@ -61,6 +66,8 @@ capture verifies something (and the profile/memory map with the evidence).
 | B113 | Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots) | Slot limits per character | ⬜ |
 | B114 | Switch equipped weapon between several weapons | Equipped-slot behavior per weapon | 🟡 knife/Beretta seen |
 
+---
+
 ## 0.3.0 — Overlay and HUD
 
 | ID | Do this in-game | Verifies | Status |
@@ -68,12 +75,14 @@ capture verifies something (and the profile/memory map with the evidence).
 | B201 | Play windowed at a few window sizes and positions; alt-tab away and back | Game window tracking, focus handling | 🛠️ needs window geometry in captures |
 | B202 | Play in fullscreen | Overlay behavior in fullscreen | 🛠️ |
 
+---
+
 ## 0.4.0 — World database (rooms, cameras, items, enemies)
 
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
-| B301 | Visit every reachable room in **stage 1** (mansion 1F) | Room ids, cameras per room, door connections | 🟡 106 105 104 107 108 109 113 115 116 |
-| B302 | Visit every reachable room in **stage 2** (mansion 2F) | Same | 🟡 203 |
+| B301 | Visit every reachable room in **stage 1** (mansion 1F) | Room ids, cameras per room, door connections | 🟡 rooms seen: 106 105 104 107 108 109 113 115 116 |
+| B302 | Visit every reachable room in **stage 2** (mansion 2F) | Same | 🟡 rooms seen: 203 |
 | B303 | Visit every reachable room in **stage 3** | Same; stage identity | ⬜ |
 | B304 | Visit every reachable room in **stage 4** | Same; stage identity | ⬜ |
 | B305 | Visit every reachable room in **stage 5** | Same; stage identity | ⬜ |
@@ -85,12 +94,16 @@ capture verifies something (and the profile/memory map with the evidence).
 | B313 | Encounter **spiders**, **wasps** and **sharks** | Enemy type ids | ⬜ |
 | B314 | Boss fights: **Yawn** (both), **Plant 42**, **Neptune**, **Black Tiger**, **Tyrant** (both) | Boss ids and HP | ⬜ |
 
+---
+
 ## 0.5.0 — Object highlighting and ESP
 
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
 | B401 | Stand still in a few rooms for a few seconds per camera angle | Camera projection (world → screen) | 🛠️ needs synced screenshots in captures |
 | B402 | Walk past items and doors in view of the camera | On-screen positions of objects | 🛠️ |
+
+---
 
 ## 0.6.0 — Advanced trainer (flags, enemies, events)
 
@@ -101,6 +114,8 @@ capture verifies something (and the profile/memory map with the evidence).
 | B503 | Kill each enemy type | Enemy death, kill flags | ⬜ |
 | B504 | Push/move objects (statues, shelves, boxes) | Object state | ⬜ |
 
+---
+
 ## 0.7.0 — Guidance and warnings
 
 | ID | Do this in-game | Verifies | Status |
@@ -108,6 +123,8 @@ capture verifies something (and the profile/memory map with the evidence).
 | B601 | Pick up items, leave the room and come back | Per-room item pickup flags `0xBE989C` | ⬜ |
 | B602 | Trigger partner/cutscene events (Barry, Rebecca, Richard, Wesker) | Event flags and cutscene detection | ⬜ |
 | B603 | Skip vs. watch cutscenes | Cutscene state | ⬜ |
+
+---
 
 ## 0.8.0 — Speedrun and challenge suite
 
@@ -119,23 +136,24 @@ capture verifies something (and the profile/memory map with the evidence).
 | B704 | Knife-only section | Weapon-use tracking | ⬜ |
 | B705 | Resets mid-run (quit to title; restart the game) | Reset detection | 🟡 quit to title and game restart seen |
 
+---
+
 ## 0.9.0 — Compatibility (other builds)
 
-These only need a capture started while the game is open — the fingerprint alone helps, and a short play session
-makes a new profile possible.
+| ID | Do this in-game | Verifies | Status |
+|---|---|---|---|
+| B801 | Capture with this build running: GOG in **French** or **German** | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B802 | Capture with this build running: Earlier GOG English revision (before hotfix4) | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B803 | Capture with this build running: GOG **Japanese** (`Biohazard.exe`) | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B804 | Capture with this build running: Sourcenext/Mediakite Japanese + **Classic REbirth** | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B805 | Capture with this build running: Original 1996/1997 **CD release** (US or EU) | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B806 | Capture with this build running: **Director's Cut** PC (if one exists for your region) | Build fingerprint (and a profile, with a short play session) | ⬜ |
+| B807 | Capture with this build running: Windows 10 (not 11), different GPUs, multi-monitor/high-DPI setups | Build fingerprint (and a profile, with a short play session) | ⬜ |
 
-| ID | Build | Status |
-|---|---|---|
-| B801 | GOG in **French** or **German** | ⬜ |
-| B802 | Earlier GOG English revision (before hotfix4) | ⬜ |
-| B803 | GOG **Japanese** (`Biohazard.exe`) | ⬜ |
-| B804 | Sourcenext/Mediakite Japanese + **Classic REbirth** | ⬜ |
-| B805 | Original 1996/1997 **CD release** (US or EU) | ⬜ |
-| B806 | **Director's Cut** PC (if one exists for your region) | ⬜ |
-| B807 | Windows 10 (not 11), different GPUs, multi-monitor/high-DPI setups | ⬜ |
+---
 
 ## 1.0.0 — Stable release
 
-| ID | Do this | Verifies | Status |
+| ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
 | B901 | Full playthrough per supported build with every Lockpick feature on | Final regression pass | ⬜ |

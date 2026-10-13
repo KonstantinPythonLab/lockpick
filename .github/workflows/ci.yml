@@ -67,6 +67,12 @@ jobs:
           sys.exit(0 if ok else 1)
           EOF
 
+      - name: Bounty list is in sync with data/bounties.json
+        run: python3 tools/bounties/bounties.py render --check
+
+      - name: Bounty tooling tests
+        run: python3 -m unittest discover -s tools/bounties -v
+
       - name: No game binaries or assets are committed
         run: |
           bad=$(git ls-files | grep -iE '\.(exe|dll|rdt|pak|pix|tim|emd|emw|tmd|bss|dat)$' || true)

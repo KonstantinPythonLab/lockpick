@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Bounty automation: `data/bounties.json` is the source of truth and `docs/CAPTURE_BOUNTIES.md` is generated;
+  `tools/bounties/bounties.py` analyzes capture zips and records findings (only unambiguous ones verify a bounty
+  automatically; captures with trainer writes never do); the `capture-triage` workflow comments on Capture
+  submission issues with the analysis.
+
 ### Changed
 - Bounty rules: unpaid, completed only by captures (never code changes), no automated or AI-generated replies;
   blank issues disabled so reports go through the forms.

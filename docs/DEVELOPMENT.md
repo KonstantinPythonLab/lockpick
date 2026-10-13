@@ -75,16 +75,22 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
 
 ## Volunteer captures
 
-Volunteers capture from the app's Debug page (see [CAPTURE.md](CAPTURE.md)). Processing a returned
-`LockpickCapture-*.zip`:
+Volunteers capture from the app's Debug page (see [CAPTURE.md](CAPTURE.md)) and attach the zip to a Capture
+submission issue. The `capture-triage` workflow analyzes it and comments with what it shows (it never edits the repo).
 
-1. Read `capture-info.json`: if `Builds[].ProfileId` is null, the SHA-256/PE fields identify a new build to profile.
-2. `trace-N.txt` has every raw field change (same format as `lockpick-probe trace`); look for new evidence there.
-3. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
+Bounty data lives in `data/bounties.json`; `docs/CAPTURE_BOUNTIES.md` is generated (`render --check` runs in CI).
+
+1. `python tools/bounties/bounties.py analyze LockpickCapture-*.zip` — review the report (also posted on the issue).
+2. `python tools/bounties/bounties.py apply LockpickCapture-*.zip --source "issue #N"` — records findings in
+   `data/bounties.json` and regenerates the doc. Unambiguous results are checked off; everything else becomes
+   "evidence — needs review": confirm it against the trace, then set `status` to `done` by hand (and update the
+   profile evidence / MEMORY_MAP for new addresses).
+3. `capture-info.json`: if `Builds[].ProfileId` is null, the SHA-256/PE fields identify a new build to profile.
+4. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
    (keep the trace beside it), then add playback assertions.
-4. Check off the bounties the capture verified in `docs/CAPTURE_BOUNTIES.md` (✅ + date), and add new bounties
-   when a roadmap item needs data nobody has captured yet.
-5. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed (the submission form asks).
+5. Add new bounties to `data/bounties.json` when a roadmap item needs data nobody has captured yet (give them a
+   `detector` when the tool can recognize them).
+6. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed (the submission form asks).
 
 ## Project management
 
