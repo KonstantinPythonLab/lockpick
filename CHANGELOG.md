@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- The app shows its version consistently as the release version (e.g. `0.1.3`, keeping any pre-release suffix);
+  the startup log and capture info no longer show the four-part `0.1.3.0`.
+
 ## [0.1.3] - 2026-10-13
 
 ### Added

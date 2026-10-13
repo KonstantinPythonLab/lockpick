@@ -63,7 +63,7 @@ public sealed class AppServices : IAsyncDisposable
         var logProvider = new JsonLinesLoggerProvider(logPath, args.Contains("--verbose") ? LogLevel.Debug : LogLevel.Information);
         var loggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(b => b.AddProvider(logProvider).SetMinimumLevel(LogLevel.Trace));
         var log = loggerFactory.CreateLogger("Lockpick");
-        log.LogInformation("Lockpick {Version} starting", typeof(AppServices).Assembly.GetName().Version);
+        log.LogInformation("Lockpick {Version} starting", AppInfo.Version);
 
         var settings = new SettingsStore(AppPaths.SettingsFile, log);
         var current = settings.Load();

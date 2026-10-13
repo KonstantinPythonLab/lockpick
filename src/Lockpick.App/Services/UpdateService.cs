@@ -29,7 +29,7 @@ public sealed partial class UpdateService : ObservableObject, IDisposable
     {
         _settings = settings;
         _logger = logger;
-        CurrentVersion = typeof(UpdateService).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+        CurrentVersion = AppInfo.Version;
         IsSupported = Manager?.IsInstalled == true;
         Status = IsSupported
             ? "Not checked yet."
