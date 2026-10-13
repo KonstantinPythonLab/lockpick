@@ -1,0 +1,36 @@
+name: Capture submission
+description: Send a Lockpick capture (Debug → Start capture) and the bounties it covers.
+labels: [capture]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping Lockpick learn the game! Attach your `LockpickCapture-*.zip` below (drag it into the box).
+        Bounty IDs are listed in [docs/CAPTURE_BOUNTIES.md](https://github.com/mscrnt/lockpick/blob/main/docs/CAPTURE_BOUNTIES.md).
+        Captures contain game values and the game's file fingerprint only — no personal information.
+  - type: textarea
+    id: zip
+    attributes:
+      label: Capture zip
+      description: Drag and drop the LockpickCapture-*.zip file here.
+    validations:
+      required: true
+  - type: input
+    id: bounties
+    attributes:
+      label: Bounties covered
+      placeholder: e.g. B102, B104, B109
+  - type: textarea
+    id: notes
+    attributes:
+      label: What did you do? (rough order is enough)
+      placeholder: e.g. Jill game from a save, item box twice, got poisoned by the snake, died once, quit to title.
+  - type: dropdown
+    id: credit
+    attributes:
+      label: May we credit you in CONTRIBUTORS.md?
+      options:
+        - "Yes, with my GitHub username"
+        - "No thanks"
+    validations:
+      required: true

@@ -82,7 +82,9 @@ Volunteers capture from the app's Debug page (see [CAPTURE.md](CAPTURE.md)). Pro
 2. `trace-N.txt` has every raw field change (same format as `lockpick-probe trace`); look for new evidence there.
 3. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
    (keep the trace beside it), then add playback assertions.
-4. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed.
+4. Check off the bounties the capture verified in `docs/CAPTURE_BOUNTIES.md` (✅ + date), and add new bounties
+   when a roadmap item needs data nobody has captured yet.
+5. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed (the submission form asks).
 
 ## Coding conventions
 

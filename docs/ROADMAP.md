@@ -20,6 +20,9 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 | 0.9.0 | Optional AI, optimization, compatibility testing | ⬜ |
 | 1.0.0 | Stable RE1 release | ⬜ |
 
+Game-specific work depends on live captures; what each release still needs captured is tracked in
+[CAPTURE_BOUNTIES.md](CAPTURE_BOUNTIES.md).
+
 RE2 and RE3 adapters are deliberately out of scope until RE1 reaches 1.0, but the adapter contract
 (`IGameAdapter`, profile JSON) is designed so they can be added without restructuring.
 

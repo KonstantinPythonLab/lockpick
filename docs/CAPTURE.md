@@ -27,6 +27,12 @@ Not recorded: screenshots, audio, input, file paths, computer or user names.
 Capturing is read-only — it never writes to the game's memory or files, the same way a LiveSplit autosplitter works.
 If you submit runs to a leaderboard, check that leaderboard's rules for external tools.
 
+## What to play
+
+The **[bounty list](CAPTURE_BOUNTIES.md)** has everything still needed, by release — pick anything marked ⬜ and
+mention the IDs (e.g. B102) when you send the zip. Send captures through a
+[Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue.
+
 ## Especially useful (if it happens naturally)
 
 - Using the item box (putting items in and taking them out)

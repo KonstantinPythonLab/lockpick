@@ -63,7 +63,7 @@ dotnet run --project tools/Lockpick.Probe -- identify    # check your installed 
 
 Lockpick verifies everything against the real game. Recording a play session (any kind; speedruns are great)
 helps the most: install Lockpick, open **Debug → Start capture**, play, then *Stop and save* and send the zip
-([details](docs/CAPTURE.md)). Helpers are credited in
+([details](docs/CAPTURE.md)). The **[bounty list](docs/CAPTURE_BOUNTIES.md)** shows what's still needed. Helpers are credited in
 [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 ## Repository layout
