@@ -25,12 +25,9 @@ WEAPONS = set(range(1, 11))
 INK_RIBBON = 47
 CHARACTERS = {0: "Chris", 1: "Jill", 3: "Rebecca"}
 
-# Flag bits whose meaning was confirmed in live sessions (docs/MEMORY_MAP.md).
-KNOWN_FLAGS = {
-    ("flagScenarioA0", 0x100000): "the statue falls (blue jewel drops into the dining room)",
-    ("flagScenarioA0", 0x10000): "blue jewel placed in the lion head",
-    ("flagScenarioA0", 0x40000): "lion head gives the wind crest",
-}
+# Flag bits whose meaning was confirmed in live sessions (data/games/re1/flag-labels.json).
+KNOWN_FLAGS = {(e["bank"], int(e["mask"], 16)): e["label"]
+               for e in json.loads((DATA / "flag-labels.json").read_text(encoding="utf-8"))["labels"]}
 FLAG_BANKS = ("flagScenarioA", "flagScenarioB", "flagRoom")
 
 # Damage per hit by enemy type and attack, from SHiiDO's RE1 damage chart (speedrun.com guides; JP PC, new game).
@@ -335,7 +332,12 @@ def render(capture: bounties.Capture, names: Names) -> str:
         except ValueError:
             ms = None
         note = f": {m['note']}" if m["note"] else ""
-        timeline.lines.append((ms, f"🚩 **Marker #{m['number']}** {m['at']}{' room ' + m['room'] if m['room'] else ''}{note}"))
+        where = f"{m['at']}{' room ' + m['room'] if m['room'] else ''}"
+        if m["kind"] in ("answer", "skipped"):
+            answer = f"**{m['note']}**" if m["note"] else "(skipped)"
+            timeline.lines.append((ms, f"❓ **Question #{m['number']}** {where} — {answer} — about: {'; '.join(m['changes'])}"))
+        else:
+            timeline.lines.append((ms, f"🚩 **Marker #{m['number']}** {where}{note}"))
     ordered = sorted(enumerate(timeline.lines), key=lambda x: (x[1][0] is None, x[1][0] or 0, x[0]))
     out = [f"# Timeline — {capture.name}", ""]
     out += [text for _, (_, text) in ordered]

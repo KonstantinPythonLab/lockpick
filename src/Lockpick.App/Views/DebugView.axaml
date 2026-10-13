@@ -53,6 +53,9 @@
           </Button>
         </Grid>
         <TextBlock Text="{Binding HotkeyInfo}" TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}" IsVisible="{Binding IsCapturing}" />
+        <CheckBox IsChecked="{Binding AskAboutUnknownEvents}" AutomationProperties.Name="Ask me about unknown events">
+          <TextBlock TextWrapping="Wrap" Text="Ask me about unknown events — when the game does something Lockpick doesn't recognize (a cutscene, an event), it pauses the game and asks what happened. Off for normal captures." />
+        </CheckBox>
         <ItemsControl ItemsSource="{Binding Markers}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>

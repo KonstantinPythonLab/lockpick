@@ -138,6 +138,16 @@ from data), so it never re-triggers by accident and new steps can be shown to ex
 per-poll `Polled` event (raw fields change without normalized state changing, e.g. ammo). `CaptureSession` writes
 per-attachment trace/recording/event files and zips them; there is no separate tool.
 
+**ADR-015 — Ask mode: explain changes live, pause the game to ask.** Adapters may provide an `IChangeExplainer` that
+reports changes their data can't account for (RE1: flag bits not used by any item/enemy/door in the room index, not a
+first room visit and not a confirmed label; unknown item ids and enemy types). `QuestionScheduler` (Core) groups
+them and asks once the changes have stopped for 3 s and the in-game timer runs again, each change once per capture.
+The game is frozen with `NtSuspendProcess` through a handle with only `PROCESS_SUSPEND_RESUME` — the single exception
+to read-only access, opt-in per session. `GamePause` guarantees the resume: on answer/skip/close, a 10-minute
+watchdog, app exit, and at the next start if Lockpick died while the game was frozen (the frozen pid and its start
+time are kept in settings). Answers are `markers.jsonl` entries of kind `answer`/`skipped` with the changes asked
+about; confirmed meanings go into `data/games/re1/flag-labels.json`, which the timeline and the explainer share.
+
 **ADR-014 — Capture markers and a registered hotkey, not a keyboard hook.** Players mark moments while capturing
 (`markers.jsonl`: wall-clock time, attachment, room, game time, a note that can be added later). The hotkey uses
 `RegisterHotKey` on a dedicated message-loop thread, so Windows reports only that key combination — Lockpick never

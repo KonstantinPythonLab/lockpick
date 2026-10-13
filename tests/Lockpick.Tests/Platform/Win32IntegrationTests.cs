@@ -37,6 +37,22 @@ public sealed class Win32IntegrationTests : IDisposable
     }
 
     [Fact]
+    public void Suspends_and_resumes_a_whole_process()
+    {
+        static bool AllSuspended(int id)
+        {
+            using var p = Process.GetProcessById(id);
+            return p.Threads.Cast<ProcessThread>().All(t => t.ThreadState == System.Diagnostics.ThreadState.Wait && t.WaitReason == ThreadWaitReason.Suspended);
+        }
+
+        Assert.Null(ProcessSuspender.Suspend(_child.Id));
+        Assert.True(AllSuspended(_child.Id));
+        Assert.Null(ProcessSuspender.Resume(_child.Id));
+        Assert.False(AllSuspended(_child.Id));
+        Assert.NotNull(ProcessSuspender.Suspend(int.MaxValue - 1)); // no such process: an error, not an exception
+    }
+
+    [Fact]
     public void Finds_process_by_executable_name_with_full_path()
     {
         var found = new Win32ProcessHost().FindProcesses(["PING.EXE"]);

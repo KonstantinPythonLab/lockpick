@@ -56,6 +56,9 @@ public sealed class Re1Adapter : IGameAdapter
         return new Re1Session(new ValidatedMemory(process, ImageVerifier.AllowedRanges(profile)), profile);
     }
 
+    public Core.Insight.IChangeExplainer CreateChangeExplainer(VersionProfile profile) =>
+        new Re1ChangeExplainer(Re1Knowledge.LoadEmbedded());
+
     public static IEnumerable<VersionProfile> LoadEmbeddedProfiles()
     {
         var assembly = typeof(Re1Adapter).Assembly;

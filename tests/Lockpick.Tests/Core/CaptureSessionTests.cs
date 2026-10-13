@@ -250,6 +250,24 @@ public sealed class CaptureSessionTests : IDisposable
     }
 
     [Fact]
+    public void Ask_mode_answers_are_saved_with_the_changes_they_explain()
+    {
+        var monitor = new GameMonitor(_adapter, _host, _fingerprints, time: _time);
+        using var capture = new CaptureSession(monitor, _root, "re1", "9.9.9");
+        var question = new Lockpick.Core.Insight.PendingQuestion(
+            [new("flagScenarioB0:0x20000000:set", "story B flag #2 set (flagScenarioB0 bit 0x20000000) in room 104")],
+            "104", TimeSpan.FromSeconds(87), _time.GetUtcNow());
+
+        var answered = capture.AddAnswer(question, "  Kenneth's body\nfound ");
+        var skipped = capture.AddAnswer(question, null);
+
+        Assert.Equal(("answer", "Kenneth's body found", "104", 87.0), (answered.Kind, answered.Note, answered.Room, answered.GameSeconds));
+        Assert.Equal("skipped", skipped.Kind);
+        Assert.Contains("story B flag #2", Assert.Single(answered.Changes!), StringComparison.Ordinal);
+        Assert.Contains("\"kind\":\"answer\"", File.ReadAllText(Path.Combine(capture.Directory, "markers.jsonl")), StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Unsupported_builds_are_fingerprinted_but_not_recorded()
     {
         _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(_adapter.Profiles[0], ExePath) with { Sha256 = new string('C', 64) };

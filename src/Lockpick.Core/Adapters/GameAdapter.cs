@@ -39,6 +39,12 @@ public interface IGameAdapter
     /// Throws <see cref="AttachRejectedException"/> when the process does not match.
     /// </summary>
     IGameSession Attach(IAttachedProcess process, VersionProfile profile);
+
+    /// <summary>
+    /// Finds changes the game's known data doesn't explain, for captures that ask the player about them; null when the
+    /// adapter has no such knowledge.
+    /// </summary>
+    Insight.IChangeExplainer? CreateChangeExplainer(VersionProfile profile) => null;
 }
 
 /// <summary>A verified connection to one running game process.</summary>

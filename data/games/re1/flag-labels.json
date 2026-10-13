@@ -1,0 +1,29 @@
+{
+ "comment": "Meanings of game flag bits confirmed in live play (docs/MEMORY_MAP.md). Used by the capture timeline and by Lockpick's ask-about-unknown-events capture mode, which doesn't ask about these. Banks/masks refer to the profile fields of re1-gog-usa-hotfix4.",
+ "labels": [
+  {
+   "bank": "flagScenarioA0",
+   "mask": "0x00100000",
+   "label": "the statue falls (blue jewel drops into the dining room)",
+   "source": "live 2026-10-13, Jill and Chris"
+  },
+  {
+   "bank": "flagScenarioA0",
+   "mask": "0x00010000",
+   "label": "blue jewel placed in the lion head",
+   "source": "live 2026-10-13 + owner"
+  },
+  {
+   "bank": "flagScenarioA0",
+   "mask": "0x00040000",
+   "label": "lion head gives the wind crest",
+   "source": "live 2026-10-13 + owner"
+  },
+  {
+   "bank": "flagEnemies7",
+   "mask": "0x00000001",
+   "label": "an enemy the room doesn't remember died (kill flag 255)",
+   "source": "room scripts + live 2026-10-13"
+  }
+ ]
+}

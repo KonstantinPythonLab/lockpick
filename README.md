@@ -105,6 +105,8 @@ docs/                          architecture, roadmap, research, compatibility, m
 ## Safety and integrity
 
 - Read-only in 0.1. No game files are modified, no game binaries or assets are distributed.
+- The one exception is opt-in: the Debug page's *Ask me about unknown events* capture mode can pause (suspend) the
+  game process while you answer a question. It never writes to the game, and the game resumes as soon as you answer.
 - Exact build identification and runtime image verification before any read; reads are confined to the
   verified module image.
 - Future Trainer Mode writes will be explicit, validated and logged; Challenge Mode will disable writes.

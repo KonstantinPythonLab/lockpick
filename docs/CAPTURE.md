@@ -15,6 +15,18 @@ item box, Rebecca, more rooms and game builds) get verified. Capture is built in
 
 If you close Lockpick while capturing, the capture is saved automatically.
 
+## Ask mode (Lockpick asks what just happened)
+
+Tick **Ask me about unknown events** on the Debug page (it is off every time Lockpick starts). While capturing,
+Lockpick checks each change against what it knows about the game — every item, enemy and door in every room, and the
+events already identified. When something unknown happens (usually a cutscene or a scripted event), it waits until
+you're back in control, **pauses the game**, and asks what happened, showing the room, time and what changed. Type a
+short answer ("Barry's cutscene in the dining room") and press Enter, or Skip; the game resumes either way.
+
+Each thing is asked about once per capture. Answers are saved in the capture next to the changes they explain, so the
+event can be named for everyone. Pausing suspends the game process (nothing in it is changed); if the game runs as
+administrator it can't be paused, and the question appears while it keeps running.
+
 ## Markers (tell Lockpick what just happened)
 
 Markers tie a moment in the capture to what happened on screen, which turns guesses into facts ("this flag is the

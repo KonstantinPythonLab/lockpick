@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Lockpick.App.Services;
+using Lockpick.Core.Insight;
 using Lockpick.Core.Logging;
 using Lockpick.Core.Monitoring;
 using Lockpick.Core.Profiles;
@@ -46,6 +47,8 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
     private readonly DispatcherTimer _timer;
     private readonly ILogger _logger;
     private CaptureSession? _capture;
+    private QuestionScheduler? _questions;
+    private volatile bool _asking;
 
     public DebugViewModel(AppServices services, LiveState state)
         : base("Debug", "Icon.Bug")
@@ -89,6 +92,16 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
     [ObservableProperty]
     public partial string MarkerNote { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Ask mode: while capturing, pause the game and ask the player about changes Lockpick can't explain. Off at every
+    /// start so ordinary captures are never interrupted.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool AskAboutUnknownEvents { get; set; }
+
+    /// <summary>Shows a question to the player; set by the main window.</summary>
+    public Func<QuestionViewModel, Task<string?>>? AskPlayer { get; set; }
+
     [ObservableProperty]
     public partial string PollStats { get; private set; } = "—";
 
@@ -124,6 +137,7 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
             IsCapturing = true;
             LastCaptureZip = null;
             Markers.Clear();
+            _services.Source.Polled += OnPolledForQuestions;
             _logger.LogInformation("Capture started: {Directory}", _capture.Directory);
             UpdateCaptureStatus();
         }
@@ -145,6 +159,8 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
         }
 
         _capture = null;
+        _services.Source.Polled -= OnPolledForQuestions;
+        _questions = null;
         IsCapturing = false;
         foreach (var row in Markers)
         {
@@ -180,6 +196,71 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
         var marker = capture.AddMarker(MarkerNote);
         Markers.Insert(0, new MarkerRow(marker, capture.SetMarkerNote));
         MarkerNote = string.Empty;
+    }
+
+    partial void OnAskAboutUnknownEventsChanged(bool value)
+    {
+        // Start fresh: changes from before the mode was switched on are not asked about.
+        var profile = State.Status.Profile ?? _services.Adapter.Profiles.FirstOrDefault();
+        _questions = value && profile is not null && _services.Adapter.CreateChangeExplainer(profile) is { } explainer
+            ? new QuestionScheduler(explainer)
+            : null;
+        if (value && _questions is null)
+        {
+            CaptureStatus = "This game version can't tell known from unknown events yet, so ask mode is unavailable.";
+        }
+    }
+
+    /// <summary>Monitor thread: feeds every poll to the scheduler and asks on the UI thread when a question is ready.</summary>
+    private void OnPolledForQuestions(object? sender, GameSnapshot snapshot)
+    {
+        if (_asking || _questions is not { } questions || _capture is null)
+        {
+            return;
+        }
+
+        if (questions.Feed(snapshot) is { } question)
+        {
+            _asking = true;
+            Dispatcher.UIThread.Post(() => _ = AskAsync(question));
+        }
+    }
+
+    private async Task AskAsync(PendingQuestion question)
+    {
+        try
+        {
+            if (_capture is not { } capture || AskPlayer is not { } ask)
+            {
+                return;
+            }
+
+            var pid = State.Status.State == ConnectionState.Attached ? State.Status.Process?.ProcessId : null;
+            var problem = pid is { } id ? _services.Pause.Pause(id) : "not attached to a running game";
+            string? answer;
+            try
+            {
+                answer = await ask(new QuestionViewModel(question, problem)).ConfigureAwait(true);
+            }
+            finally
+            {
+                _services.Pause.Resume();
+            }
+
+            if (_capture == capture)
+            {
+                var marker = capture.AddAnswer(question, answer);
+                Markers.Insert(0, new MarkerRow(marker, capture.SetMarkerNote));
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            // The capture was stopped while the question was open.
+        }
+        finally
+        {
+            _asking = false;
+        }
     }
 
     private void RefreshHotkeyInfo() =>

@@ -36,6 +36,8 @@ public sealed class AppServices : IAsyncDisposable
         _wait = wait;
         _log = loggerFactory.CreateLogger("Lockpick");
         SetMarkerHotkey(settings.Current.MarkerHotkey);
+        Pause = new GamePause(settings, loggerFactory.CreateLogger("GamePause"));
+        Pause.RecoverFromCrash();
         ReplayPath = replayPath;
     }
 
@@ -52,6 +54,9 @@ public sealed class AppServices : IAsyncDisposable
     public FileFingerprintProvider Fingerprints { get; }
 
     public UpdateService Updates { get; }
+
+    /// <summary>Freezes the game while an ask-mode question is open.</summary>
+    public GamePause Pause { get; }
 
     /// <summary>Raised (on a background thread) when the marker hotkey is pressed, whichever window has focus.</summary>
     public event EventHandler? MarkerHotkeyPressed;
@@ -132,6 +137,7 @@ public sealed class AppServices : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        Pause.Dispose();
         await Source.DisposeAsync();
         Updates.Dispose();
         _markerHotkey?.Dispose();

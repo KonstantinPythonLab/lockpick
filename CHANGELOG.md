@@ -10,6 +10,9 @@ All notable changes to this project are documented here. The format follows
 - Capture markers: press **Ctrl+Shift+M** while playing (configurable in Settings) or use **Add marker** on the Debug
   page to mark a moment, then describe it. Markers record the time, room and game time, are saved in the capture
   (`markers.jsonl`) and are listed in the bounty analysis report.
+- Ask mode for captures (Debug page, off by default): when the game does something Lockpick can't explain — usually
+  a cutscene or scripted event — it pauses the game and asks what happened. Answers are saved in the capture with the
+  changes they explain. Pausing suspends the game process only while the question is open (opt-in; never writes).
 - Capture timeline (`tools/bounties/timeline.py`): a readable account of a capture — rooms, pickups, documents and
   maps by name, kills, enemies getting back up, unlocked doors, pushes, item box, item use, saves and markers.
 - Room index (`tools/rdt/rdt_index.py` → `data/games/re1/room-index.json`): which item, enemy or door each game flag

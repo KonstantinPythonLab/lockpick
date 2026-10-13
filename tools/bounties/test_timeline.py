@@ -56,6 +56,13 @@ class TimelineTests(unittest.TestCase):
             {"number": 1, "at": "2026-10-13T10:00:00-07:00", "room": "106", "gameSeconds": 1.0, "note": "hello"})))
         self.assertIn("Marker #1** 10:00:00 room 106: hello", timeline.render(capture, timeline.Names()))
 
+    def test_answers_show_what_was_asked(self):
+        capture = bounties.Capture("q.zip", [], markers=bounties.parse_markers(json.dumps(
+            {"number": 2, "at": "2026-10-13T10:00:00-07:00", "room": "104", "gameSeconds": 87, "note": "Kenneth found",
+             "kind": "answer", "changes": ["story B flag #2 set"]})))
+        text = timeline.render(capture, timeline.Names())
+        self.assertIn("Question #2** 10:00:00 room 104 — **Kenneth found** — about: story B flag #2 set", text)
+
 
 if __name__ == "__main__":
     unittest.main()

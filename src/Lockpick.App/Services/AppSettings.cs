@@ -38,6 +38,9 @@ public sealed record AppSettings
 
     /// <summary>Hotkey that adds a capture marker while the game has focus (a GlobalHotkey.Choices name, or "Off").</summary>
     public string MarkerHotkey { get; init; } = "Ctrl+Shift+M";
+
+    /// <summary>Set only while ask mode has the game frozen; lets the next start unfreeze it after a crash.</summary>
+    public PausedGame? PausedGame { get; init; }
 }
 
 public sealed class SettingsStore(string path, ILogger logger)

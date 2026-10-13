@@ -15,7 +15,9 @@ public sealed record CapturedBuild(string FileName, long FileSize, string Sha256
 /// A moment the player marked while capturing (markers.jsonl), so the data around it can be matched to what happened
 /// on screen. <see cref="At"/> is the wall clock the memory log and traces also use.
 /// </summary>
-public sealed record CaptureMarker(int Number, DateTimeOffset At, int Attachment, double? GameSeconds, string? Room, string Note);
+/// <param name="Kind">"marker" (added by the player), "answer" or "skipped" (an ask-mode question).</param>
+/// <param name="Changes">For questions: the unexplained changes that were asked about.</param>
+public sealed record CaptureMarker(int Number, DateTimeOffset At, int Attachment, double? GameSeconds, string? Room, string Note, string Kind = "marker", IReadOnlyList<string>? Changes = null);
 
 /// <summary>Contents of capture-info.json.</summary>
 public sealed record CaptureInfo(string LockpickVersion, string Os, DateTimeOffset StartedAt)
@@ -186,6 +188,33 @@ public sealed class CaptureSession : IDisposable
                 CleanNote(note));
             _markers.Add(marker);
             _events?.WriteLine($"[{marker.At.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)}] Marker {marker.Number}{(marker.Note.Length > 0 ? ": " + marker.Note : string.Empty)}");
+            _events?.Flush();
+            WriteMarkers();
+            return marker;
+        }
+    }
+
+    /// <summary>
+    /// Records the player's answer to an ask-mode question (or that it was skipped), placed at the moment the first
+    /// unexplained change happened.
+    /// </summary>
+    public CaptureMarker AddAnswer(Insight.PendingQuestion question, string? answer)
+    {
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_stopped, this);
+            var note = CleanNote(answer);
+            var marker = new CaptureMarker(
+                _markers.Count + 1,
+                question.At.ToLocalTime(),
+                _trace is not null ? _info.Attachments : 0,
+                question.GameTime is { } t ? Math.Round(t.TotalSeconds, 2) : null,
+                question.Room,
+                note,
+                note.Length > 0 ? "answer" : "skipped",
+                [.. question.Changes.Select(c => c.Description)]);
+            _markers.Add(marker);
+            _events?.WriteLine($"[{_time.GetLocalNow().ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)}] Question {marker.Number} ({string.Join("; ", marker.Changes!)}): {(note.Length > 0 ? note : "skipped")}");
             _events?.Flush();
             WriteMarkers();
             return marker;

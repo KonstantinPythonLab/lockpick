@@ -274,6 +274,8 @@ def parse_markers(text: str) -> list[dict]:
             "room": str(m["room"])[:8] if m.get("room") else None,
             "gameSeconds": float(seconds) if isinstance(seconds, (int, float)) else None,
             "note": " ".join(str(m.get("note", "")).split())[:200],
+            "kind": m.get("kind") if m.get("kind") in ("marker", "answer", "skipped") else "marker",
+            "changes": [str(c)[:200] for c in m.get("changes") or [] if isinstance(c, str)][:12],
         })
     return markers
 
@@ -535,7 +537,10 @@ def report(data: dict, capture: Capture, findings: dict[str, Finding], facts: di
                 where.append(f"game {t // 3600}:{t // 60 % 60:02}:{t % 60:02}")
             # Notes are player text: shown as code so they can't mention people, link or format the comment.
             note = m["note"].replace("`", "'")
-            lines.append(f"- #{m['number']} {' · '.join(where)}" + (f" — `{note}`" if note else ""))
+            kind = {"answer": "answered: ", "skipped": "asked, skipped"}.get(m["kind"], "")
+            asked = f" (asked about: {'; '.join(m['changes'])})" if m["changes"] else ""
+            detail = kind + (f"`{note}`" if note else "") + asked
+            lines.append(f"- #{m['number']} {' · '.join(where)}" + (f" — {detail}" if detail else ""))
         if len(capture.markers) > MAX_REPORTED_MARKERS:
             lines.append(f"- … and {len(capture.markers) - MAX_REPORTED_MARKERS} more")
     if not matched and not rooms:
