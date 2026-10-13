@@ -146,6 +146,128 @@
       "sources": ["deserteagle417/RE1-Autosplitter mainMenu (EnglishGOG)"]
     },
     {
+      "name": "inv0",
+      "address": "0xBE9944",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 1: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv1",
+      "address": "0xBE9946",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 2: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv2",
+      "address": "0xBE9948",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 3: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv3",
+      "address": "0xBE994A",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 4: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv4",
+      "address": "0xBE994C",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 5: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv5",
+      "address": "0xBE994E",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 6: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv6",
+      "address": "0xBE9950",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 7: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "inv7",
+      "address": "0xBE9952",
+      "type": "u16",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12 (tests/Lockpick.Tests/Fixtures/re1-live-jill-inventory.trace.txt): pickups fill the first empty slot; Beretta (id 0x02) quantity = loaded rounds, decremented per shot; reload moves rounds from handgun bullets (id 0x0B); consumed items are removed and later slots shift up. Static: item writes at 0xBE9944 (id) / 0xBE9945 (qty).",
+      "description": "Inventory slot 8: low byte item id, high byte quantity/ammo. Slots 7-8 are Jill only.",
+      "sources": ["static analysis of this executable (item writes at 0xBE9944/0xBE9945)", "ecruells/resident-evil-pc-decomp BioCard.h", "deserteagle417/RE1-Autosplitter Inventory"]
+    },
+    {
+      "name": "equippedSlot",
+      "address": "0xBE9849",
+      "type": "u8",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12: 1 with the knife (slot 1) equipped, 2 after equipping the Beretta (slot 2), 0 on New Game.",
+      "description": "Equipped inventory slot (1-based, 0 = none).",
+      "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
+    },
+    {
+      "name": "inventoryPtr",
+      "address": "0xD22768",
+      "type": "u32",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-12: 0xBE9944 throughout. Static: mov dword [0xD22768],0xBE9944 at 0x47793F. Rebecca's 0xBE9950 not yet observed.",
+      "description": "Pointer to the active character's inventory (0xBE9944, or 0xBE9950 for Rebecca).",
+      "sources": ["ecruells/resident-evil-pc-decomp Globals.h", "static: mov dword [0xD22768],0xBE9944 at 0x47793F"]
+    },
+    {
+      "name": "box0",
+      "address": "0xBE98E4",
+      "type": "u16",
+      "verification": "unverified",
+      "description": "Item box entry 1 (low byte id, high byte quantity).",
+      "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
+    },
+    {
+      "name": "box1",
+      "address": "0xBE98E6",
+      "type": "u16",
+      "verification": "unverified",
+      "description": "Item box entry 2 (low byte id, high byte quantity).",
+      "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
+    },
+    {
+      "name": "box2",
+      "address": "0xBE98E8",
+      "type": "u16",
+      "verification": "unverified",
+      "description": "Item box entry 3 (low byte id, high byte quantity).",
+      "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
+    },
+    {
+      "name": "box3",
+      "address": "0xBE98EA",
+      "type": "u16",
+      "verification": "unverified",
+      "description": "Item box entry 4 (low byte id, high byte quantity).",
+      "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
+    },
+    {
       "name": "enemyCount",
       "address": "0xBE41E2",
       "type": "u8",

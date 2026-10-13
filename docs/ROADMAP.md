@@ -65,6 +65,7 @@ Acceptance criteria:
 - Every write goes through a typed, profile-declared writable field with bounds (e.g. HP 1..maxHp) and is read back to confirm.
 - Trainer action log (persisted) with timestamp, field, old → new value.
 - Features: set/lock HP, infinite ammo, inventory viewer/editor (8 slots, id + quantity at `0xBE9944`), item box viewer.
+  Inventory layout, ammo semantics and equipped slot are already runtime-verified (read side); the item box is not.
 - Item id table (from biorand, MIT, with attribution) verified against the in-game inventory.
 - Hotkeys (global, configurable) with no effect when the game is not attached.
 - Run record notes whether any write occurred (`RunInvalidated` event).

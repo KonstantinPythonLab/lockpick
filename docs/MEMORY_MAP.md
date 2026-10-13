@@ -27,6 +27,10 @@ from a third-party source, diagnostics only.
 | `0xBE631C` | i32 | positionY | Player Y (entity +0x38) | static (0 on flat floors) |
 | `0xBE6320` | i32 | positionZ | Player Z (entity +0x3C) | runtime |
 | `0xBE6358` | i16 | yaw | Facing (entity +0x74), units unconfirmed | unverified |
+| `0xBE9944` + 2·i | u16 | inv0..inv7 | Inventory slot: low byte item id, high byte quantity (weapons: loaded rounds). 6 slots (Chris/Rebecca), 8 (Jill); compacts when an item is used | runtime |
+| `0xBE9849` | u8 | equippedSlot | Equipped slot, 1-based (0 = none) | runtime |
+| `0xD22768` | u32 | inventoryPtr | Active inventory (`0xBE9944`; `0xBE9950` for Rebecca) | runtime (Jill) |
+| `0xBE98E4` + 2·i | u16 | box0..box3 | Item box entries (id, quantity) | unverified |
 | `0xBE41E2` | u8 | enemyCount | Active enemy count | unverified (changed 2→0→2 across rooms 106/105/104 live) |
 
 ### Code anchors (checked in the live process before reading)
@@ -54,6 +58,21 @@ from a third-party source, diagnostics only.
 - The timer is zeroed on New Game (`0x48090A`), restored from the save copy `0xBE9844` on load
   (`0x430695`), and the results screen divides the saved copy by `0x1A5E0` (1 h at 30/s) and `0x708` (1 min).
 
+### Item ids observed live (behavioral identification)
+
+| Id | Behavior observed | Likely item |
+|---|---|---|
+| `0x01` | Starting item, slot 1, equipped as melee | Knife |
+| `0x02` | Quantity drops by 1 per shot, refilled to 15 on reload | Beretta |
+| `0x0B` | Consumed by Beretta reloads; item box starts with two stacks of 15 | Handgun bullets |
+| `0x41` | Consumed while HP went 46 → 96 (full heal) | First aid spray |
+| `0x03` | Picked up with quantity 7 | Shotgun (unconfirmed) |
+| `0x1F`, `0x44` | Picked up, not used | unknown |
+
+Names are not shown in the UI until an item table is verified (0.2/0.4).
+
+Stage/room note: walking up the main-hall stairs goes to `stage=1, room=0x03` (room 203): stage 2 = mansion 2F.
+
 ## `stateFlags` (`0xBE41C0`) observed values
 
 | Situation | Value(s) |
@@ -77,10 +96,8 @@ From the decomp (GPL-3.0; facts only, no code used) and the RE1 Mod SDK layout, 
 |---|---|---|
 | `0xBE62E4` | Player entity (0x180 bytes) | partially (fields above) |
 | `0xBE6464` | Enemy array, 30 × 0x18C; slot active when `+0x00 & 1` | unverified |
-| `0xBE9944` | Inventory, `{u8 id, u8 qty}` × 6 (Chris/Rebecca) or 8 (Jill) | static (item writes at `+0`/`+1`) |
 | `0xBE9950` | Rebecca's inventory | unverified |
 | `0xBE98E4` | Item box, 48 × `{id, qty}` | unverified |
-| `0xBE9849` | Equipped slot (1-based) | unverified |
 | `0xBE9844` | Saved copy of the game timer | static |
 | `0xBE9620` | Save block ("bio card"), 0x41C bytes | unverified |
 | `0xBE98C0`… | Scenario/flag banks (see RESEARCH.md) | unverified |
