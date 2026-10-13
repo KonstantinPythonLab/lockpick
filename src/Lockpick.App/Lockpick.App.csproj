@@ -25,6 +25,10 @@
     <ProjectReference Include="..\Lockpick.GameAdapter.RE1\Lockpick.GameAdapter.RE1.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Single source for the in-app credits (Settings -> Credits). -->
+    <EmbeddedResource Include="..\..\CONTRIBUTORS.md" LogicalName="Lockpick.App.CONTRIBUTORS.md" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="Lockpick.Tests" />
   </ItemGroup>
 </Project>

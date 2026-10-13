@@ -14,6 +14,10 @@ The most valuable help right now. Lockpick only trusts what it has seen the real
 
 Details and privacy: [docs/CAPTURE.md](docs/CAPTURE.md).
 
+Bounties are **not paid**. The reward is your name in the app's credits (Settings → Credits) and in
+CONTRIBUTORS.md, if you want it. Automated "proposed fix" comments on bounty issues are hidden as spam — bounties
+are completed by real captures of the game.
+
 ## 2. Report builds, bugs and ideas
 
 - Unsupported game version: open an **Unsupported game build** issue with the fingerprint (Settings → Check build).
@@ -30,4 +34,5 @@ Details and privacy: [docs/CAPTURE.md](docs/CAPTURE.md).
   game-specific code in the game adapter, no game files or assets in the repository, and keep
   `dotnet build -c Release` warning-free and `dotnet test` green.
 
-With your permission, contributors are credited in [CONTRIBUTORS.md](CONTRIBUTORS.md).
+Lockpick is free and unpaid work all round. With your permission, contributors are credited in the app
+(Settings → Credits) and in [CONTRIBUTORS.md](CONTRIBUTORS.md).

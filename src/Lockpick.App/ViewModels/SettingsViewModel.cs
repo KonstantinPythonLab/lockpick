@@ -34,6 +34,9 @@ public sealed partial class SettingsViewModel : PageViewModel
 
     public UpdateService Updates { get; }
 
+    /// <summary>People credited in the app, from CONTRIBUTORS.md.</summary>
+    public IReadOnlyList<CreditSection> Credits { get; } = Services.Credits.Load();
+
     public string DetectedInstall { get; }
 
     public string ProfileDirectory { get; }

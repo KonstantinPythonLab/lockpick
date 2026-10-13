@@ -8,6 +8,7 @@ body:
         Thanks for helping Lockpick learn the game! Attach your `LockpickCapture-*.zip` below (drag it into the box).
         Bounty IDs are listed in [docs/CAPTURE_BOUNTIES.md](https://github.com/mscrnt/lockpick/blob/main/docs/CAPTURE_BOUNTIES.md).
         Captures contain game values and the game's file fingerprint only — no personal information.
+        Bounties are not paid: the reward is your name in Lockpick's in-app credits, if you want it.
   - type: textarea
     id: zip
     attributes:
@@ -28,7 +29,7 @@ body:
   - type: dropdown
     id: credit
     attributes:
-      label: May we credit you in CONTRIBUTORS.md?
+      label: May we credit you in the app's credits and CONTRIBUTORS.md?
       options:
         - "Yes, with my GitHub username"
         - "No thanks"

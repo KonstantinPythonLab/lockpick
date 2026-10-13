@@ -69,7 +69,8 @@ dotnet run --project tools/Lockpick.Probe -- identify    # check your installed 
 
 Lockpick verifies everything against the real game. Recording a play session (any kind; speedruns are great)
 helps the most: install Lockpick, open **Debug → Start capture**, play, then *Stop and save* and send the zip
-([details](docs/CAPTURE.md)). The **[bounty list](docs/CAPTURE_BOUNTIES.md)** shows what's still needed. Planning lives on the
+([details](docs/CAPTURE.md)). The **[bounty list](docs/CAPTURE_BOUNTIES.md)** shows what's still needed — bounties are unpaid; the reward is
+your name in the app's credits. Planning lives on the
 [roadmap board](https://github.com/users/mscrnt/projects/8); questions and ideas go to
 [Discussions](https://github.com/mscrnt/lockpick/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md). Helpers are credited in
 [CONTRIBUTORS.md](CONTRIBUTORS.md).

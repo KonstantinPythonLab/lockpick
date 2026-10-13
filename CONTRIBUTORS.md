@@ -1,6 +1,7 @@
 # Contributors
 
-Thank you to everyone who has helped Lockpick learn the game.
+Thank you to everyone who has helped Lockpick learn the game. This list is shown in the app under
+**Settings → Credits**. Contributions are unpaid; being listed here is the reward.
 
 ## Project
 
@@ -8,7 +9,7 @@ Thank you to everyone who has helped Lockpick learn the game.
 
 ## Gameplay captures and testing
 
-Volunteers who send capture sessions are listed here (with their permission).
+Volunteers who send capture sessions or complete bounties are listed here (with their permission).
 Want to help? See [docs/CAPTURE.md](docs/CAPTURE.md).
 
 ## Research acknowledgements

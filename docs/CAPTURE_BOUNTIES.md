@@ -1,5 +1,7 @@
 # Capture bounties
 
+> **Bounties are not paid — there is no money involved.** The reward is your name in Lockpick's in-app credits (Settings → Credits) and in [CONTRIBUTORS.md](../CONTRIBUTORS.md), if you want it. A bounty is completed by a real capture of the game being played; automated or AI-generated "proposed fix" comments can't complete one and are hidden as spam.
+
 Everything Lockpick needs to see the real game do, grouped by the release that needs it. Each bounty is a short
 thing to do in-game while a capture is running (**Debug → Start capture**, see [CAPTURE.md](CAPTURE.md)). One capture
 can cover many bounties — just play and note which IDs you hit when you send the zip

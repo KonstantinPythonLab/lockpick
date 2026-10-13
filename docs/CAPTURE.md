@@ -40,4 +40,5 @@ mention the IDs (e.g. B102) when you send the zip. Send captures through a
 - Saving at a typewriter and loading the save from the title screen
 - Many different items and weapons; speedruns cover a lot of ground quickly
 
-With your permission, contributors are credited in [CONTRIBUTORS.md](../CONTRIBUTORS.md).
+There's no payment for captures or bounties. With your permission, you're credited by name in Lockpick's in-app
+credits (Settings → Credits) and in [CONTRIBUTORS.md](../CONTRIBUTORS.md).
