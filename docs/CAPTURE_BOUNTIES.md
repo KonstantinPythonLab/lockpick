@@ -1,6 +1,17 @@
 # Capture bounties
 
-> **Bounties are not paid — there is no money involved.** The reward is your name in Lockpick's in-app credits (Settings → Credits) and in [CONTRIBUTORS.md](../CONTRIBUTORS.md), if you want it. A bounty is completed by a real capture of the game being played; automated or AI-generated "proposed fix" comments can't complete one and are hidden as spam.
+> **Unpaid, captures only, no bots** — see the rules below.
+
+## Bounty rules
+
+1. **Bounties are unpaid.** No money, crypto or other payment is ever offered or owed. The reward is your name in
+   Lockpick's in-app credits (Settings → Credits) and in CONTRIBUTORS.md, if you want it.
+2. **Bounties are captures, never code changes.** A bounty is completed only by a capture zip of you playing the
+   game (Debug → Start capture). Patches, pull requests or "proposed fixes" don't complete bounties and are never
+   rewarded. Code contributions are welcome separately under the normal [contributing guide](../CONTRIBUTING.md).
+3. **No automated or AI-generated replies.** Comments, issues or pull requests produced by bots or AI tools are hidden
+   as spam and the account may be blocked and reported. Payment requests are ignored.
+
 
 Everything Lockpick needs to see the real game do, grouped by the release that needs it. Each bounty is a short
 thing to do in-game while a capture is running (**Debug → Start capture**, see [CAPTURE.md](CAPTURE.md)). One capture

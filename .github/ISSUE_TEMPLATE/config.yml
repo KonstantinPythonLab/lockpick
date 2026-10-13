@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/mscrnt/lockpick/discussions
+    about: Ask questions, share ideas and report game versions in Discussions.
+  - name: Capture bounty rules
+    url: https://github.com/mscrnt/lockpick/blob/main/docs/CAPTURE_BOUNTIES.md#bounty-rules
+    about: Bounties are unpaid, completed only by captures (never code changes), and automated replies are not accepted.

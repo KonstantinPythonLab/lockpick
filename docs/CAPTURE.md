@@ -40,5 +40,6 @@ mention the IDs (e.g. B102) when you send the zip. Send captures through a
 - Saving at a typewriter and loading the save from the title screen
 - Many different items and weapons; speedruns cover a lot of ground quickly
 
-There's no payment for captures or bounties. With your permission, you're credited by name in Lockpick's in-app
+There's no payment for captures or bounties, bounties are completed only by captures (never code changes), and
+automated or AI-generated replies aren't accepted — see the [bounty rules](CAPTURE_BOUNTIES.md#bounty-rules). With your permission, you're credited by name in Lockpick's in-app
 credits (Settings → Credits) and in [CONTRIBUTORS.md](../CONTRIBUTORS.md).

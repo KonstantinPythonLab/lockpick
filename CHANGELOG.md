@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Bounty rules: unpaid, completed only by captures (never code changes), no automated or AI-generated replies;
+  blank issues disabled so reports go through the forms.
+
 ## [0.1.2] - 2026-10-13
 
 ### Added

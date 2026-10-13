@@ -9,6 +9,7 @@ body:
         Bounty IDs are listed in [docs/CAPTURE_BOUNTIES.md](https://github.com/mscrnt/lockpick/blob/main/docs/CAPTURE_BOUNTIES.md).
         Captures contain game values and the game's file fingerprint only — no personal information.
         Bounties are not paid: the reward is your name in Lockpick's in-app credits, if you want it.
+        Bounties are completed only by captures (never code changes). Automated or AI-generated submissions are closed.
   - type: textarea
     id: zip
     attributes:
@@ -26,6 +27,13 @@ body:
     attributes:
       label: What did you do? (rough order is enough)
       placeholder: e.g. Jill game from a save, item box twice, got poisoned by the snake, died once, quit to title.
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I played this capture myself, and I understand bounties are unpaid (credit only).
+          required: true
   - type: dropdown
     id: credit
     attributes:

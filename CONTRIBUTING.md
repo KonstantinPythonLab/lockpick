@@ -14,9 +14,16 @@ The most valuable help right now. Lockpick only trusts what it has seen the real
 
 Details and privacy: [docs/CAPTURE.md](docs/CAPTURE.md).
 
-Bounties are **not paid**. The reward is your name in the app's credits (Settings → Credits) and in
-CONTRIBUTORS.md, if you want it. Automated "proposed fix" comments on bounty issues are hidden as spam — bounties
-are completed by real captures of the game.
+### Bounty rules
+
+1. **Bounties are unpaid.** No money, crypto or other payment is ever offered or owed. The reward is your name in
+   Lockpick's in-app credits (Settings → Credits) and in CONTRIBUTORS.md, if you want it.
+2. **Bounties are captures, never code changes.** A bounty is completed only by a capture zip of you playing the
+   game (Debug → Start capture). Patches, pull requests or "proposed fixes" don't complete bounties and are never
+   rewarded. Code contributions are welcome separately under the normal [contributing guide](#3-code).
+3. **No automated or AI-generated replies.** Comments, issues or pull requests produced by bots or AI tools are hidden
+   as spam and the account may be blocked and reported. Payment requests are ignored.
+
 
 ## 2. Report builds, bugs and ideas
 
@@ -25,6 +32,10 @@ are completed by real captures of the game.
 - Questions and ideas: [Discussions](https://github.com/mscrnt/lockpick/discussions).
 
 ## 3. Code
+
+Code is never a bounty and is never paid; it's volunteer work like everything else here.
+Please write your own changes — AI-generated or automated pull requests are closed.
+
 
 - Read [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (build, test, verifying addresses) and
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (structure and decisions).
