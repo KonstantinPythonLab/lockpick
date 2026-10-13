@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format follows
   automatically; captures with trainer writes never do); the `capture-triage` workflow comments on Capture
   submission issues with the analysis.
 
+### Fixed
+- A capture started mid-session now records the current state first (a quiet session left the recording empty).
+- Bounty analysis ignores changes outside gameplay (attract-mode demos, loads, title screen).
+
 ### Changed
 - Bounty rules: unpaid, completed only by captures (never code changes), no automated or AI-generated replies;
   blank issues disabled so reports go through the forms.

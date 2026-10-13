@@ -62,7 +62,7 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 | B109 | Get **poisoned** (snake/Yawn/spider) and cure it with a blue herb or serum | Status flags (player +0xDC) | ⬜ |
 | B110 | Combine items (herbs; anything else combinable) | Combine results and slot changes | ⬜ |
 | B111 | Pick up each **key item** (keys, crests, MO disk, emblems, etc.) | Key item ids → item name table | ⬜ |
-| B112 | Use an ink ribbon to save at a typewriter | Ink ribbon id and count | ⬜ |
+| B112 | Use an ink ribbon to save at a typewriter | Ink ribbon id and count | 🟡 attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — needs a real save to confirm |
 | B113 | Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots) | Slot limits per character | ⬜ |
 | B114 | Switch equipped weapon between several weapons | Equipped-slot behavior per weapon | 🟡 knife/Beretta seen |
 

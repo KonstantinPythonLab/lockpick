@@ -45,6 +45,15 @@ class LiveTraceTests(unittest.TestCase):
         self.assertEqual(facts["new_item_ids"], [])
 
 
+class AttractDemoTests(unittest.TestCase):
+    def test_attract_mode_demo_produces_no_evidence(self):
+        # Live capture (2026-10-13) of the title-screen demo: Chris in room 107 with a preset inventory and item box,
+        # HP left at 0. It is not gameplay and must not count towards any bounty.
+        found, facts = bounties.detect(bounties.read_capture(FIXTURES / "re1-live-attract-demo.trace.txt"))
+        self.assertEqual(found, {})
+        self.assertEqual(facts["rooms"], {})
+
+
 class CaptureZipTests(unittest.TestCase):
     def test_a_single_rebecca_signal_needs_review(self):
         trace = BASE + "[10:00:05.000] character=0x3 | timer=0x200 pos=0x0,0x0\n"

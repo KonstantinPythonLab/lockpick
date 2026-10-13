@@ -68,6 +68,9 @@ from a third-party source, diagnostics only.
 | `0x41` | Consumed while HP went 46 → 96 (full heal) | First aid spray |
 | `0x03` | Picked up with quantity 7 | Shotgun (unconfirmed) |
 | `0x1F`, `0x44` | Picked up, not used | unknown |
+| `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
+| `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |
+| `0x2F` | In the attract-mode demo inventory, quantity 2 | Ink ribbon? (id 47 in BioRand's table) |
 
 Names are not shown in the UI until an item table is verified (0.2/0.4).
 

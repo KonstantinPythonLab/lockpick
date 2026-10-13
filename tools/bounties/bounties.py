@@ -35,7 +35,7 @@ DOC = ROOT / "docs" / "CAPTURE_BOUNTIES.md"
 STATUS_ICON = {"done": "✅", "partial": "🟡", "needed": "⬜", "blocked": "🛠️"}
 
 # Item ids already identified from live captures (docs/MEMORY_MAP.md); anything else is reported as new.
-KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x0B, 0x1F, 0x41, 0x44}
+KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x0B, 0x0E, 0x1F, 0x2F, 0x41, 0x44}
 
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
@@ -255,6 +255,7 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
 
             if prev is not None:
                 prev_hp = signed(prev.get("hp", 0), 16)
+                playing = game and in_game(prev)
                 if prev.get("maxHp", 0) > 0 and prev_hp > 0 and hp <= 0:
                     died = True
                     add("death", f"HP {prev_hp} → {hp}", True)
@@ -265,13 +266,13 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
                 old_t, new_t = prev.get("gameTimer"), s.get("gameTimer")
                 if game and old_t is not None and new_t is not None and new_t < old_t and new_t >= 60:
                     add("save_loaded", f"timer restored {old_t / 30:.0f}s → {new_t / 30:.0f}s", True)
-                for i in range(8):
+                for i in range(8 if playing else 0):
                     key = f"inv{i}"
                     if key in s and key in prev and (s[key] & 0xFF) == (prev[key] & 0xFF) and s[key] & 0xFF:
                         before, after = prev[key] >> 8, s[key] >> 8
                         if after == before - 1 and s.get("equippedSlot") == i + 1:
                             add("fire_and_reload", f"weapon id 0x{s[key] & 0xFF:02X} fired (slot {i + 1})", False)
-                for i in range(4):
+                for i in range(4 if playing else 0):
                     key = f"box{i}"
                     if key in s and key in prev and s[key] != prev[key]:
                         add("item_box_changed", f"item box entry {i + 1}: 0x{prev[key]:04X} → 0x{s[key]:04X}", False)
@@ -341,7 +342,9 @@ def report(data: dict, capture: Capture, findings: dict[str, Finding], facts: di
         new = ", ".join(f"0x{i:02X}" for i in facts["new_item_ids"]) or "none"
         lines.append(f"**Item ids seen:** {', '.join(f'0x{i:02X}' for i in facts['item_ids'])} (new: {new})")
     if not matched and not rooms:
-        lines += ["", "No bounty evidence found in this capture (was the game running while capturing?)."]
+        reason = ("it only contains the title screen or attract-mode demos — start or load a game while capturing"
+                  if facts["samples"] else "no game data was recorded — was the game running while capturing?")
+        lines += ["", f"No bounty evidence found: {reason}."]
     lines += ["", "_Automated summary. A maintainer confirms results before bounties are checked off. "
               "Bounties are unpaid; the reward is an in-app credit if you want it._"]
     return "\n".join(lines) + "\n"

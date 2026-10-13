@@ -111,6 +111,26 @@ public sealed class CaptureSessionTests : IDisposable
     }
 
     [Fact]
+    public void Capture_started_mid_session_records_the_current_state_first()
+    {
+        var profile = _adapter.Profiles[0];
+        _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(profile, ExePath);
+        _host.Launch(5, ExePath, new FakeMemory().WithVerifiedImage(profile), new ModuleImage(0x400000, 0x49B2000, ExePath));
+        var monitor = new GameMonitor(_adapter, _host, _fingerprints, time: _time);
+        _time.Advance(TimeSpan.FromSeconds(2));
+        monitor.Tick(); // attached before capture starts
+
+        using var capture = new CaptureSession(monitor, _root, "re1", "9.9.9");
+        monitor.Tick(); // nothing changes (title screen)
+        var zip = capture.Stop();
+
+        using var archive = ZipFile.OpenRead(zip);
+        using var reader = new StreamReader(archive.GetEntry("recording-1.jsonl")!.Open());
+        var (_, frames) = SessionRecording.Read(reader);
+        Assert.Single(frames);
+    }
+
+    [Fact]
     public void Unsupported_builds_are_fingerprinted_but_not_recorded()
     {
         _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(_adapter.Profiles[0], ExePath) with { Sha256 = new string('C', 64) };

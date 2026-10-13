@@ -170,7 +170,10 @@
           "id": "B112",
           "task": "Use an ink ribbon to save at a typewriter",
           "verifies": "Ink ribbon id and count",
-          "status": "needed"
+          "status": "partial",
+          "evidence": [
+            "attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — needs a real save to confirm"
+          ]
         },
         {
           "id": "B113",

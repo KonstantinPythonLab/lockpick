@@ -81,6 +81,9 @@ SCD opcodes: `0x0C door_aot_set` (26 bytes; target = stage<<5 | room), `0x18 ite
   timer jumps to the save's value (backwards, `0x64AE → 0x6253`), the position resets to the saved spot and the
   timer resumes. During the load-file screen (~7 s) the previous game's values remain in memory with
   `mainMenu == 0`, so they briefly count as "in game".
+- **Confirmed (live, 2026-10-13):** attract mode (title screen left idle) replays the same demo each cycle on this
+  build: Chris in room 107 with a preset 8-slot inventory and item box, `mainMenu = 0`, max HP 140 but **HP 0**.
+  The session rule (`hp > 0`) therefore treats demos as "not in game", so they produce no state or events.
 - **Refuted for this build:** the autosplitter's `time` (`0x4D46D4`) is not the live timer — it is a
   copy written at one code site (`0x4298AB`). The live timer is `0xD22730`.
 

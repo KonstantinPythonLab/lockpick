@@ -269,6 +269,12 @@ public sealed class CaptureSession : IDisposable
         _events = new StreamWriter(Path.Combine(Directory, $"events-{n}.txt"));
         _recorder = SessionRecorder.Create(Path.Combine(Directory, $"recording-{n}.jsonl"), _gameId, profileId, _time.GetUtcNow());
         _lastRaw = null;
+
+        // Started mid-session: record the current state first, or a quiet session would leave the recording empty.
+        if (_source.Latest is { } current)
+        {
+            _recorder.Append(current);
+        }
         WriteInfo();
     }
 
