@@ -149,6 +149,27 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **Enemy types confirmed by behavior:** 0 and 17 zombies, 2 dogs (Cerberus), 5 crows. Dog kills set `flagEnemies` bits
   like zombie kills; a new game clears every flag bank.
 
+## Not yet accounted for (sessions 4–5, 2026-10-13)
+
+What changes during play but isn't explained yet — candidates for markers in future captures.
+
+- **Scenario flags** (`flagScenarioA/B`): ~40 bits set at story moments, e.g. B0 flag 2 on entering 104 (both
+  characters; Kenneth's body?), B0 flag 3 back in the main hall afterwards, B5 flags 160–173 around the dining room
+  (Jill), B2 64/65 in 108 as each dog appears, B1 32 in 115 when the trap-room door reopened (Barry?), A3 103 / B2
+  66, 94 on the balcony 212, A0 flag 3 in the gallery 117 just before the star crest, A3 106 / 108 when the star and
+  wind crests went into the door in 11A. Meanings are inferred from timing only.
+- **`flagRoom` beyond rooms visited:** word 3 bit `0x8` (flag 124) when the 1F map is taken (both characters);
+  word 4 bit `0x4000` (flag 145) when the 206 document was read; word 0 bit `0x4` (flag 29) in 107 for Chris only.
+- **Kill flag 255** (`flagEnemies7` bit `0x1`) is set when an enemy whose room script says "not persisted" dies.
+- **Jill's lockpick** never appears in the inventory or item box, yet she opened Sword-key doors (107→108, 103→10E).
+- **Unidentified memory** (changes during play): `0xBE41C6–0xBE41DC` (state block next to `stateFlags`; `0xBE41DC`
+  toggles 0/2 at every room load), `0xBE5684–0xBE62DE` (arrays with a 0x84-byte stride — objects/effects, mostly
+  updated at room loads; the pushed stairs/statue positions were not found in the recorded regions),
+  `0xBE92CC–0xBE9318`, `0xBE9616` (counts 0→1→2→3→0 through each door transition), `0xBE9682–0xBE981F` (written
+  once at new game), `0xBE9823–0xBE9852` (save-card fields after stage/room/camera, very active), `0xBE995C–0xBE9A3B`
+  (224-byte table, single bytes change at a few moments — door/map state?), and the system block `0xD213A1–0xD21503`
+  (arrays with a 0x24 stride).
+
 ## Structures (leads for later milestones)
 
 From the decomp (GPL-3.0; facts only, no code used) and the RE1 Mod SDK layout, consistent with each other:

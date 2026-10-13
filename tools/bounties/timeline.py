@@ -192,7 +192,7 @@ class Timeline:
                     doors = names.lookup("doors", flag, room, player, key="lockFlag")
                     where = ", ".join(sorted({f"{d['room']}→{d['target']}" for d in doors})) or f"lock flag {flag}"
                     keys = sorted({names.item(d["key"]) for d in doors if d.get("key")})
-                    self.emit(s, f"{'unlocked' if now_set else 'locked'} door {where}" + (f" (needs {', '.join(keys)})" if keys else ""))
+                    self.emit(s, f"{'unlocked' if now_set else 'locked'} door {where}" + (f" ({', '.join(keys)} lock)" if keys else ""))
             for bank in FLAG_BANKS:
                 for word in range(8):
                     key = f"{bank}{word}"
