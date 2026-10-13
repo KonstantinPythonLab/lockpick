@@ -112,7 +112,7 @@
       "type": "u32",
       "verification": "static",
       "description": "Main state bitfield (diagnostics only). 0x00800000 = Jill RDT variant. 0x02000000 is NOT a gameplay flag: live it is set only around game start and door transitions. 0x04000000 is set during door transitions, 0x00008000 while menus are open.",
-      "evidence": "0x2000000 is OR-ed in by game start (0x480B53, 0x41B5AA); 0x1000000 at 0x481906; 0x800000 selects ROOMxxx1.RDT in the room loader (0x477DE6) and is set when a non-Chris character is chosen (0x4817CE). Live 2026-10-12: free movement 0x8011000C/0x8013000C (room 106) and 0x80000000 (room 105); menus 0x80400000 -> 0x60400000 -> 0x80008000 -> 0x40000000; door 0x6601000C -> 0x46010000; title 0x0/0x40000000/0x80000000; death 0x8100000C (0x01000000 set at HP -10); Jill game start 0x4080000C (0x00800000 Jill RDT bit set).",
+      "evidence": "0x2000000 is OR-ed in by game start (0x480B53, 0x41B5AA); 0x1000000 at 0x481906; 0x800000 selects ROOMxxx1.RDT in the room loader (0x477DE6) and is set when a non-Chris character is chosen (0x4817CE). Live 2026-10-12: free movement 0x8011000C/0x8013000C (room 106) and 0x80000000 (room 105); menus 0x80400000 -> 0x60400000 -> 0x80008000 -> 0x40000000; door 0x6601000C -> 0x46010000; title 0x0/0x40000000/0x80000000; death 0x8100000C (0x01000000 set at HP -10); Jill game start 0x4080000C (0x00800000 Jill RDT bit set). Live 2026-10-13: 0x40 while pushing an object; 0x800 while examining/picking up (0x8000 while the message shows), also on a pickup refused with a full inventory.",
       "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h g_main_state_flags", "Gemini-Loboto3/RE1-Mod-SDK STFLG_JILL"]
     },
     {

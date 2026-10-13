@@ -168,7 +168,8 @@
           "verifies": "Combine results and slot changes",
           "status": "partial",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): 0x44 + 0x44 → 0x47 in one slot (herbs); empty 0x07 + 0x11 ×6 → 0x08 ×6 (loading a weapon with a different round type)"
+            "2026-10-13 (live session 4, Jill, memory log): 0x44 + 0x44 → 0x47 in one slot (herbs); empty 0x07 + 0x11 ×6 → 0x08 ×6 (loading a weapon with a different round type)",
+            "2026-10-13 (live session 5, Jill): empty Beretta (0x02 ×0) + clip (0x0B ×15) → Beretta ×15 in the Beretta's slot; the clip's slot empties"
           ]
         },
         {
@@ -198,7 +199,7 @@
           "status": "partial",
           "detector": "full_inventory",
           "evidence": [
-            "2026-10-13: all 8 of Jill's slots filled; a refused pickup isn't visible in memory; Chris's 6-slot limit not yet observed"
+            "2026-10-13 (live session 5, Jill): refused pickup with all 8 of Jill's slots full (blue gem, dining room 105): stateFlags 0x800 (interacting) + 0x8000 (message) with no inventory or room-item flag change. After combining the empty Beretta with a clip freed slot 8, the same action picked the gem up into it. Chris's 6-slot limit not yet observed"
           ]
         },
         {

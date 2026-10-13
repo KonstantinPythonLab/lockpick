@@ -93,6 +93,7 @@ Stage/room note: walking up the main-hall stairs goes to `stage=1, room=0x03` (r
 | Free movement, room 105 | `0x80000000` |
 | Menu open/close | `0x80400000 → 0x60400000 → 0x80008000 → 0x60008000 → 0x40008000 → 0x40000000` |
 | Pushing an object | `0x40` set while pushing (statue in 202) |
+| Examining / picking up | `0x800` while interacting, plus `0x8000` while the message shows; a pickup refused with a full inventory shows the same bits with no inventory change |
 | Door transition | `0x8201000C → 0x6601000C → 0x46010000 → 0x46000000 → 0x42000000 → 0x82000000` |
 | Death | `0x8100000C` (`0x01000000` set when HP reached −10) |
 | Jill game, main hall | `0x4080000C` (`0x00800000` = Jill RDT variant) |
