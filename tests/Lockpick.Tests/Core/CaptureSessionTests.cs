@@ -131,6 +131,38 @@ public sealed class CaptureSessionTests : IDisposable
     }
 
     [Fact]
+    public void Recordings_stay_compact_timer_only_changes_are_throttled_and_raw_values_omitted()
+    {
+        var profile = _adapter.Profiles[0];
+        _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(profile, ExePath);
+        var memory = new FakeMemory().WithVerifiedImage(profile);
+        memory.WriteU8(profile.FindField("room")!.Address, 0x06)
+            .WriteI16(profile.FindField("hp")!.Address, 96)
+            .WriteU8(profile.FindField("maxHp")!.Address, 96);
+        _host.Launch(6, ExePath, memory, new ModuleImage(0x400000, 0x49B2000, ExePath));
+        var monitor = new GameMonitor(_adapter, _host, _fingerprints, time: _time);
+        using var capture = new CaptureSession(monitor, _root, "re1", "9.9.9");
+        _time.Advance(TimeSpan.FromSeconds(2));
+        monitor.Tick();
+
+        // 60 polls of normal play: the timer advances one frame per poll (2 s of game time).
+        var timer = profile.FindField("gameTimer")!.Address;
+        for (uint frame = 1; frame <= 60; frame++)
+        {
+            memory.WriteU32(timer, frame);
+            monitor.Tick();
+        }
+
+        var zip = capture.Stop();
+        using var archive = ZipFile.OpenRead(zip);
+        using var reader = new StreamReader(archive.GetEntry("recording-1.jsonl")!.Open());
+        var (_, frames) = SessionRecording.Read(reader);
+
+        Assert.InRange(frames.Count, 2, 4); // first state plus roughly one per second, not 61
+        Assert.All(frames, f => Assert.Empty(f.Snapshot.RawFields));
+    }
+
+    [Fact]
     public void Unsupported_builds_are_fingerprinted_but_not_recorded()
     {
         _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(_adapter.Profiles[0], ExePath) with { Sha256 = new string('C', 64) };

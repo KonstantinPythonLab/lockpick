@@ -13,6 +13,8 @@ All notable changes to this project are documented here. The format follows
   submission issues with the analysis.
 
 ### Fixed
+- Capture recordings stay compact: raw values are left to the trace and timer-only changes are written at most
+  once per second (a 20-minute live session had produced a 64 MB recording).
 - A capture started mid-session now records the current state first (a quiet session left the recording empty).
 - Bounty analysis ignores changes outside gameplay (attract-mode demos, loads, title screen).
 

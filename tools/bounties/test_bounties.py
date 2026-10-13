@@ -45,6 +45,17 @@ class LiveTraceTests(unittest.TestCase):
         self.assertEqual(facts["new_item_ids"], [])
 
 
+class ItemBoxSessionTests(unittest.TestCase):
+    def test_item_box_session_evidence(self):
+        # Live Jill session (2026-10-13): item box used, all 8 slots filled, weapons switched, shotgun fired.
+        found, facts = bounties.detect(bounties.read_capture(FIXTURES / "re1-live-jill-itembox.trace.txt"))
+        for detector in ("item_box_changed", "full_inventory", "weapon_switching", "fire_and_reload", "healing"):
+            self.assertIn(detector, found)
+            self.assertFalse(found[detector].auto, detector)  # all need a maintainer's review
+        self.assertIn("jill_game", found)
+        self.assertIn(0x0B, facts["rooms"][2])  # room 20B
+
+
 class AttractDemoTests(unittest.TestCase):
     def test_attract_mode_demo_produces_no_evidence(self):
         # Live capture (2026-10-13) of the title-screen demo: Chris in room 107 with a preset inventory and item box,
@@ -79,6 +90,9 @@ class CaptureZipTests(unittest.TestCase):
         self.assertFalse(found["item_box_changed"].auto)
 
         data = copy.deepcopy(bounties.load_data())
+        for b in bounties.all_bounties(data):  # independent of what the live data has verified so far
+            if b["id"] in ("B007", "B102"):
+                b["status"], b["evidence"] = "needed", []
         changes = bounties.apply(data, found, "test.zip", "2026-10-13")
         status = {b["id"]: b for b in bounties.all_bounties(data)}
         self.assertEqual(status["B007"]["status"], "done")

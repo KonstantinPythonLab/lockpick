@@ -239,7 +239,8 @@
       "name": "box0",
       "address": "0xBE98E4",
       "type": "u16",
-      "verification": "unverified",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-13 (tests/Lockpick.Tests/Fixtures/re1-live-jill-itembox.trace.txt): items put into and taken out of the box change these entries (low byte item id, high byte quantity); swaps exchange box and inventory slots.",
       "description": "Item box entry 1 (low byte id, high byte quantity).",
       "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
     },
@@ -247,7 +248,8 @@
       "name": "box1",
       "address": "0xBE98E6",
       "type": "u16",
-      "verification": "unverified",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-13 (tests/Lockpick.Tests/Fixtures/re1-live-jill-itembox.trace.txt): items put into and taken out of the box change these entries (low byte item id, high byte quantity); swaps exchange box and inventory slots.",
       "description": "Item box entry 2 (low byte id, high byte quantity).",
       "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
     },
@@ -255,7 +257,8 @@
       "name": "box2",
       "address": "0xBE98E8",
       "type": "u16",
-      "verification": "unverified",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-13 (tests/Lockpick.Tests/Fixtures/re1-live-jill-itembox.trace.txt): items put into and taken out of the box change these entries (low byte item id, high byte quantity); swaps exchange box and inventory slots.",
       "description": "Item box entry 3 (low byte id, high byte quantity).",
       "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
     },
@@ -263,7 +266,8 @@
       "name": "box3",
       "address": "0xBE98EA",
       "type": "u16",
-      "verification": "unverified",
+      "verification": "runtime",
+      "evidence": "Live Jill session 2026-10-13 (tests/Lockpick.Tests/Fixtures/re1-live-jill-itembox.trace.txt): items put into and taken out of the box change these entries (low byte item id, high byte quantity); swaps exchange box and inventory slots.",
       "description": "Item box entry 4 (low byte id, high byte quantity).",
       "sources": ["ecruells/resident-evil-pc-decomp BioCard.h"]
     },

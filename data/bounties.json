@@ -102,8 +102,11 @@
           "id": "B102",
           "task": "Put items **into** and take them **out of** the item box",
           "verifies": "Item box layout `0xBE98E4`",
-          "status": "needed",
-          "detector": "item_box_changed"
+          "status": "done",
+          "detector": "item_box_changed",
+          "evidence": [
+            "2026-10-13 (live session): put items in and took them out — entries are 2 bytes (id + quantity), swaps exchange box and inventory slots, the inventory compacts when an item leaves"
+          ]
         },
         {
           "id": "B103",
@@ -111,7 +114,7 @@
           "verifies": "Shotgun id, shell ammo id, capacity",
           "status": "partial",
           "evidence": [
-            "picked up (id 0x03, 7 shells); not fired"
+            "2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 ×6 picked up — likely shells, unconfirmed)"
           ]
         },
         {
@@ -144,7 +147,8 @@
           "verifies": "Item ids, heal amounts, herb combining",
           "status": "partial",
           "evidence": [
-            "first aid spray (full heal) seen"
+            "first aid spray (full heal) seen",
+            "2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68)"
           ],
           "detector": "healing"
         },
@@ -168,27 +172,31 @@
         },
         {
           "id": "B112",
-          "task": "Use an ink ribbon to save at a typewriter",
-          "verifies": "Ink ribbon id and count",
+          "task": "Save at a typewriter (a few times, different slots)",
+          "verifies": "Save detection; the PC version needs no ink ribbons",
           "status": "partial",
           "evidence": [
-            "attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — needs a real save to confirm"
+            "2026-10-13: 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbons used on PC; memory shows only a frozen timer, so save detection needs the save-file watcher (issue)",
+            "attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — unconfirmed"
           ]
         },
         {
           "id": "B113",
           "task": "Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots)",
           "verifies": "Slot limits per character",
-          "status": "needed",
-          "detector": "full_inventory"
+          "status": "partial",
+          "detector": "full_inventory",
+          "evidence": [
+            "2026-10-13: all 8 of Jill's slots filled; a refused pickup isn't visible in memory; Chris's 6-slot limit not yet observed"
+          ]
         },
         {
           "id": "B114",
           "task": "Switch equipped weapon between several weapons",
           "verifies": "Equipped-slot behavior per weapon",
-          "status": "partial",
+          "status": "done",
           "evidence": [
-            "knife/Beretta seen"
+            "2026-10-13 (live session): equipped slot follows the weapon — knife 1, Beretta 2, shotgun 5 then 4 after the inventory shifted"
           ],
           "detector": "weapon_switching"
         }
@@ -225,7 +233,7 @@
           "verifies": "Room ids, cameras per room, door connections",
           "status": "partial",
           "evidence": [
-            "rooms seen: 106 105 104 107 108 109 113 115 116"
+            "rooms seen: 104 105 106 107 108 109 10A 10B 10F 113 115 116 117 118 11A"
           ],
           "detector": "rooms_stage_1"
         },
@@ -235,7 +243,7 @@
           "verifies": "Same",
           "status": "partial",
           "evidence": [
-            "rooms seen: 203"
+            "rooms seen: 203 204 206 207 20B"
           ],
           "detector": "rooms_stage_2"
         },

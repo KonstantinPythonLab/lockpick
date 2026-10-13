@@ -31,3 +31,7 @@ recordings/
 *.tim
 *.emd
 savedat*.dat
+
+# Python
+__pycache__/
+*.pyc

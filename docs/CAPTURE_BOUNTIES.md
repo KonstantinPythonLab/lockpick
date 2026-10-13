@@ -52,19 +52,19 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
 | B101 | Pick up items, fire the Beretta, reload | Inventory slots (id + quantity), rounds per shot, reload from bullets | ✅ 2026-10-12 (Jill) |
-| B102 | Put items **into** and take them **out of** the item box | Item box layout `0xBE98E4` | ⬜ |
-| B103 | Pick up, fire and reload the **shotgun** | Shotgun id, shell ammo id, capacity | 🟡 picked up (id 0x03, 7 shells); not fired |
+| B102 | Put items **into** and take them **out of** the item box | Item box layout `0xBE98E4` | ✅ 2026-10-13 (live session): put items in and took them out — entries are 2 bytes (id + quantity), swaps exchange box and inventory slots, the inventory compacts when an item leaves |
+| B103 | Pick up, fire and reload the **shotgun** | Shotgun id, shell ammo id, capacity | 🟡 2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 ×6 picked up — likely shells, unconfirmed) |
 | B104 | Same for the **Colt Python / magnum** | Magnum + magnum rounds ids | ⬜ |
 | B105 | Same for the **bazooka** with each round type (explosive, acid, flame) | Bazooka ids and round types | ⬜ |
 | B106 | Use the **flamethrower** (Chris) | Flamethrower id and fuel | ⬜ |
 | B107 | Use the **rocket launcher** (ending) | Rocket launcher id | ⬜ |
-| B108 | Use each healing item: green, red+green, blue herb, mixed herbs, first aid spray | Item ids, heal amounts, herb combining | 🟡 first aid spray (full heal) seen |
+| B108 | Use each healing item: green, red+green, blue herb, mixed herbs, first aid spray | Item ids, heal amounts, herb combining | 🟡 first aid spray (full heal) seen; 2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68) |
 | B109 | Get **poisoned** (snake/Yawn/spider) and cure it with a blue herb or serum | Status flags (player +0xDC) | ⬜ |
 | B110 | Combine items (herbs; anything else combinable) | Combine results and slot changes | ⬜ |
 | B111 | Pick up each **key item** (keys, crests, MO disk, emblems, etc.) | Key item ids → item name table | ⬜ |
-| B112 | Use an ink ribbon to save at a typewriter | Ink ribbon id and count | 🟡 attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — needs a real save to confirm |
-| B113 | Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots) | Slot limits per character | ⬜ |
-| B114 | Switch equipped weapon between several weapons | Equipped-slot behavior per weapon | 🟡 knife/Beretta seen |
+| B112 | Save at a typewriter (a few times, different slots) | Save detection; the PC version needs no ink ribbons | 🟡 2026-10-13: 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbons used on PC; memory shows only a frozen timer, so save detection needs the save-file watcher (issue); attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — unconfirmed |
+| B113 | Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots) | Slot limits per character | 🟡 2026-10-13: all 8 of Jill's slots filled; a refused pickup isn't visible in memory; Chris's 6-slot limit not yet observed |
+| B114 | Switch equipped weapon between several weapons | Equipped-slot behavior per weapon | ✅ 2026-10-13 (live session): equipped slot follows the weapon — knife 1, Beretta 2, shotgun 5 then 4 after the inventory shifted |
 
 ---
 
@@ -81,8 +81,8 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
-| B301 | Visit every reachable room in **stage 1** (mansion 1F) | Room ids, cameras per room, door connections | 🟡 rooms seen: 106 105 104 107 108 109 113 115 116 |
-| B302 | Visit every reachable room in **stage 2** (mansion 2F) | Same | 🟡 rooms seen: 203 |
+| B301 | Visit every reachable room in **stage 1** (mansion 1F) | Room ids, cameras per room, door connections | 🟡 rooms seen: 104 105 106 107 108 109 10A 10B 10F 113 115 116 117 118 11A |
+| B302 | Visit every reachable room in **stage 2** (mansion 2F) | Same | 🟡 rooms seen: 203 204 206 207 20B |
 | B303 | Visit every reachable room in **stage 3** | Same; stage identity | ⬜ |
 | B304 | Visit every reachable room in **stage 4** | Same; stage identity | ⬜ |
 | B305 | Visit every reachable room in **stage 5** | Same; stage identity | ⬜ |

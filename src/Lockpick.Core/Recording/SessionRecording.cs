@@ -113,6 +113,18 @@ public sealed class SessionRecorder : IDisposable
         }
     }
 
+    /// <summary>Writes buffered frames to disk so they survive a crash.</summary>
+    public void Flush()
+    {
+        lock (_gate)
+        {
+            if (!_disposed)
+            {
+                _writer.Flush();
+            }
+        }
+    }
+
     public void Dispose()
     {
         lock (_gate)

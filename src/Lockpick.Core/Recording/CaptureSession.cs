@@ -34,6 +34,8 @@ public sealed record CaptureInfo(string LockpickVersion, string Os, DateTimeOffs
 public sealed class CaptureSession : IDisposable
 {
     private static readonly JsonSerializerOptions InfoJson = new() { WriteIndented = true };
+    private static readonly IReadOnlyDictionary<string, Field<long>> NoRawFields = new Dictionary<string, Field<long>>();
+    private static readonly TimeSpan MinTimerOnlyInterval = TimeSpan.FromSeconds(1);
 
     /// <summary>Raw fields that change continuously; printed as context on every trace line instead of as changes.</summary>
     public static readonly IReadOnlySet<string> ContextFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -51,6 +53,7 @@ public sealed class CaptureSession : IDisposable
     private StreamWriter? _events;
     private SessionRecorder? _recorder;
     private IReadOnlyDictionary<string, Field<long>>? _lastRaw;
+    private GameSnapshot? _lastRecorded;
     private DateTimeOffset _lastFlush;
     private bool _stopped;
 
@@ -235,6 +238,7 @@ public sealed class CaptureSession : IDisposable
             {
                 _trace.Flush();
                 _events?.Flush();
+                _recorder?.Flush();
                 _lastFlush = now;
             }
         }
@@ -244,8 +248,34 @@ public sealed class CaptureSession : IDisposable
     {
         lock (_gate)
         {
-            _recorder?.Append(snapshot);
+            Record(snapshot);
         }
+    }
+
+    /// <summary>
+    /// Appends a compact frame: raw fields are omitted (trace-N.txt already has every raw change), and while only
+    /// the in-game timer moves, at most one frame per second is written. A live session otherwise records every
+    /// 30 Hz poll (~64 MB per 20 minutes in the first live capture).
+    /// </summary>
+    private void Record(GameSnapshot snapshot)
+    {
+        if (_recorder is null)
+        {
+            return;
+        }
+
+        var compact = snapshot with { RawFields = NoRawFields };
+        if (_lastRecorded is { } last
+            && compact.HasSameStateAs(last with { GameTime = compact.GameTime })
+            && compact.GameTime.TryGet(out var now)
+            && last.GameTime.TryGet(out var before)
+            && now - before < MinTimerOnlyInterval)
+        {
+            return;
+        }
+
+        _recorder.Append(compact);
+        _lastRecorded = compact;
     }
 
     private void OnEvent(object? sender, GameEvent gameEvent)
@@ -271,10 +301,12 @@ public sealed class CaptureSession : IDisposable
         _lastRaw = null;
 
         // Started mid-session: record the current state first, or a quiet session would leave the recording empty.
+        _lastRecorded = null;
         if (_source.Latest is { } current)
         {
-            _recorder.Append(current);
+            Record(current);
         }
+
         WriteInfo();
     }
 

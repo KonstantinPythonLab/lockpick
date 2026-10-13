@@ -30,7 +30,7 @@ from a third-party source, diagnostics only.
 | `0xBE9944` + 2·i | u16 | inv0..inv7 | Inventory slot: low byte item id, high byte quantity (weapons: loaded rounds). 6 slots (Chris/Rebecca), 8 (Jill); compacts when an item is used | runtime |
 | `0xBE9849` | u8 | equippedSlot | Equipped slot, 1-based (0 = none) | runtime |
 | `0xD22768` | u32 | inventoryPtr | Active inventory (`0xBE9944`; `0xBE9950` for Rebecca) | runtime (Jill) |
-| `0xBE98E4` + 2·i | u16 | box0..box3 | Item box entries (id, quantity) | unverified |
+| `0xBE98E4` + 2·i | u16 | box0..box3 | Item box entries: low byte id, high byte quantity (48 entries total; first 4 read) | runtime |
 | `0xBE41E2` | u8 | enemyCount | Active enemy count | unverified (changed 2→0→2 across rooms 106/105/104 live) |
 
 ### Code anchors (checked in the live process before reading)
@@ -66,8 +66,10 @@ from a third-party source, diagnostics only.
 | `0x02` | Quantity drops by 1 per shot, refilled to 15 on reload | Beretta |
 | `0x0B` | Consumed by Beretta reloads; item box starts with two stacks of 15 | Handgun bullets |
 | `0x41` | Consumed while HP went 46 → 96 (full heal) | First aid spray |
-| `0x03` | Picked up with quantity 7 | Shotgun (unconfirmed) |
-| `0x1F`, `0x44` | Picked up, not used | unknown |
+| `0x03` | Quantity drops by 1 per shot (7 → 0), equipped as a weapon | Shotgun |
+| `0x44` | Consumed while HP rose 54 → 86 (+32, Jill) | Green herb? (BioRand id 68) |
+| `0x11` | Picked up with quantity 6 | Shotgun shells? (unconfirmed) |
+| `0x1F`, `0x23`, `0x26`, `0x2D` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
 | `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
 | `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |
 | `0x2F` | In the attract-mode demo inventory, quantity 2 | Ink ribbon? (id 47 in BioRand's table) |

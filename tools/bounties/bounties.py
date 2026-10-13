@@ -35,7 +35,7 @@ DOC = ROOT / "docs" / "CAPTURE_BOUNTIES.md"
 STATUS_ICON = {"done": "✅", "partial": "🟡", "needed": "⬜", "blocked": "🛠️"}
 
 # Item ids already identified from live captures (docs/MEMORY_MAP.md); anything else is reported as new.
-KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x0B, 0x0E, 0x1F, 0x2F, 0x41, 0x44}
+KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x0B, 0x0E, 0x11, 0x1F, 0x23, 0x26, 0x2D, 0x2F, 0x41, 0x44}
 
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
