@@ -137,6 +137,10 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **Statue push (202)**, seen three times (session 4 and both new games in session 5): `stateFlags` bit `0x40` is set
   while pushing; when the statue falls, `flagScenarioA0` bit `0x100000` and `stateFlags` `0x100000` (camera cut) are set.
   It drops the blue gem in the dining room.
+- **Stairs push (107)** to reach the map, by both characters: push bit `0x40` per push; taking the map cleared
+  `flagRoomItems4` bit `0x4000` and set `flagRoom3` bit `0x8` (maps don't enter the inventory). No word in the
+  recorded regions moves with a pushed object, so object positions live elsewhere.
+- **Zombie getting up:** HP ≤ 0, kill flag set, then active again with HP 1 (204, both sessions).
 - **Room 206** (Jill): the timer paused 4.5 s, `flagRoom4` bit `0x4000` set and `flagRoomItems7` bit `0x100` cleared, with
   no inventory change — probably reading a document (not identified).
 - **Enemy types confirmed by behavior:** 0 and 17 zombies, 2 dogs (Cerberus), 5 crows. Dog kills set `flagEnemies` bits

@@ -297,9 +297,10 @@
           "id": "B310",
           "task": "Encounter **zombies** (and let one get up again)",
           "verifies": "Enemy array `0xBE6464`, enemy type id, HP",
-          "status": "partial",
+          "status": "done",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): enemy slots decode as flags/type/HP — zombies type 0 (rooms 101 103 10E 201 202) and type 17 (204 207); HP drops 12 per Beretta round, 201 per bazooka hit, slot HP set to -1 once a zombie is dead. A zombie getting up again not yet seen"
+            "2026-10-13 (live session 4, Jill, memory log): enemy slots decode as flags/type/HP — zombies type 0 (rooms 101 103 10E 201 202) and type 17 (204 207); HP drops 12 per Beretta round, 201 per bazooka hit, slot HP set to -1 once a zombie is dead. A zombie getting up again not yet seen",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): a zombie getting back up (owner + capture) — type 17 in 204 fell to HP -2, its kill flag was set, 7 s later it was active again with HP 1, bit Jill four times (6 HP each) and went down for good after one more round. The same thing shows in session 4 (204, -3 → 1)"
           ],
           "detector": "enemies_zombie"
         },
@@ -391,7 +392,7 @@
           "detector": "enemy_killed",
           "evidence": [
             "2026-10-13 (live session 4, Jill, memory log): 13 zombie kills, each set exactly one new bit in flagEnemies (kill flags persist); crow kills set none",
-            "2026-10-13 (live session 5: new Jill game, then new Chris game): 21 zombie and 3 dog kills (Jill and Chris), each setting one flagEnemies bit; a new game clears them all. Other enemy types not yet killed"
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): 20 zombies and 3 dogs killed (Jill and Chris), each setting one flagEnemies bit — set when the enemy first falls, even if it gets back up; a new game clears them all. Other enemy types not yet killed"
           ]
         },
         {
@@ -402,6 +403,7 @@
           "detector": "room_flags",
           "evidence": [
             "2026-10-13 (live session 5: new Jill game, then new Chris game): statue push in room 202, seen three times (session 4, and both new games in session 5): stateFlags bit 0x40 is set while pushing (slow straight-line movement), then scenario flag A0 bit 0x100000 and stateFlags 0x100000 (camera cut) as the statue falls; it drops the blue gem in the dining room (105). Shelves/boxes not yet seen",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): stairs in room 107 pushed to reach the map, by Jill and by Chris (owner + capture): push bit 0x40 during each push; picking up the map then cleared flagRoomItems4 bit 0x4000 and set flagRoom3 bit 0x8, with no inventory change. The pushed object's own position is not in the recorded memory (no word moves with the push), so object positions need another region",
             "2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state"
           ]
         }
