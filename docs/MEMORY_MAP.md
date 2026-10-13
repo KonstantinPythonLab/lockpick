@@ -72,8 +72,8 @@ from a third-party source, diagnostics only.
 | `0x11` | Loaded into an empty `0x07` (×6), which became `0x08` ×6 — not shotgun shells | Bazooka rounds |
 | `0x08` | `0x07` after loading `0x11` rounds; −1 per shot | Bazooka with other rounds? (BioRand id 8) |
 | `0x47` | Made from two `0x44`; consumed while HP went 71 → 96 (max) | Mixed herb (green + green)? |
-| `0x21` | Used in room 10D, setting scenario flag A0 `0x10000`; `0x29` was received there | Puzzle item |
-| `0x29` | Received from the 10D puzzle | Puzzle reward |
+| `0x21` | Dropped by the statue pushed in 206, picked up in 105, used in 10D (scenario flag A0 `0x10000`) | **Blue gem** (owner-confirmed) |
+| `0x29` | Received in 10D for the blue gem | Puzzle reward (unnamed) |
 | `0x1F`, `0x23`, `0x26`, `0x2D` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
 | `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
 | `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |
@@ -131,6 +131,8 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **`flagRoom0`/`flagRoom1`**: rooms visited, one word per stage, room *n* = bit 31 − *n* (e.g. 100 → `0x80000000`,
   118 → `0x80`, 212 → `0x2000`); every first entry into a room set its bit.
 - **`flagLocks0`**: one bit set per door unlocked (4 doors).
+- **`flagRoom4`** bit `0x4000` set (and `flagRoomItems7` bit `0x100` cleared) when the statue in 206 was pushed off;
+  the game timer paused for 4.5 s while it fell. So the room-flag bank also holds object state, not only visits.
 
 ## Structures (leads for later milestones)
 

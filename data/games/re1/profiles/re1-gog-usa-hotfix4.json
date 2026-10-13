@@ -760,6 +760,7 @@
       "address": "0xBE98E0",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): bit 0x4000 set when the statue in room 206 was pushed off (it drops the blue gem).",
       "description": "Room flags, word 4 (bytes 16-19).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },

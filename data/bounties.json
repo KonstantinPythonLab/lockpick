@@ -175,7 +175,10 @@
           "id": "B111",
           "task": "Pick up each **key item** (keys, crests, MO disk, emblems, etc.)",
           "verifies": "Key item ids → item name table",
-          "status": "needed"
+          "status": "partial",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): blue gem = id 0x21 (owner-confirmed), picked up in 105"
+          ]
         },
         {
           "id": "B112",
@@ -373,7 +376,7 @@
           "status": "partial",
           "detector": "scenario_flags",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): one item puzzle in 10D — id 0x21 used (scenario A0 bit 0x10000 set), id 0x29 received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
+            "2026-10-13 (live session 4, Jill, memory log): blue gem chain — statue pushed in 206 (flagRoom4 0x4000), gem (id 0x21) picked up in the dining room 105, used in 10D (scenario A0 bit 0x10000), id 0x29 received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
           ]
         },
         {
@@ -390,10 +393,11 @@
           "id": "B504",
           "task": "Push/move objects (statues, shelves, boxes)",
           "verifies": "Object state",
-          "status": "needed",
+          "status": "partial",
           "detector": "room_flags",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state; pushed objects not yet seen"
+            "2026-10-13 (live session 4, Jill, memory log): statue pushed in room 206 (owner: it gave the blue gem) — game timer paused 4.5 s while it fell; flagRoom4 bit 0x4000 set and flagRoomItems7 bit 0x100 cleared at that moment. The push itself isn't visible in the player data. Shelves/boxes and other statues not yet seen",
+            "2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state"
           ]
         }
       ]
