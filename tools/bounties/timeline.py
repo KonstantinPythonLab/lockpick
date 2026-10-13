@@ -44,6 +44,10 @@ def flag_index(word: int, bit: int) -> int:
     return word * 32 + (31 - bit)
 
 
+def flag_is_set(state: dict, flag: int, bank: str = "flagRoomItems") -> bool:
+    return bool(state.get(f"{bank}{flag // 32}", 0) >> (31 - flag % 32) & 1)
+
+
 def changed_bits(before: int, after: int):
     diff = before ^ after
     for bit in range(32):
@@ -119,7 +123,7 @@ class Timeline:
         fired: Counter = Counter()
         damage = None  # (first state, hp before, hits)
         pushing = None
-        for s in session.states:
+        for position, s in enumerate(session.states):
             if not bounties.in_game(s):
                 if prev is not None:
                     self.flush_fired(prev, fired)
@@ -171,11 +175,15 @@ class Timeline:
 
             # Pickups, kills and unlocks recorded in the game's flag banks.
             picked: set[int] = set()
+            returned: set[int] = set()
             for word in range(8):
                 key = f"flagRoomItems{word}"
                 for bit, now_set in changed_bits(prev.get(key, 0), s.get(key, 0)):
                     flag = flag_index(word, bit)
                     found = names.lookup("items", flag, room, player)
+                    if now_set and found:
+                        returned.add(found[0]["item"])
+                        self.emit(s, f"put {names.item(found[0]['item'])} back in its place")
                     if not now_set:
                         what = names.item(found[0]["item"], found[0]["quantity"]) if found else f"item flag {flag}"
                         if found:
@@ -227,7 +235,11 @@ class Timeline:
                     damage = [s, php, hp, Counter({attack: 1})]
 
             # Inventory and item box.
-            self.inventory_changes(prev, s, fired, hp - php, picked, 8 if char == 1 else 6)
+            # An item about to be put back in its place (its pickup flag sets a frame later) isn't "used".
+            upcoming = session.states[position + 1:position + 6]
+            returning = {e["item"] for e in names.index["items"] if e["room"] == room and e["player"] in (player, "both")
+                         and any(flag_is_set(u, e["flag"]) and not flag_is_set(s, e["flag"]) for u in upcoming)}
+            self.inventory_changes(prev, s, fired, hp - php, picked | returned | returning, 8 if char == 1 else 6)
 
             # Pushing an object sets stateFlags bit 0x40 (statue in 202, stairs in 107).
             sf, psf = s.get("stateFlags", 0), prev.get("stateFlags", 0)
@@ -305,6 +317,7 @@ class Timeline:
             elif delta != 0:
                 self.emit(s, f"{names.item(i)}: {inv_b[i]} → {inv_a[i]}")
         new -= picked
+        gone -= picked  # put back in its place (reported from the item flag)
         if gone and new:
             self.emit(s, f"combined {' + '.join(names.item(i) for i in sorted(gone))} → {', '.join(names.item(i, inv_a[i] if inv_a[i] > 1 else None) for i in sorted(new))}")
             return

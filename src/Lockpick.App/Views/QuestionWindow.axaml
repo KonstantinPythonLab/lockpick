@@ -15,8 +15,17 @@
         <TextBlock Classes="caption" Text="WHAT JUST HAPPENED?" />
       </StackPanel>
       <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
-                 Text="The game did something Lockpick doesn't recognize yet. The game is paused; describe what you saw (a cutscene, an item, a door, a puzzle...) and it resumes when you're done." />
-      <TextBlock Classes="mono" Text="{Binding Where}" />
+                 Text="The game did something Lockpick doesn't recognize yet. The game is paused; describe what happened at that moment (a cutscene, an item, a door, a puzzle...) and it resumes when you're done." />
+      <TextBlock Classes="mono" Text="{Binding Where, StringFormat='It happened in {0}'}" TextWrapping="Wrap" />
+      <TextBlock Classes="label" Text="Around then Lockpick saw" IsVisible="{Binding HasContext}" />
+      <ItemsControl ItemsSource="{Binding Context}" IsVisible="{Binding HasContext}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Classes="mono" Text="{Binding StringFormat='  {0}'}" TextWrapping="Wrap" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Classes="label" Text="What changed" />
       <ItemsControl ItemsSource="{Binding Changes}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="x:String">

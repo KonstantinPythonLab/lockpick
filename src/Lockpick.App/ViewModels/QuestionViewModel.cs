@@ -13,7 +13,12 @@ public sealed partial class QuestionViewModel(PendingQuestion question, string? 
     public PendingQuestion Question { get; } = question;
 
     public string Where { get; } = string.Create(CultureInfo.InvariantCulture,
-        $"Room {question.Room ?? "?"}{(question.GameTime is { } t ? $" · game time {t:h\\:mm\\:ss}" : string.Empty)} · {question.At.ToLocalTime():HH:mm:ss}");
+        $"Room {question.Room ?? "?"}{(question.GameTime is { } t ? $" · game time {t:h\\:mm\\:ss}" : string.Empty)} · {Ago(question.At)}");
+
+    /// <summary>Known events around the change, so the player can tell which moment is meant.</summary>
+    public IReadOnlyList<string> Context { get; } = question.Context;
+
+    public bool HasContext => Context.Count > 0;
 
     public IReadOnlyList<string> Changes { get; } = [.. question.Changes.Select(c => c.Description)];
 
@@ -31,4 +36,10 @@ public sealed partial class QuestionViewModel(PendingQuestion question, string? 
 
     [RelayCommand]
     public void Skip() => _result.TrySetResult(null);
+
+    private static string Ago(DateTimeOffset at)
+    {
+        var seconds = (int)Math.Max(0, (DateTimeOffset.Now - at).TotalSeconds);
+        return seconds < 2 ? "just now" : string.Create(CultureInfo.InvariantCulture, $"{seconds} seconds ago");
+    }
 }

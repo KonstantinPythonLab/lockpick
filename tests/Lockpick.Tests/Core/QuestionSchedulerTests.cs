@@ -12,8 +12,11 @@ public class QuestionSchedulerTests
     {
         public Dictionary<int, string[]> ByPoll { get; } = [];
 
-        public IReadOnlyList<UnexplainedChange> Unexplained(GameSnapshot previous, GameSnapshot current) =>
-            ByPoll.TryGetValue((int)current.Sequence, out var keys) ? [.. keys.Select(k => new UnexplainedChange(k, k))] : [];
+        public Dictionary<int, string> KnownByPoll { get; } = [];
+
+        public ChangeReport Explain(GameSnapshot previous, GameSnapshot current) => new(
+            ByPoll.TryGetValue((int)current.Sequence, out var keys) ? [.. keys.Select(k => new UnexplainedChange(k, k))] : [],
+            KnownByPoll.TryGetValue((int)current.Sequence, out var known) ? [known] : []);
     }
 
     private static GameSnapshot Poll(int n, bool playing = true, bool timerRuns = true) => new()
@@ -28,7 +31,7 @@ public class QuestionSchedulerTests
     [Fact]
     public void Asks_once_the_changes_stop_and_play_resumes()
     {
-        var explainer = new ScriptedExplainer { ByPoll = { [1] = ["a"], [2] = ["b"] } };
+        var explainer = new ScriptedExplainer { ByPoll = { [1] = ["a"], [2] = ["b"] }, KnownByPoll = { [1] = "picked up Emblem" } };
         var scheduler = new QuestionScheduler(explainer) { QuietPeriod = TimeSpan.FromSeconds(3) };
         Assert.Null(scheduler.Feed(Poll(0)));
         Assert.Null(scheduler.Feed(Poll(1)));
@@ -39,6 +42,7 @@ public class QuestionSchedulerTests
         Assert.Equal(["a", "b"], question.Changes.Select(c => c.Key));
         Assert.Equal("105", question.Room);
         Assert.Equal(T0.AddSeconds(1), question.At);
+        Assert.Equal(["1:41 picked up Emblem"], question.Context);
     }
 
     [Fact]

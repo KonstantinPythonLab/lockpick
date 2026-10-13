@@ -45,35 +45,40 @@ public class Re1ChangeExplainerTests
     }
 
     [Fact]
-    public void Pickups_from_the_room_index_are_explained()
+    public void Pickups_from_the_room_index_are_explained_and_named()
     {
         var after = Jill(1, raw: ("flagRoomItems1", 0xFED7FFFF)); // blue jewel, item flag 44
-        Assert.Empty(_explainer.Unexplained(Jill(0), after));
+        var report = _explainer.Explain(Jill(0), after);
+        Assert.Empty(report.Unexplained);
+        Assert.Equal(["picked up Blue jewel"], report.Known);
+
+        // Putting it back (the Emblem trick) is explained too.
+        Assert.Equal(["put Blue jewel back"], _explainer.Explain(after, Jill(2)).Known);
     }
 
     [Fact]
     public void Story_flags_are_unexplained_unless_confirmed()
     {
-        var change = Assert.Single(_explainer.Unexplained(Jill(0), Jill(1, raw: ("flagScenarioB0", 0xA0000000))));
-        Assert.Equal("flagScenarioB0:0x20000000:set", change.Key);
-        Assert.Contains("story B flag #2 set", change.Description, StringComparison.Ordinal);
+        var change = Assert.Single(_explainer.Explain(Jill(0), Jill(1, raw: ("flagScenarioB0", 0xC0000000))).Unexplained);
+        Assert.Equal("flagScenarioB0:0x40000000:set", change.Key);
+        Assert.Contains("story B flag #1 set", change.Description, StringComparison.Ordinal);
 
         // The statue falling is a confirmed label: not asked about.
-        Assert.Empty(_explainer.Unexplained(Jill(0, "202"), Jill(1, "202", ("flagScenarioA0", 0x00100000))));
+        Assert.Empty(_explainer.Explain(Jill(0, "202"), Jill(1, "202", ("flagScenarioA0", 0x00100000))).Unexplained);
     }
 
     [Fact]
     public void First_visits_are_explained_but_other_room_bank_bits_are_not()
     {
-        Assert.Empty(_explainer.Unexplained(Jill(0, "104"), Jill(1, "104", ("flagRoom0", 0x0E000000)))); // room 104 = bit 27
-        var odd = Assert.Single(_explainer.Unexplained(Jill(0, "107"), Jill(1, "107", ("flagRoom3", 0x8))));
-        Assert.Equal("flagRoom3:0x00000008:set", odd.Key);
+        Assert.Empty(_explainer.Explain(Jill(0, "104"), Jill(1, "104", ("flagRoom0", 0x0E000000))).Unexplained); // room 104 = bit 27
+        var odd = Assert.Single(_explainer.Explain(Jill(0, "107"), Jill(1, "107", ("flagRoom3", 0x10))).Unexplained);
+        Assert.Equal("flagRoom3:0x00000010:set", odd.Key);
     }
 
     [Fact]
     public void Unknown_items_and_enemies_are_reported()
     {
-        var changes = _explainer.Unexplained(Jill(0), Jill(1, raw: [("inv3", 0x014C), ("enemy0Flags", 1), ("enemy0Type", 60)]));
+        var changes = _explainer.Explain(Jill(0), Jill(1, raw: [("inv3", 0x014C), ("enemy0Flags", 1), ("enemy0Type", 60)])).Unexplained;
         Assert.Contains(changes, c => c.Key == "item:0x4C");
         Assert.Contains(changes, c => c.Key == "enemy:60");
     }
@@ -83,6 +88,6 @@ public class Re1ChangeExplainerTests
     {
         var later = Jill(0, raw: ("flagScenarioB0", 0xFFFFFFFF));
         var newGame = Jill(1) with { GameTime = Field<TimeSpan>.Valid(TimeSpan.Zero) };
-        Assert.Empty(_explainer.Unexplained(later, newGame));
+        Assert.Empty(_explainer.Explain(later, newGame).Unexplained);
     }
 }
