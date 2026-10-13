@@ -306,6 +306,7 @@
       "address": "0xBE64EC",
       "type": "i16",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): drops 12 per Beretta round; -1 once dead; holds the previous room's value for about a frame after a room loads.",
       "description": "Enemy slot 0: HP.",
       "sources": ["ecruells/resident-evil-pc-decomp Entities.h", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -546,6 +547,7 @@
       "address": "0xBE9874",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): one bit set per door unlocked.",
       "description": "Door lock flags, word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -562,6 +564,7 @@
       "address": "0xBE987C",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): one bit set per zombie killed (crow kills set none).",
       "description": "Enemy flags (killed/spawned), word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -626,6 +629,7 @@
       "address": "0xBE989C",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): one bit cleared per item picked up (1 = still in the world).",
       "description": "Per-room item pickup flags, word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -722,6 +726,7 @@
       "address": "0xBE98D0",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): rooms visited in stage 1, room n = bit 31 - n; set on first entry.",
       "description": "Room flags, word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -730,6 +735,7 @@
       "address": "0xBE98D4",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live session 4 (2026-10-13): rooms visited in stage 2, room n = bit 31 - n; set on first entry.",
       "description": "Room flags, word 1 (bytes 4-7).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },

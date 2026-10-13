@@ -114,7 +114,7 @@
           "verifies": "Shotgun id, shell ammo id, capacity",
           "status": "partial",
           "evidence": [
-            "2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 ×6 picked up — likely shells, unconfirmed)"
+            "2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 is not shotgun shells: it loads into the bazooka, see B105)"
           ]
         },
         {
@@ -127,7 +127,10 @@
           "id": "B105",
           "task": "Same for the **bazooka** with each round type (explosive, acid, flame)",
           "verifies": "Bazooka ids and round types",
-          "status": "needed"
+          "status": "partial",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): weapon id 0x07 picked up with 6 rounds, fired 6 → 0 (one round per shot, 201 damage per hit); loading id 0x11 ×6 into the empty 0x07 turned it into id 0x08 ×6, also fired. Likely the bazooka with two round types (BioRand ids 7/8) — names unconfirmed; flame rounds not seen"
+          ]
         },
         {
           "id": "B106",
@@ -148,7 +151,8 @@
           "status": "partial",
           "evidence": [
             "first aid spray (full heal) seen",
-            "2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68)"
+            "2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68)",
+            "2026-10-13 (live session 4, Jill, memory log): id 0x47 (made from two 0x44) consumed while HP went 71 → 96 (capped at max) — likely mixed herb (green + green)"
           ],
           "detector": "healing"
         },
@@ -162,7 +166,10 @@
           "id": "B110",
           "task": "Combine items (herbs; anything else combinable)",
           "verifies": "Combine results and slot changes",
-          "status": "needed"
+          "status": "partial",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): 0x44 + 0x44 → 0x47 in one slot (herbs); empty 0x07 + 0x11 ×6 → 0x08 ×6 (loading a weapon with a different round type)"
+          ]
         },
         {
           "id": "B111",
@@ -287,7 +294,7 @@
           "verifies": "Enemy array `0xBE6464`, enemy type id, HP",
           "status": "partial",
           "evidence": [
-            "zombie damage seen; enemy array not yet read"
+            "2026-10-13 (live session 4, Jill, memory log): enemy slots decode as flags/type/HP — zombies type 0 (rooms 101 103 10E 201 202) and type 17 (204 207); HP drops 12 per Beretta round, 201 per bazooka hit, slot HP set to -1 once a zombie is dead. A zombie getting up again not yet seen"
           ],
           "detector": "enemies_zombie"
         },
@@ -295,8 +302,11 @@
           "id": "B311",
           "task": "Encounter **dogs (Cerberus)** and **crows**",
           "verifies": "Enemy type ids",
-          "status": "needed",
-          "detector": "enemies_dog_crow"
+          "status": "partial",
+          "detector": "enemies_dog_crow",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): crows are type 5 — six idle in 117; in 212 they attacked (3 HP per peck) and three were shot down. Dogs not seen in this capture"
+          ]
         },
         {
           "id": "B312",
@@ -350,29 +360,41 @@
           "id": "B501",
           "task": "Unlock doors with keys and the lockpick",
           "verifies": "Lock flags bank `0xBE9874`",
-          "status": "needed",
-          "detector": "lock_flags"
+          "status": "partial",
+          "detector": "lock_flags",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): flagLocks0 gained one bit at each of four door unlocks (rooms 207, 206, 103 twice) with no item used — which bit is which door still needs mapping"
+          ]
         },
         {
           "id": "B502",
           "task": "Solve puzzles (piano, statues, armor room, crests, V-Jolt, computer/MO disk)",
           "verifies": "Scenario flag banks",
-          "status": "needed",
-          "detector": "scenario_flags"
+          "status": "partial",
+          "detector": "scenario_flags",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): one item puzzle in 10D — id 0x21 used (scenario A0 bit 0x10000 set), id 0x29 received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
+          ]
         },
         {
           "id": "B503",
           "task": "Kill each enemy type",
           "verifies": "Enemy death, kill flags",
-          "status": "needed",
-          "detector": "enemy_killed"
+          "status": "partial",
+          "detector": "enemy_killed",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): 13 zombie kills, each set exactly one new bit in flagEnemies (kill flags persist); 3 crows killed in 212 set no kill flag (crows don't stay dead). Other enemy types not yet killed"
+          ]
         },
         {
           "id": "B504",
           "task": "Push/move objects (statues, shelves, boxes)",
           "verifies": "Object state",
           "status": "needed",
-          "detector": "room_flags"
+          "detector": "room_flags",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state; pushed objects not yet seen"
+          ]
         }
       ]
     },
@@ -384,8 +406,11 @@
           "id": "B601",
           "task": "Pick up items, leave the room and come back",
           "verifies": "Per-room item pickup flags `0xBE989C`",
-          "status": "needed",
-          "detector": "room_item_flags"
+          "status": "done",
+          "detector": "room_item_flags",
+          "evidence": [
+            "2026-10-13 (live session 4, Jill, memory log): each of 9 pickups cleared exactly one bit in flagRoomItems at the moment the item entered the inventory, and the bits stayed cleared across rooms (1 = item still in the world)"
+          ]
         },
         {
           "id": "B602",

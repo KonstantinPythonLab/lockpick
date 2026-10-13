@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Bounty analyzer: enemy encounters and kills are only counted once a room has settled; for about a frame after a
+  door the enemy slots still hold the previous room's values, which were reported as phantom enemies and kills.
+
 ## [0.1.4] - 2026-10-13
 
 ### Added

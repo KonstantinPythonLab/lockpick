@@ -36,7 +36,8 @@ DOC = ROOT / "docs" / "CAPTURE_BOUNTIES.md"
 STATUS_ICON = {"done": "✅", "partial": "🟡", "needed": "⬜", "blocked": "🛠️"}
 
 # Item ids already identified from live captures (docs/MEMORY_MAP.md); anything else is reported as new.
-KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x0B, 0x0E, 0x11, 0x1F, 0x23, 0x26, 0x2D, 0x2F, 0x41, 0x44}
+KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x07, 0x08, 0x0B, 0x0E, 0x11, 0x1F, 0x21, 0x23, 0x26, 0x29, 0x2D, 0x2F, 0x41,
+                  0x44, 0x47}
 
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
@@ -298,6 +299,9 @@ class Finding:
     auto: bool  # True: unambiguous, may check the bounty off; False: evidence for review
 
 
+ROOM_SETTLE_FRAMES = 30  # one second of game time after entering a room
+
+
 def in_game(s: dict[str, int]) -> bool:
     return s.get("mainMenu", 1) == 0 and s.get("maxHp", 0) > 0 and signed(s.get("hp", 0), 16) > 0
 
@@ -322,6 +326,7 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
         equipped: set[int] = set()
         last_room = None
         room_changes = 0
+        entered_at = 0
         for s in session.states:
             game = in_game(s)
             char = s.get("character", 0) & 3
@@ -341,6 +346,8 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
                 room = (s.get("stage"), s.get("room"))
                 if last_room is not None and room != last_room:
                     room_changes += 1
+                if room != last_room or prev is None or not in_game(prev):
+                    entered_at = s.get("gameTimer", 0)
                 last_room = room
                 for i in range(8):
                     if (v := s.get(f"inv{i}")) is not None and v & 0xFF:
@@ -357,19 +364,21 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
             if s.get("inventoryPtr") == 0xBE9950 and char != 3:
                 add("rebecca", "inventory pointer at Rebecca's inventory (0xBE9950)", False)
 
-            if game:
+            # Enemy slots hold leftovers from the previous room for a few frames after a room loads.
+            settled = game and s.get("gameTimer", 0) - entered_at >= ROOM_SETTLE_FRAMES
+            if settled:
                 room_id = f"{s.get('stage', 0) + 1}{s.get('room', 0):02X}"
                 for slot in range(30):
                     if f"enemy{slot}Flags" not in s:
                         break
-                    if s[f"enemy{slot}Flags"] & 1:
+                    if s[f"enemy{slot}Flags"] & 1 and signed(s.get(f"enemy{slot}Hp", 0), 16) > 0:
                         enemy_type = s.get(f"enemy{slot}Type", -1)
                         enemies.setdefault(enemy_type, set()).add(room_id)
             if prev is not None:
                 prev_hp = signed(prev.get("hp", 0), 16)
                 playing = game and in_game(prev)
                 same_room = (s.get("stage"), s.get("room")) == (prev.get("stage"), prev.get("room"))
-                for slot in range(30 if playing and same_room else 0):
+                for slot in range(30 if playing and same_room and settled else 0):
                     flags, hp_key = f"enemy{slot}Flags", f"enemy{slot}Hp"
                     if flags not in s or flags not in prev:
                         break

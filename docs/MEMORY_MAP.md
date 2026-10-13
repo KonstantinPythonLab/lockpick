@@ -68,7 +68,12 @@ from a third-party source, diagnostics only.
 | `0x41` | Consumed while HP went 46 → 96 (full heal) | First aid spray |
 | `0x03` | Quantity drops by 1 per shot (7 → 0), equipped as a weapon | Shotgun |
 | `0x44` | Consumed while HP rose 54 → 86 (+32, Jill) | Green herb? (BioRand id 68) |
-| `0x11` | Picked up with quantity 6 | Shotgun shells? (unconfirmed) |
+| `0x07` | Picked up with 6 rounds, −1 per shot, 201 damage per hit | Bazooka? (BioRand id 7) |
+| `0x11` | Loaded into an empty `0x07` (×6), which became `0x08` ×6 — not shotgun shells | Bazooka rounds |
+| `0x08` | `0x07` after loading `0x11` rounds; −1 per shot | Bazooka with other rounds? (BioRand id 8) |
+| `0x47` | Made from two `0x44`; consumed while HP went 71 → 96 (max) | Mixed herb (green + green)? |
+| `0x21` | Used in room 10D, setting scenario flag A0 `0x10000`; `0x29` was received there | Puzzle item |
+| `0x29` | Received from the 10D puzzle | Puzzle reward |
 | `0x1F`, `0x23`, `0x26`, `0x2D` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
 | `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
 | `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |
@@ -114,6 +119,18 @@ Bits with support: `0x00800000` Jill RDT variant (static + live), `0x01000000` p
 | `box4..47` | `0xBE98EC`… | Remaining item-box entries (layout verified on entries 1–4) |
 
 The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box starts — consistent with the layout.
+
+### Observed in live session 4 (2026-10-13, Jill, memory log) — behavior only, no code anchors yet
+
+- **Enemy slots** decode consistently: zombies type 0 and 17, crows type 5; HP drops 12 per Beretta round and 201 per
+  bazooka hit, and a dead enemy's HP is set to −1 (crows −50). For about one frame after a room loads the slots still
+  hold the previous room's values (types 34, 37, 38 appeared only then) — readers must let the room settle.
+  Type 15 (six slots at HP 1 in 10C, player took 2-HP hits there) is not identified.
+- **`flagEnemies`**: each of 13 zombie kills set exactly one new bit; killing crows set none.
+- **`flagRoomItems`**: each pickup cleared exactly one bit as the item entered the inventory (1 = still in the world).
+- **`flagRoom0`/`flagRoom1`**: rooms visited, one word per stage, room *n* = bit 31 − *n* (e.g. 100 → `0x80000000`,
+  118 → `0x80`, 212 → `0x2000`); every first entry into a room set its bit.
+- **`flagLocks0`**: one bit set per door unlocked (4 doors).
 
 ## Structures (leads for later milestones)
 

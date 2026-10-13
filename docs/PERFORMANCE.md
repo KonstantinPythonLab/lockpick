@@ -13,6 +13,7 @@ was measured, with the method stated.
 | Exit check per poll | — | **0.23 µs** | `HasExitedCheck` |
 | Event detection per poll | — | **22 ns** | `DetectEvents` |
 | Fingerprint 1 MB executable | once per process | **0.75 ms** | `Sha256AndPeHeader` (cached afterwards) |
+| Capture size | small enough to attach to an issue | **1.2 MB zip for 21 min** (memory log 2.8 MB raw / 842 KB zipped, 10,522 records) | live capture 2026-10-13, Lockpick 0.1.4 |
 | State→event latency | < 50 ms | ≤ 33 ms poll interval + < 0.1 ms processing | derived from the above |
 | Idle CPU (game not running) | minimal | one process scan per second | design; not yet profiled |
 | Game frame-rate impact | < 2% | not yet measured | external read-only polling; measure in 0.3 with the overlay |

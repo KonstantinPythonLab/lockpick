@@ -75,6 +75,9 @@ class MemoryLogTests(unittest.TestCase):
         self.assertIn("Cerberus", found["enemies_dog_crow"].text)
         self.assertIn("106", found["enemies_dog_crow"].text)
         self.assertIn("×1", found["enemy_killed"].text)
+        # The leftover slot cleared during the room load is neither an encounter nor a kill.
+        self.assertNotIn("type 37", found["enemy_killed"].text)
+        self.assertNotIn("type 37", json.dumps(facts["enemies"]))
         self.assertIn("flagLocks0", found["lock_flags"].text)
         self.assertIn("item box entry 6", found["item_box_changed"].text)
         self.assertTrue(all(not f.auto for k, f in found.items() if k.startswith(("enemies", "enemy_", "lock"))))

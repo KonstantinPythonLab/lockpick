@@ -24,6 +24,8 @@ If you close Lockpick while capturing, the capture is saved automatically.
 - The game executable's fingerprint (file name, size, SHA-256, PE header fields), so unsupported builds can be added.
 - Lockpick version and OS version.
 
+A 20-minute capture is about 1–2 MB zipped (about 7 MB for two hours), well within GitHub's attachment limit.
+
 Not recorded: screenshots, audio, input, anything outside the game's memory, file paths, computer or user names.
 
 Capturing is read-only — it never writes to the game's memory or files, the same way a LiveSplit autosplitter works.

@@ -80,7 +80,10 @@ public class RegionLogTests
         Assert.Equal(File.ReadAllBytes(GoldenPath), bytes);
     }
 
-    /// <summary>A dog (type 2) in room 106 is shot down, a door unlocks and an item moves in the item box.</summary>
+    /// <summary>
+    /// Room 106 loads with a leftover slot from the previous room (type 37, cleared to -1 within a frame, as seen live);
+    /// once the room has settled a dog (type 2) is shot down, a door unlocks and an item moves in the item box.
+    /// </summary>
     private static byte[] BuildGoldenSample()
     {
         var profile = new Re1Adapter().Profiles[0];
@@ -110,6 +113,9 @@ public class RegionLogTests
         Put("enemy0Flags", 1);
         Put("enemy0Type", 2);
         Put("enemy0Hp", 30);
+        Put("enemy1Flags", 1);
+        Put("enemy1Type", 37);
+        Put("enemy1Hp", 38);
         Put("box5", 0x0F0B);
 
         var stream = new MemoryStream();
@@ -118,15 +124,18 @@ public class RegionLogTests
             void Poll(int ms) => writer.Append(T0.AddMilliseconds(ms), [new RegionData("gameState", game.Address, (byte[])g.Clone()), new RegionData("system", system.Address, (byte[])sys.Clone())]);
             Poll(0);
             Put("gameTimer", 1001);
-            Put("enemy0Hp", 12);
+            Put("enemy1Hp", -1);
             Poll(33);
-            Put("gameTimer", 1002);
+            Put("gameTimer", 1040);
+            Put("enemy0Hp", 12);
+            Poll(1333);
+            Put("gameTimer", 1041);
             Put("enemy0Hp", 0);
             Put("flagLocks0", 0x10);
-            Poll(66);
-            Put("gameTimer", 1003);
+            Poll(1366);
+            Put("gameTimer", 1042);
             Put("box5", 0);
-            Poll(100);
+            Poll(1400);
         }
 
         return stream.ToArray();

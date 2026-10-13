@@ -56,14 +56,14 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 |---|---|---|---|
 | B101 | Pick up items, fire the Beretta, reload | Inventory slots (id + quantity), rounds per shot, reload from bullets | ✅ 2026-10-12 (Jill) |
 | B102 | Put items **into** and take them **out of** the item box | Item box layout `0xBE98E4` | ✅ 2026-10-13 (live session): put items in and took them out — entries are 2 bytes (id + quantity), swaps exchange box and inventory slots, the inventory compacts when an item leaves |
-| B103 | Pick up, fire and reload the **shotgun** | Shotgun id, shell ammo id, capacity | 🟡 2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 ×6 picked up — likely shells, unconfirmed) |
+| B103 | Pick up, fire and reload the **shotgun** | Shotgun id, shell ammo id, capacity | 🟡 2026-10-13: shotgun (id 0x03) fired 7 → 0, one shell per shot; reload not yet observed (id 0x11 is not shotgun shells: it loads into the bazooka, see B105) |
 | B104 | Same for the **Colt Python / magnum** | Magnum + magnum rounds ids | ⬜ |
-| B105 | Same for the **bazooka** with each round type (explosive, acid, flame) | Bazooka ids and round types | ⬜ |
+| B105 | Same for the **bazooka** with each round type (explosive, acid, flame) | Bazooka ids and round types | 🟡 2026-10-13 (live session 4, Jill, memory log): weapon id 0x07 picked up with 6 rounds, fired 6 → 0 (one round per shot, 201 damage per hit); loading id 0x11 ×6 into the empty 0x07 turned it into id 0x08 ×6, also fired. Likely the bazooka with two round types (BioRand ids 7/8) — names unconfirmed; flame rounds not seen |
 | B106 | Use the **flamethrower** (Chris) | Flamethrower id and fuel | ⬜ |
 | B107 | Use the **rocket launcher** (ending) | Rocket launcher id | ⬜ |
-| B108 | Use each healing item: green, red+green, blue herb, mixed herbs, first aid spray | Item ids, heal amounts, herb combining | 🟡 first aid spray (full heal) seen; 2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68) |
+| B108 | Use each healing item: green, red+green, blue herb, mixed herbs, first aid spray | Item ids, heal amounts, herb combining | 🟡 first aid spray (full heal) seen; 2026-10-13: id 0x44 consumed while HP went 54 → 86 (+32, Jill) — likely green herb (BioRand id 68); 2026-10-13 (live session 4, Jill, memory log): id 0x47 (made from two 0x44) consumed while HP went 71 → 96 (capped at max) — likely mixed herb (green + green) |
 | B109 | Get **poisoned** (snake/Yawn/spider) and cure it with a blue herb or serum | Status flags (player +0xDC) | ⬜ |
-| B110 | Combine items (herbs; anything else combinable) | Combine results and slot changes | ⬜ |
+| B110 | Combine items (herbs; anything else combinable) | Combine results and slot changes | 🟡 2026-10-13 (live session 4, Jill, memory log): 0x44 + 0x44 → 0x47 in one slot (herbs); empty 0x07 + 0x11 ×6 → 0x08 ×6 (loading a weapon with a different round type) |
 | B111 | Pick up each **key item** (keys, crests, MO disk, emblems, etc.) | Key item ids → item name table | ⬜ |
 | B112 | Save at a typewriter (a few times, different slots) | Save detection; the PC version needs no ink ribbons | 🟡 2026-10-13: 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbons used on PC; memory shows only a frozen timer, so save detection needs the save-file watcher (issue); attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — unconfirmed |
 | B113 | Try to pick something up with a **full** inventory (Chris 6 / Jill 8 slots) | Slot limits per character | 🟡 2026-10-13: all 8 of Jill's slots filled; a refused pickup isn't visible in memory; Chris's 6-slot limit not yet observed |
@@ -91,8 +91,8 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 | B305 | Visit every reachable room in **stage 5** | Same; stage identity | ⬜ |
 | B306 | Visit every reachable room in **stages 6 and 7** | Same; which rooms are revisits | ⬜ |
 | B307 | Both scenarios start to finish (Chris and Jill) | Scenario room differences (ROOMxxx0 vs xxx1) | ⬜ |
-| B310 | Encounter **zombies** (and let one get up again) | Enemy array `0xBE6464`, enemy type id, HP | 🟡 zombie damage seen; enemy array not yet read |
-| B311 | Encounter **dogs (Cerberus)** and **crows** | Enemy type ids | ⬜ |
+| B310 | Encounter **zombies** (and let one get up again) | Enemy array `0xBE6464`, enemy type id, HP | 🟡 2026-10-13 (live session 4, Jill, memory log): enemy slots decode as flags/type/HP — zombies type 0 (rooms 101 103 10E 201 202) and type 17 (204 207); HP drops 12 per Beretta round, 201 per bazooka hit, slot HP set to -1 once a zombie is dead. A zombie getting up again not yet seen |
+| B311 | Encounter **dogs (Cerberus)** and **crows** | Enemy type ids | 🟡 2026-10-13 (live session 4, Jill, memory log): crows are type 5 — six idle in 117; in 212 they attacked (3 HP per peck) and three were shot down. Dogs not seen in this capture |
 | B312 | Encounter **Hunters** and **Chimeras** | Enemy type ids | ⬜ |
 | B313 | Encounter **spiders**, **wasps** and **sharks** | Enemy type ids | ⬜ |
 | B314 | Boss fights: **Yawn** (both), **Plant 42**, **Neptune**, **Black Tiger**, **Tyrant** (both) | Boss ids and HP | ⬜ |
@@ -112,10 +112,10 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
-| B501 | Unlock doors with keys and the lockpick | Lock flags bank `0xBE9874` | ⬜ |
-| B502 | Solve puzzles (piano, statues, armor room, crests, V-Jolt, computer/MO disk) | Scenario flag banks | ⬜ |
-| B503 | Kill each enemy type | Enemy death, kill flags | ⬜ |
-| B504 | Push/move objects (statues, shelves, boxes) | Object state | ⬜ |
+| B501 | Unlock doors with keys and the lockpick | Lock flags bank `0xBE9874` | 🟡 2026-10-13 (live session 4, Jill, memory log): flagLocks0 gained one bit at each of four door unlocks (rooms 207, 206, 103 twice) with no item used — which bit is which door still needs mapping |
+| B502 | Solve puzzles (piano, statues, armor room, crests, V-Jolt, computer/MO disk) | Scenario flag banks | 🟡 2026-10-13 (live session 4, Jill, memory log): one item puzzle in 10D — id 0x21 used (scenario A0 bit 0x10000 set), id 0x29 received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212 |
+| B503 | Kill each enemy type | Enemy death, kill flags | 🟡 2026-10-13 (live session 4, Jill, memory log): 13 zombie kills, each set exactly one new bit in flagEnemies (kill flags persist); 3 crows killed in 212 set no kill flag (crows don't stay dead). Other enemy types not yet killed |
+| B504 | Push/move objects (statues, shelves, boxes) | Object state | ⬜ 2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state; pushed objects not yet seen |
 
 ---
 
@@ -123,7 +123,7 @@ Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4).
 
 | ID | Do this in-game | Verifies | Status |
 |---|---|---|---|
-| B601 | Pick up items, leave the room and come back | Per-room item pickup flags `0xBE989C` | ⬜ |
+| B601 | Pick up items, leave the room and come back | Per-room item pickup flags `0xBE989C` | ✅ 2026-10-13 (live session 4, Jill, memory log): each of 9 pickups cleared exactly one bit in flagRoomItems at the moment the item entered the inventory, and the bits stayed cleared across rooms (1 = item still in the world) |
 | B602 | Trigger partner/cutscene events (Barry, Rebecca, Richard, Wesker) | Event flags and cutscene detection | ⬜ |
 | B603 | Skip vs. watch cutscenes | Cutscene state | ⬜ |
 
