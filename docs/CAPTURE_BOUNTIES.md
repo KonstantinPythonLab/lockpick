@@ -5,6 +5,10 @@ thing to do in-game while a capture is running (**Debug → Start capture**, see
 can cover many bounties — just play and note which IDs you hit when you send the zip
 ([Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue).
 
+Open bounties for the next release are also GitHub issues with the
+[`bounty` label](https://github.com/mscrnt/lockpick/issues?q=is%3Aissue+label%3Abounty) — comment on one to claim
+it. This file stays the source of truth.
+
 Status: ✅ verified from a capture · 🟡 partly verified · ⬜ needed · 🛠️ needs a Lockpick feature first
 
 Unless noted, bounties are for the supported build (GOG, USA, 1.0 hotfix4). Maintainers update this file when a

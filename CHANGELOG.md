@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows
 ### Added
 - Capture bounty list (docs/CAPTURE_BOUNTIES.md) covering everything to capture through 1.0.0, and a
   Capture submission issue form.
+- CONTRIBUTING.md, README badges, milestones, labels, bounty issues, a public roadmap board and Discussions.
 
 ### Changed
 - CI actions updated (checkout v7, setup-dotnet v6, upload-artifact v7, codeql-action v4); xunit.runner.visualstudio 4.0.1.

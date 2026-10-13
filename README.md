@@ -2,6 +2,12 @@
 
 *Master of Unlocking.*
 
+[![Latest release](https://img.shields.io/github/v/release/mscrnt/lockpick?label=release)](https://github.com/mscrnt/lockpick/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/mscrnt/lockpick/total)](https://github.com/mscrnt/lockpick/releases)
+[![CI](https://github.com/mscrnt/lockpick/actions/workflows/ci.yml/badge.svg)](https://github.com/mscrnt/lockpick/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Discussions](https://img.shields.io/github/discussions/mscrnt/lockpick)](https://github.com/mscrnt/lockpick/discussions)
+
 Lockpick Trainer is a trainer and gameplay-intelligence platform for the original Resident Evil trilogy
 on PC, starting with **Resident Evil (1996), GOG release**. It reads live game state, verifies exactly
 which build it is talking to, and is designed to grow into a trainer, overlay, world explorer and
@@ -63,7 +69,9 @@ dotnet run --project tools/Lockpick.Probe -- identify    # check your installed 
 
 Lockpick verifies everything against the real game. Recording a play session (any kind; speedruns are great)
 helps the most: install Lockpick, open **Debug → Start capture**, play, then *Stop and save* and send the zip
-([details](docs/CAPTURE.md)). The **[bounty list](docs/CAPTURE_BOUNTIES.md)** shows what's still needed. Helpers are credited in
+([details](docs/CAPTURE.md)). The **[bounty list](docs/CAPTURE_BOUNTIES.md)** shows what's still needed. Planning lives on the
+[roadmap board](https://github.com/users/mscrnt/projects/8); questions and ideas go to
+[Discussions](https://github.com/mscrnt/lockpick/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md). Helpers are credited in
 [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 ## Repository layout

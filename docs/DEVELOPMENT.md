@@ -86,6 +86,17 @@ Volunteers capture from the app's Debug page (see [CAPTURE.md](CAPTURE.md)). Pro
    when a roadmap item needs data nobody has captured yet.
 5. Credit the volunteer in `CONTRIBUTORS.md` once they have contributed and agreed to be listed (the submission form asks).
 
+## Project management
+
+- **Milestones** 0.2.0 → 1.0.0 mirror docs/ROADMAP.md; every issue for a release goes in its milestone.
+- **Board:** [Lockpick Roadmap](https://github.com/users/mscrnt/projects/8) (public, linked to the repo).
+- **Labels:** `bounty` (capture needed), `capture`, `compatibility`, `needs-game` (needs live validation),
+  `area:core|re1|app|trainer|overlay|ci`, plus the GitHub defaults.
+- **Bounties:** docs/CAPTURE_BOUNTIES.md is the source of truth; open bounties for the next milestone also exist as
+  `[Bnnn]` issues. When a capture verifies one, check it off in the file and close the issue.
+- **Pinned:** the capture-bounties tracker issue. **Discussions** for questions, ideas and announcements (no wiki:
+  documentation lives in `docs/`).
+
 ## Coding conventions
 
 - C# latest, nullable enabled, file-scoped namespaces, `_camelCase` private fields, warnings as errors
