@@ -77,6 +77,10 @@ SCD opcodes: `0x0C door_aot_set` (26 bytes; target = stage<<5 | room), `0x18 ite
 - **Confirmed (live):** `stateFlags & 0x01000000` set at death; HP overshoots below zero (−10).
 - **Confirmed (live):** after death, choosing New Game keeps the dead game's room/HP in memory through
   character select and the intro (~23 s) until the new game initializes.
+- **Confirmed (live):** loading a save from the title: `mainMenu` 1 → 0 on entering the load screen, then the
+  timer jumps to the save's value (backwards, `0x64AE → 0x6253`), the position resets to the saved spot and the
+  timer resumes. During the load-file screen (~7 s) the previous game's values remain in memory with
+  `mainMenu == 0`, so they briefly count as "in game".
 - **Refuted for this build:** the autosplitter's `time` (`0x4D46D4`) is not the live timer — it is a
   copy written at one code site (`0x4298AB`). The live timer is `0xD22730`.
 

@@ -85,7 +85,7 @@ docs/                          architecture, roadmap, research, compatibility, m
 
 - Only the GOG USA 1.0 hotfix4 build is supported.
 - The Rebecca character id (partner swap) is implemented from static analysis but not yet observed live.
-- Loading a save from the title screen has not been observed live yet.
+- While choosing a save file on the load screen, the previous game's values are still shown for a few seconds.
 - After a death, values are hidden until the next game initializes (the dead game's data lingers in memory).
 - The game stops rendering when unfocused, and its window can't be dragged — original game behavior.
 - If the game runs elevated, Lockpick must also run elevated to read it.

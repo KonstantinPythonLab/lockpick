@@ -51,7 +51,7 @@ character id 1, max HP 96 and the Jill RDT bit.
 
 - [x] Live-verify Jill (character id 1, max HP 96, Jill RDT bit).
 - [ ] Live-verify the Rebecca partner swap (character id 3).
-- [ ] Live-verify loading a save from the title screen (session rule: `mainMenu == 0 && maxHp > 0 && hp > 0`).
+- [x] Live-verify loading a save from the title screen (session rule holds; see RESEARCH.md §7).
 - [ ] Push to GitHub so `release.yml` publishes the tagged build.
 
 ---
@@ -97,6 +97,12 @@ Acceptance criteria:
 ## 0.7.0 — Contextual guidance
 
 - Missed-item warnings, puzzle-state tracking, route guidance, warnings under 100 ms.
+
+## Event candidates found in live traces
+
+- `GameLoaded`: the in-game timer moves backwards while a session is active (a save restores its saved time).
+- New game: timer reset to 0 with HP = max HP in room 106.
+Both need a fixture-backed test before being emitted.
 
 ## 0.8.0 — Speedrun and challenges
 
