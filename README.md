@@ -75,6 +75,10 @@ your name in the app's credits. Planning lives on the
 [Discussions](https://github.com/mscrnt/lockpick/discussions). See [CONTRIBUTING.md](CONTRIBUTING.md). Helpers are credited in
 [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
+Lockpick is free. If you'd like to support its development, you can
+[buy me a coffee](https://buymeacoffee.com/mscrnt). Donations are entirely optional: they don't buy features, priority
+or bounties.
+
 ## Repository layout
 
 ```text
