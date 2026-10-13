@@ -69,6 +69,7 @@ verified independently against the GOG executable. No source code from them is i
 | ecruells/resident-evil-pc-decomp | GPL-3.0 | Global addresses and entity layout for the GOG USA build |
 | Gemini-Loboto3/RE1-Mod-SDK | CC BY-NC-ND 4.0 | Struct layout cross-check |
 | deserteagle417/RE1-Autosplitter | No license file | Address leads (credited) |
+| deserteagle417, "Autosplitter Room ID Maps" (speedrun.com resource) | none stated | Stage → area mapping (credited; images not included) |
 | pmandin/reevengi | GPL-2.0 | RDT opcode list cross-check (facts only) |
 | speedrun.com Resident Evil guides (SHiiDO damage chart, SephJul notes) | none stated | Facts used as leads with credit |
 | shadwork/Windows-ResidentEvil1-MODS | MIT | Layout cross-check |

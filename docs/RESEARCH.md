@@ -19,7 +19,20 @@ Research date: 2026-10-12. No third-party code was copied into Lockpick.
 | [pmandin/reevengi](https://github.com/pmandin/reevengi) | RE engine re-implementation | PC data files | GPL-2.0 | Opcode list cross-check only (it differs on 0x17/0x28/0x33; the fixed sizes parse every retail room) |
 | [speedrun.com guides](https://www.speedrun.com/residentevil/guides) | Speedrun community guides | JP PC / PS1 mostly | none stated | Leads: green herb heals 32 (Jill) / 46 (Chris), G+G 64 / 93; zombie HP rerolled 18–99 on room entry; Richard's 421 s timer |
 
-## 0. Room files (RDT) — what each game flag means
+## 0. Areas, rooms and routes
+
+- **Stage areas** (deserteagle417's "Autosplitter Room ID Maps", speedrun.com resources; floor plans with room numbers,
+  no names, no license — not committed): stage index 0 = mansion 1F (rooms 1xx), 1 = mansion 2F (2xx),
+  2 = courtyard & underground (3xx), 3 = guardhouse (4xx), 4 = laboratory (5xx), 5/6 = mansion 1F/2F on the return
+  (6xx/7xx). The plans agree with the door links in `room-index.json` (e.g. 2F room 2, the balcony around the dining
+  room, is where the statue falls from). `data/games/re1/rooms.json` holds the areas, and names only for rooms whose
+  identity live captures or the player confirmed.
+- **Speedrun segments** (LiveSplit templates from speedrun.com, no times): Chris/Jill × good/bad ending × MG/NMG share
+  Yawn 1 › Mansion 1 › Courtyard 1 › Boxes › Guardhouse › Courtyard 2 › Yawn 2 › Basement › Mansion 2 › Courtyard 3 ›
+  Black Tiger › Underground › Loud Room › (Lab) Tyrant › [Orgy Room, good ending] › End; the first split is
+  "King Henry" (Jill NMG), "Rebecca Piano" (Chris NMG) or "Chemical Skip" (MG). A lead for route/split features (0.8+).
+
+## 0b. Room files (RDT) — what each game flag means
 
 The game's room files (`USA\Stage1..7\ROOMsrrv.RDT`, s = stage, rr = room, v = 0 Chris / 1 Jill) contain init and
 main scripts with `item_aot_set` (item id, quantity, pickup flag), `em_set` (enemy type, kill flag) and

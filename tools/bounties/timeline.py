@@ -53,6 +53,7 @@ class Names:
         self.items_observed = set(names["itemsObserved"])
         self.items_uncertain = {int(k) for k in names.get("itemsUncertain", {})}
         self.enemies = {int(k): v for k, v in names["enemies"].items()}
+        self.rooms = json.loads((DATA / "rooms.json").read_text(encoding="utf-8"))["rooms"]
         index_path = DATA / "room-index.json"
         self.index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.exists() else {"items": [], "enemies": [], "doors": []}
 
@@ -63,6 +64,11 @@ class Names:
         elif item_id not in self.items_observed or item_id in self.items_uncertain:
             name += "?"
         return f"{name} ×{quantity}" if quantity and quantity > 1 else name
+
+    def room(self, room_id: str) -> str:
+        """'105 Dining room' where the room is identified, else '10C (Mansion 1F)'."""
+        info = self.rooms.get(room_id, {})
+        return f"{room_id} {info['name']}" if "name" in info else f"{room_id} ({info.get('area', '?')})"
 
     def enemy(self, enemy_type: int) -> str:
         return self.enemies.get(enemy_type, f"enemy type {enemy_type}")
@@ -128,7 +134,7 @@ class Timeline:
                 damage = None
                 prev = None
             if prev is None and self.segment_start is not None and all(
-                    "— start" in text or "— entered from" in text or "— left the game" in text or text.startswith("\n**")
+                    "— start" in text or "— entered " in text or "— left the game" in text or text.startswith("\n**")
                     for _, text in self.lines[self.segment_start:]):
                 del self.lines[self.segment_start:]  # only a flash of old values while the next game loaded
             if prev is None:
@@ -139,7 +145,7 @@ class Timeline:
                 down = {}
                 self.listed_room = False
                 prev = s
-                self.emit(s, "start")
+                self.emit(s, f"start in {names.room(room)}")
                 continue
             prev_room = f"{prev.get('stage', 0) + 1}{prev.get('room', 0):02X}"
             if room != prev_room:
@@ -149,7 +155,7 @@ class Timeline:
                 entered = t
                 down = {}
                 self.listed_room = False
-                self.emit(s, f"entered from {prev_room}")
+                self.emit(s, f"entered {names.room(room)} from {prev_room}")
             settled = t - entered >= SETTLE_FRAMES
             if settled and entered is not None and not self.listed_room:
                 self.listed_room = True
