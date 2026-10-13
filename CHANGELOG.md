@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-13
+
 ### Added
 - Captures record the game's state memory (`memory-N.bin`: the main game-state block and a system block, 10 Hz,
   keyframes plus changed bytes), so every bounty that lives in game memory can be checked from a capture — including
