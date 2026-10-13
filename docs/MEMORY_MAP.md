@@ -72,8 +72,8 @@ from a third-party source, diagnostics only.
 | `0x11` | Loaded into an empty `0x07` (×6), which became `0x08` ×6 — not shotgun shells | Bazooka rounds |
 | `0x08` | `0x07` after loading `0x11` rounds; −1 per shot | Bazooka with other rounds? (BioRand id 8) |
 | `0x47` | Made from two `0x44`; consumed while HP went 71 → 96 (max) | Mixed herb (green + green)? |
-| `0x21` | Dropped by the statue pushed in 206, picked up in 105, used in 10D (scenario flag A0 `0x10000`) | **Blue gem** (owner-confirmed) |
-| `0x29` | Received in 10D for the blue gem | Puzzle reward (unnamed) |
+| `0x21` | Dropped by the statue pushed in 206, picked up in 105, placed in the lion head in 10D (scenario flag A0 `0x10000`) | **Blue gem** (owner-confirmed) |
+| `0x29` | Received from the lion head in 10D for the blue gem | **Wind crest** (owner-confirmed) |
 | `0x1F`, `0x23`, `0x26`, `0x2D` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
 | `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
 | `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |

@@ -177,17 +177,17 @@
           "verifies": "Key item ids → item name table",
           "status": "partial",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): blue gem = id 0x21 (owner-confirmed), picked up in 105"
+            "2026-10-13 (live session 4, Jill, memory log): blue gem = id 0x21, wind crest = id 0x29 (both owner-confirmed): gem picked up in 105, placed in the lion head in 10D, crest received"
           ]
         },
         {
           "id": "B112",
           "task": "Save at a typewriter (a few times, different slots)",
-          "verifies": "Save detection; the PC version needs no ink ribbons",
+          "verifies": "Save detection; ink ribbon use (Chris's game uses them, Jill's didn't)",
           "status": "partial",
           "evidence": [
-            "2026-10-13: 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbons used on PC; memory shows only a frozen timer, so save detection needs the save-file watcher (issue)",
-            "attract-mode demo inventory holds id 0x2F ×2 (BioRand: Ink Ribbon) — unconfirmed"
+            "2026-10-13 (Jill): 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbon used; memory shows only a frozen timer, so save detection needs the save-file watcher (issue #37)",
+            "Owner: Chris's game does use ink ribbons. A Chris save with a ribbon in the inventory is still needed to confirm the ribbon id (attract-mode demo, a Chris game, holds id 0x2F ×2 — BioRand: Ink Ribbon)"
           ]
         },
         {
@@ -376,7 +376,7 @@
           "status": "partial",
           "detector": "scenario_flags",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): blue gem chain — statue pushed in 206 (flagRoom4 0x4000), gem (id 0x21) picked up in the dining room 105, used in 10D (scenario A0 bit 0x10000), id 0x29 received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
+            "2026-10-13 (live session 4, Jill, memory log): blue gem chain — statue pushed in 206 (flagRoom4 0x4000), gem (id 0x21) picked up in the dining room 105, placed in the lion head in 10D (scenario A0 bit 0x10000), wind crest (id 0x29) received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
           ]
         },
         {

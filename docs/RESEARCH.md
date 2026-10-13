@@ -84,9 +84,10 @@ SCD opcodes: `0x0C door_aot_set` (26 bytes; target = stage<<5 | room), `0x18 ite
 - **Confirmed (live, 2026-10-13):** attract mode (title screen left idle) replays the same demo each cycle on this
   build: Chris in room 107 with a preset 8-slot inventory and item box, `mainMenu = 0`, max HP 140 but **HP 0**.
   The session rule (`hp > 0`) therefore treats demos as "not in game", so they produce no state or events.
-- **Confirmed (live, 2026-10-13):** saving at a typewriter on the GOG PC build consumes **no ink ribbons** (owner
-  saved three times with no ribbon in the inventory and no quantity change; `SAVE\savedat1–3.dat` were written at
-  the save times). During a save the in-game timer freezes (~7 s) and no profile field or state-flag bit changes,
+- **Confirmed (live, 2026-10-13):** in **Jill's** game, saving at a typewriter on the GOG PC build consumed **no ink
+  ribbons** (owner saved three times with no ribbon in the inventory and no quantity change; `SAVE\savedat1–3.dat`
+  were written at the save times). **Chris's** game does use ink ribbons (owner) — ribbon use depends on the
+  scenario, not the platform. During a save the in-game timer freezes (~7 s) and no profile field or state-flag bit changes,
   so saves are detected from the save files, not memory.
 - **Refuted for this build:** the autosplitter's `time` (`0x4D46D4`) is not the live timer — it is a
   copy written at one code site (`0x4298AB`). The live timer is `0xD22730`.
