@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Captures record the game's state memory (`memory-N.bin`: the main game-state block and a system block, 10 Hz,
+  keyframes plus changed bytes), so every bounty that lives in game memory can be checked from a capture — including
+  values Lockpick hasn't identified yet. The bounty analyzer decodes all profile fields from it.
+- Diagnostic (unverified) fields for 8 enemy slots, all event-flag banks and the full 48-entry item box; analyzer
+  detectors for enemy types, kills, door locks, puzzle/scenario flags, room flags and room item pickups.
+
+### Changed
+- Field reads are grouped into a few block reads per poll instead of one read per field.
+
 ### Fixed
 - The app shows its version consistently as the release version (e.g. `0.1.3`, keeping any pre-release suffix);
   the startup log and capture info no longer show the four-part `0.1.3.0`.

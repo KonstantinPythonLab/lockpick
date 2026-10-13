@@ -21,6 +21,9 @@ thing to do in-game while a capture is running (**Debug → Start capture**, see
 can cover many bounties — just play and send the zip with a
 [Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue.
 
+Captures record the game's whole state memory, so a capture can complete any bounty below except the ones marked
+🛠️ (they need data from outside the game's memory, such as the window position or screenshots).
+
 Submitted captures are analyzed automatically: unambiguous results (for example Rebecca's character id appearing)
 are checked off, and everything else is marked as evidence for a maintainer to review. Open bounties for the next
 release are also GitHub issues with the [`bounty` label](https://github.com/mscrnt/lockpick/issues?q=is%3Aissue+label%3Abounty).

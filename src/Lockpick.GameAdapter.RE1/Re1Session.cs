@@ -32,6 +32,7 @@ internal sealed class Re1Session : IGameSession
     private readonly IReadOnlyList<FieldSpec> _fields;
     private readonly HashSet<string> _trusted;
     private readonly Dictionary<string, Field<long>> _lastRaw = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Cluster[] _clusters;
     private GameSnapshot? _previous;
 
     public Re1Session(IProcessMemory memory, VersionProfile profile)
@@ -40,32 +41,116 @@ internal sealed class Re1Session : IGameSession
         Profile = profile;
         _fields = profile.Fields;
         _trusted = new HashSet<string>(profile.Fields.Where(f => f.IsTrusted).Select(f => f.Name), StringComparer.OrdinalIgnoreCase);
+        _clusters = Cluster.Build(profile.Fields);
     }
 
     public VersionProfile Profile { get; }
 
+    public bool CaptureRegions { get; set; }
+
+    /// <summary>Process reads issued by the last <see cref="Read"/> (diagnostics and tests).</summary>
+    internal int LastReadCalls { get; private set; }
+
     public GameSnapshot Read(long sequence, DateTimeOffset now)
     {
         var raw = new Dictionary<string, Field<long>>(_fields.Count, StringComparer.OrdinalIgnoreCase);
-        foreach (var spec in _fields)
+        var calls = 0;
+        foreach (var cluster in _clusters)
         {
-            Field<long> value;
-            if (_memory.TryReadValue(spec.Address, spec.Type, out var v))
+            // One read per cluster of nearby fields instead of one per field; if the block read fails (e.g. a
+            // partially unmapped range), fall back to reading each field so one bad page can't hide the rest.
+            calls++;
+            var block = _memory.TryRead(cluster.Start, cluster.Buffer);
+            foreach (var spec in cluster.Fields)
             {
-                value = Field<long>.Valid(spec.Mask is { } mask ? v & mask : v);
-            }
-            else
-            {
-                value = _lastRaw.TryGetValue(spec.Name, out var last) ? last.AsFailedRead() : Field<long>.Unavailable;
-            }
+                long v = 0;
+                var ok = block;
+                if (block)
+                {
+                    v = spec.Type.Decode(cluster.Buffer.AsSpan((int)(spec.Address - cluster.Start)));
+                }
+                else
+                {
+                    calls++;
+                    ok = _memory.TryReadValue(spec.Address, spec.Type, out v);
+                }
 
-            raw[spec.Name] = value;
-            _lastRaw[spec.Name] = value;
+                var value = ok
+                    ? Field<long>.Valid(spec.Mask is { } mask ? v & mask : v)
+                    : _lastRaw.TryGetValue(spec.Name, out var last) ? last.AsFailedRead() : Field<long>.Unavailable;
+                raw[spec.Name] = value;
+                _lastRaw[spec.Name] = value;
+            }
         }
 
         var snapshot = Interpret(raw, sequence, now);
+        if (CaptureRegions && Profile.CaptureRegions.Count > 0)
+        {
+            var regions = new List<RegionData>(Profile.CaptureRegions.Count);
+            foreach (var region in Profile.CaptureRegions)
+            {
+                calls++;
+                var data = new byte[region.Length];
+                if (_memory.TryRead(region.Address, data))
+                {
+                    regions.Add(new RegionData(region.Name, region.Address, data));
+                }
+            }
+
+            snapshot = snapshot with { Regions = regions };
+        }
+
+        LastReadCalls = calls;
         _previous = snapshot;
         return snapshot;
+    }
+
+    /// <summary>A contiguous span covering nearby profile fields, read with a single process read.</summary>
+    private sealed class Cluster(ulong start, int length, List<FieldSpec> fields)
+    {
+        /// <summary>Fields further apart than this start a new cluster (don't read large unrelated gaps).</summary>
+        private const ulong MaxGap = 0x1000;
+
+        /// <summary>Upper bound for one block read.</summary>
+        private const ulong MaxLength = 0x10000;
+
+        public ulong Start { get; } = start;
+
+        public byte[] Buffer { get; } = new byte[length];
+
+        public IReadOnlyList<FieldSpec> Fields { get; } = fields;
+
+        public static Cluster[] Build(IEnumerable<FieldSpec> specs)
+        {
+            var clusters = new List<Cluster>();
+            ulong start = 0, end = 0;
+            var current = new List<FieldSpec>();
+            foreach (var spec in specs.OrderBy(f => f.Address))
+            {
+                var fieldEnd = spec.Address + (ulong)spec.Type.SizeOf();
+                if (current.Count > 0 && (spec.Address > end + MaxGap || fieldEnd - start > MaxLength))
+                {
+                    clusters.Add(new Cluster(start, (int)(end - start), current));
+                    current = [];
+                }
+
+                if (current.Count == 0)
+                {
+                    start = spec.Address;
+                    end = fieldEnd;
+                }
+
+                end = Math.Max(end, fieldEnd);
+                current.Add(spec);
+            }
+
+            if (current.Count > 0)
+            {
+                clusters.Add(new Cluster(start, (int)(end - start), current));
+            }
+
+            return [.. clusters];
+        }
     }
 
     private GameSnapshot Interpret(Dictionary<string, Field<long>> raw, long sequence, DateTimeOffset now)

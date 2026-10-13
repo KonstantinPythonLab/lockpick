@@ -105,6 +105,9 @@ public interface IGameStateSource : IAsyncDisposable
 
     MonitorStatus Status { get; }
 
+    /// <summary>Ask the source to include raw capture regions in polled snapshots (costs extra reads; capture only).</summary>
+    bool RecordRegions { get; set; }
+
     GameSnapshot? Latest { get; }
 
     MonitorStatistics Statistics { get; }

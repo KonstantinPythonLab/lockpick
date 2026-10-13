@@ -33,6 +33,9 @@ public readonly record struct Position(int X, int Y, int Z)
     public override string ToString() => $"{X}, {Y}, {Z}";
 }
 
+/// <summary>A verbatim copy of one capture region at the time of a snapshot.</summary>
+public sealed record RegionData(string Name, ulong Address, byte[] Data);
+
 /// <summary>Player health. <see cref="Maximum"/> is only set when the adapter knows it reliably.</summary>
 public readonly record struct Health(int Current, int? Maximum)
 {
@@ -64,6 +67,13 @@ public sealed record GameSnapshot
     public Field<Position> Position { get; init; } = Field<Position>.Unsupported;
 
     public Field<TimeSpan> GameTime { get; init; } = Field<TimeSpan>.Unsupported;
+
+    /// <summary>
+    /// Verbatim copies of the profile's capture regions, filled only while a capture asks for them
+    /// (<see cref="Monitoring.IGameStateSource.RecordRegions"/>). Never serialized into recordings.
+    /// </summary>
+    [JsonIgnore]
+    public IReadOnlyList<RegionData> Regions { get; init; } = [];
 
     /// <summary>Raw values of profile fields keyed by field name, for diagnostics only.</summary>
     public IReadOnlyDictionary<string, Field<long>> RawFields { get; init; } = new Dictionary<string, Field<long>>();

@@ -1,4 +1,5 @@
 using Lockpick.Core.Adapters;
+using Lockpick.Core.Memory;
 using Lockpick.Core.Processes;
 using Lockpick.Core.Profiles;
 using Lockpick.Core.State;
@@ -191,13 +192,66 @@ public class Re1AdapterTests
     }
 
     [Fact]
-    public void Reads_stay_inside_the_verified_image()
+    public void Reads_stay_inside_the_verified_image_including_capture_regions()
     {
-        // The validated memory wrapper must never let a read escape the module image.
+        var reads = new List<(ulong Address, int Length)>();
         NewChrisGameInMainHall();
-        var before = _memory.ReadCount;
-        _session.Read(1, T0);
-        Assert.Equal(_profile.Fields.Count, _memory.ReadCount - before);
+
+        // A spy under the validation layer sees every request that reaches the process.
+        var validated = new ValidatedMemory(new SpyMemory(_memory, reads), [_profile.ImageRange]);
+        var direct = new Re1Session(validated, _profile) { CaptureRegions = true };
+        direct.Read(1, T0);
+
+        Assert.NotEmpty(reads);
+        Assert.All(reads, r => Assert.True(_profile.ImageRange.Contains(r.Address, r.Length), $"0x{r.Address:X}+{r.Length}"));
+    }
+
+    [Fact]
+    public void Fields_are_read_in_a_few_block_reads_when_memory_is_mapped()
+    {
+        // Real process memory is fully mapped; make the fake contiguous over the field clusters.
+        foreach (var (start, end) in new (ulong, ulong)[] { (0xBE41C0, 0xBE41F0), (0xBE62E0, 0xBE9960), (0xD22730, 0xD22780) })
+        {
+            _memory.Write(start, new byte[end - start]);
+        }
+
+        NewChrisGameInMainHall();
+        _memory.WriteI16(Addr("inv1"), 0x0F02); // Beretta, 15 rounds
+        var session = new Re1Session(new ValidatedMemory(_memory, [_profile.ImageRange]), _profile);
+        var s = session.Read(1, T0);
+
+        Assert.InRange(session.LastReadCalls, 1, 4);
+        Assert.Equal(new Health(140, 140), s.Health.Value);
+        Assert.Equal("106", s.Location.Value.Id);
+        Assert.Equal(0x0F02, s.RawFields["inv1"].Value);
+    }
+
+    [Fact]
+    public void Capture_regions_are_copied_only_when_requested()
+    {
+        foreach (var region in _profile.CaptureRegions)
+        {
+            _memory.Write(region.Address, new byte[region.Length]);
+        }
+
+        NewChrisGameInMainHall();
+        var session = new Re1Session(new ValidatedMemory(_memory, [_profile.ImageRange]), _profile);
+        Assert.Empty(session.Read(1, T0).Regions);
+
+        session.CaptureRegions = true;
+        var regions = session.Read(2, T0).Regions;
+        Assert.Equal(_profile.CaptureRegions.Select(r => r.Name), regions.Select(r => r.Name));
+        var game = regions.Single(r => r.Name == "gameState");
+        Assert.Equal(140, BitConverter.ToInt16(game.Data, (int)(0xBE636C - game.Address))); // HP inside the block
+    }
+
+    private sealed class SpyMemory(FakeMemory inner, List<(ulong, int)> reads) : IProcessMemory
+    {
+        public bool TryRead(ulong address, Span<byte> destination)
+        {
+            reads.Add((address, destination.Length));
+            return inner.TryRead(address, destination);
+        }
     }
 
     [Fact]

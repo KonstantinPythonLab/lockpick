@@ -40,6 +40,12 @@ public sealed record VersionProfile
 
     public IReadOnlyList<FieldSpec> Fields { get; init; } = [];
 
+    /// <summary>
+    /// Memory blocks recorded verbatim by captures (e.g. the whole game-state block), so captures keep everything
+    /// needed for later analysis — including values no field describes yet.
+    /// </summary>
+    public IReadOnlyList<MemoryRegionSpec> CaptureRegions { get; init; } = [];
+
     public IReadOnlyList<string> Notes { get; init; } = [];
 
     public FieldSpec? FindField(string name) =>
@@ -84,6 +90,19 @@ public sealed record CodeAnchor
     public required byte[] Bytes { get; init; }
 
     public string? Evidence { get; init; }
+}
+
+public sealed record MemoryRegionSpec
+{
+    public required string Name { get; init; }
+
+    [JsonConverter(typeof(HexUInt64Converter))]
+    public ulong Address { get; init; }
+
+    [JsonConverter(typeof(HexUInt32Converter))]
+    public uint Length { get; init; }
+
+    public string? Description { get; init; }
 }
 
 public sealed record FieldSpec

@@ -8,6 +8,9 @@ public sealed class ProfileValidationException(string message) : Exception(messa
 /// <summary>Loads and validates <see cref="VersionProfile"/> JSON documents.</summary>
 public static class ProfileLoader
 {
+    /// <summary>Upper bound for one capture region; captures record regions at up to 30 Hz.</summary>
+    public const uint MaxRegionLength = 1024 * 1024;
+
     public static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -124,6 +127,20 @@ public static class ProfileLoader
             if (field.IsTrusted && string.IsNullOrWhiteSpace(field.Evidence))
             {
                 errors.Add($"field '{field.Name}' is marked {field.Verification} but has no evidence");
+            }
+        }
+
+        var regionNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var region in profile.CaptureRegions)
+        {
+            if (!regionNames.Add(region.Name))
+            {
+                errors.Add($"duplicate capture region '{region.Name}'");
+            }
+
+            if (region.Length == 0 || region.Length > MaxRegionLength || !image.Contains(region.Address, (int)Math.Min(region.Length, int.MaxValue)))
+            {
+                errors.Add($"capture region '{region.Name}' at 0x{region.Address:X} (+0x{region.Length:X}) is empty, too large or outside the image {image}");
             }
         }
 

@@ -163,6 +163,46 @@ public sealed class CaptureSessionTests : IDisposable
     }
 
     [Fact]
+    public void Captures_include_the_game_memory_log()
+    {
+        var profile = _adapter.Profiles[0];
+        _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(profile, ExePath);
+        var memory = new FakeMemory().WithVerifiedImage(profile);
+        foreach (var region in profile.CaptureRegions)
+        {
+            memory.Write(region.Address, new byte[region.Length]); // real process memory is fully mapped
+        }
+
+        var enemyType = profile.FindField("enemy0Type")!.Address;
+        _host.Launch(7, ExePath, memory, new ModuleImage(0x400000, 0x49B2000, ExePath));
+        var monitor = new GameMonitor(_adapter, _host, _fingerprints, time: _time);
+        using var capture = new CaptureSession(monitor, _root, "re1", "9.9.9");
+        _time.Advance(TimeSpan.FromSeconds(2));
+        monitor.Tick();
+        for (var i = 1; i <= 3; i++)
+        {
+            memory.WriteU8(enemyType, (byte)i);
+            _time.Advance(TimeSpan.FromMilliseconds(150));
+            monitor.Tick();
+        }
+
+        Assert.True(monitor.RecordRegions); // capture switched region recording on
+        var zip = capture.Stop();
+        Assert.False(monitor.RecordRegions); // and off again
+
+        using var archive = ZipFile.OpenRead(zip);
+        using var log = new MemoryStream();
+        archive.GetEntry("memory-1.bin")!.Open().CopyTo(log);
+        log.Position = 0;
+        var (regions, records) = RegionLogReader.Open(log);
+        Assert.Equal(profile.CaptureRegions.Select(r => r.Name), regions.Select(r => r.Name));
+        var states = records.ToList();
+        Assert.Equal(4, states.Count);
+        var game = profile.CaptureRegions.Single(r => r.Name == "gameState");
+        Assert.Equal(3, states[^1].State[0][(int)(enemyType - game.Address)]);
+    }
+
+    [Fact]
     public void Unsupported_builds_are_fingerprinted_but_not_recorded()
     {
         _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(_adapter.Profiles[0], ExePath) with { Sha256 = new string('C', 64) };

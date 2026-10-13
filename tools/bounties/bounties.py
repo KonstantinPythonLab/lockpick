@@ -22,6 +22,7 @@ import io
 import json
 import os
 import re
+import struct
 import sys
 import urllib.request
 import zipfile
@@ -40,7 +41,18 @@ KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x0B, 0x0E, 0x11, 0x1F, 0x23, 0x26, 0x
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
 MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024
-MEMBER_PATTERN = re.compile(r"^(?:[^/]+/)?(trace-\d+\.txt|events-\d+\.txt|capture-info\.json)$")
+MEMBER_PATTERN = re.compile(r"^(?:[^/]+/)?(trace-\d+\.txt|events-\d+\.txt|memory-\d+\.bin|capture-info\.json)$")
+PROFILES = ROOT / "data" / "games" / "re1" / "profiles"
+# Values that change continuously; a new state is only recorded when something else changes.
+CONTEXT_FIELDS = {"gameTimer", "positionX", "positionY", "positionZ", "yaw"}
+# Enemy type ids as used by BioRand (MIT) for RE1 RDT enemy entries; names are hints until verified by captures.
+ENEMY_NAMES = {0: "Zombie", 1: "Zombie (naked)", 2: "Cerberus (dog)", 3: "Web spinner", 4: "Black Tiger", 5: "Crow",
+               6: "Hunter", 7: "Wasp", 8: "Plant 42", 9: "Chimera", 10: "Snake (Yawn)", 11: "Neptune / shark",
+               12: "Tyrant", 13: "Yawn", 16: "Tyrant (final)", 17: "Zombie (researcher)", 18: "Yawn (2nd)"}
+ENEMY_GROUPS = {"enemies_zombie": {0, 1, 17}, "enemies_dog_crow": {2, 5}, "enemies_hunter_chimera": {6, 9},
+                "enemies_spider_wasp_shark": {3, 7, 11}, "enemies_boss": {4, 8, 10, 12, 13, 16, 18}}
+FLAG_GROUPS = {"lock_flags": ("flagLocks",), "scenario_flags": ("flagScenarioA", "flagScenarioB"),
+               "room_flags": ("flagRoom",), "room_item_flags": ("flagRoomItems",), "enemy_flags": ("flagEnemies",)}
 ATTACHMENT_PATTERN = re.compile(r"https://github\.com/(?:user-attachments/files|[\w.-]+/[\w.-]+/files)/\d+/[\w.%-]+\.zip")
 TRACE_LINE = re.compile(r"^\[(\d\d:\d\d:\d\d\.\d{3})\] (.*?)(?: \| (.*))?$")
 PAIR = re.compile(r"(\w+)=0x([0-9A-Fa-f]+)")
@@ -67,6 +79,9 @@ Everything Lockpick needs to see the real game do, grouped by the release that n
 thing to do in-game while a capture is running (**Debug → Start capture**, see [CAPTURE.md](CAPTURE.md)). One capture
 can cover many bounties — just play and send the zip with a
 [Capture submission](https://github.com/mscrnt/lockpick/issues/new?template=capture-submission.yml) issue.
+
+Captures record the game's whole state memory, so a capture can complete any bounty below except the ones marked
+🛠️ (they need data from outside the game's memory, such as the window position or screenshots).
 
 Submitted captures are analyzed automatically: unambiguous results (for example Rebecca's character id appearing)
 are checked off, and everything else is marked as evidence for a maintainer to review. Open bounties for the next
@@ -134,6 +149,83 @@ class Capture:
     trainer_writes: int = 0
 
 
+def load_profile_fields(profile_id: str | None) -> list[dict]:
+    """Fields of a version profile (comments allowed), as dicts with name/address/type/mask."""
+    for path in sorted(PROFILES.glob("*.json")):
+        profile = json.loads(re.sub(r"^\s*//.*$", "", path.read_text(encoding="utf-8"), flags=re.M))
+        if profile_id in (None, profile["id"]):
+            return [{"name": f["name"], "address": int(f["address"], 16), "type": f["type"],
+                     "mask": int(f["mask"], 16) if f.get("mask") else None} for f in profile["fields"]]
+    return []
+
+
+FORMATS = {"u8": "<B", "u16": "<H", "i16": "<H", "u32": "<I", "i32": "<I"}  # raw unsigned, like the trace
+
+
+def parse_memory(name: str, payload: bytes, fields: list[dict]) -> Session:
+    """Replays a memory-N.bin region log and decodes every profile field that lies inside a recorded region."""
+    session = Session(name)
+    view = memoryview(payload)
+    if bytes(view[:6]) != b"LPKMEM" or view[6] != 1:
+        raise ValueError(f"{name} is not a Lockpick memory log")
+    pos = 7
+    (count,) = struct.unpack_from("<H", view, pos)
+    pos += 2
+    regions = []
+    for _ in range(count):
+        length = view[pos]
+        region_name = bytes(view[pos + 1:pos + 1 + length]).decode("utf-8", "replace")
+        pos += 1 + length
+        address, size = struct.unpack_from("<QI", view, pos)
+        pos += 12
+        if size > MAX_MEMBER_BYTES:
+            raise ValueError("memory region larger than the analysis limits")
+        regions.append((region_name, address, size))
+    state = [bytearray(size) for _, _, size in regions]
+    present = [False] * len(regions)
+    located = []
+    for f in fields:
+        width = struct.calcsize(FORMATS[f["type"]])
+        for index, (_, address, size) in enumerate(regions):
+            if address <= f["address"] and f["address"] + width <= address + size:
+                located.append((f, index, f["address"] - address))
+                break
+    last_key = None
+    while pos < len(view):
+        kind = view[pos]
+        pos += 9  # kind + i64 timestamp
+        if kind == 0:
+            for index, (_, _, size) in enumerate(regions):
+                flag = view[pos]
+                pos += 1
+                if flag:
+                    state[index][:] = view[pos:pos + size]
+                    present[index] = True
+                    pos += size
+        elif kind == 1:
+            (runs,) = struct.unpack_from("<H", view, pos)
+            pos += 2
+            for _ in range(runs):
+                index, offset, length = struct.unpack_from("<HIH", view, pos)
+                pos += 8
+                if index >= len(regions) or offset + length > regions[index][2]:
+                    raise ValueError("corrupt memory log")
+                state[index][offset:offset + length] = view[pos:pos + length]
+                pos += length
+        else:
+            raise ValueError("corrupt memory log")
+        values = {}
+        for f, index, offset in located:
+            if present[index]:
+                (v,) = struct.unpack_from(FORMATS[f["type"]], state[index], offset)
+                values[f["name"]] = v & f["mask"] if f["mask"] is not None else v
+        key = tuple(v for k, v in sorted(values.items()) if k not in CONTEXT_FIELDS)
+        if key != last_key:
+            session.states.append(values)
+            last_key = key
+    return session
+
+
 def parse_trace(name: str, text: str) -> Session:
     session = Session(name)
     state: dict[str, int] = {}
@@ -164,9 +256,12 @@ def read_capture_zip(name: str, payload: bytes) -> Capture:
         members = [i for i in archive.infolist() if MEMBER_PATTERN.match(i.filename)]
         if sum(i.file_size for i in members) > MAX_TOTAL_BYTES or any(i.file_size > MAX_MEMBER_BYTES for i in members):
             raise ValueError("capture is larger than the analysis limits")
-        traces, events = {}, {}
+        traces, events, memory = {}, {}, {}
         for info in members:
             base = info.filename.rsplit("/", 1)[-1]
+            if base.startswith("memory-"):
+                memory[base.replace("memory-", "trace-").replace(".bin", ".txt")] = archive.read(info)
+                continue
             text = archive.read(info).decode("utf-8", errors="replace")
             if base == "capture-info.json":
                 try:
@@ -179,8 +274,14 @@ def read_capture_zip(name: str, payload: bytes) -> Capture:
                 traces[base] = text
             elif base.startswith("events-"):
                 events[base.replace("events-", "trace-")] = text
-        for trace_name in sorted(traces, key=lambda n: int(re.sub(r"\D", "", n) or 0)):
-            session = parse_trace(f"{name}/{trace_name}", traces[trace_name])
+        profile_id = next((b.get("ProfileId") for b in capture.builds if b.get("ProfileId")), None)
+        fields = load_profile_fields(profile_id) if memory else []
+        for trace_name in sorted(set(traces) | set(memory), key=lambda n: int(re.sub(r"\D", "", n) or 0)):
+            # The memory log holds every value (including ones the trace didn't list); prefer it when present.
+            if trace_name in memory and fields:
+                session = parse_memory(f"{name}/{trace_name.replace('trace-', 'memory-').replace('.txt', '.bin')}", memory[trace_name], fields)
+            else:
+                session = parse_trace(f"{name}/{trace_name}", traces.get(trace_name, ""))
             session.events = [l for l in events.get(trace_name, "").splitlines() if l.strip()]
             capture.sessions.append(session)
     return capture
@@ -205,6 +306,9 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
     """Returns findings keyed by detector name, plus general facts for the report."""
     found: dict[str, Finding] = {}
     rooms: dict[int, set[int]] = {}
+    enemies: dict[int, set[str]] = {}
+    kills: dict[int, int] = {}
+    flag_changes: dict[str, set[str]] = {}
     item_ids: set[int] = set()
     facts: dict[str, object] = {}
 
@@ -241,8 +345,8 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
                 for i in range(8):
                     if (v := s.get(f"inv{i}")) is not None and v & 0xFF:
                         item_ids.add(v & 0xFF)
-                for i in range(4):
-                    if (v := s.get(f"box{i}")) is not None and v & 0xFF:
+                for key, v in s.items():
+                    if key.startswith("box") and v & 0xFF:
                         item_ids.add(v & 0xFF)
                 if (slot := s.get("equippedSlot")) is not None and slot > 0:
                     equipped.add(slot)
@@ -253,9 +357,30 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
             if s.get("inventoryPtr") == 0xBE9950 and char != 3:
                 add("rebecca", "inventory pointer at Rebecca's inventory (0xBE9950)", False)
 
+            if game:
+                room_id = f"{s.get('stage', 0) + 1}{s.get('room', 0):02X}"
+                for slot in range(30):
+                    if f"enemy{slot}Flags" not in s:
+                        break
+                    if s[f"enemy{slot}Flags"] & 1:
+                        enemy_type = s.get(f"enemy{slot}Type", -1)
+                        enemies.setdefault(enemy_type, set()).add(room_id)
             if prev is not None:
                 prev_hp = signed(prev.get("hp", 0), 16)
                 playing = game and in_game(prev)
+                same_room = (s.get("stage"), s.get("room")) == (prev.get("stage"), prev.get("room"))
+                for slot in range(30 if playing and same_room else 0):
+                    flags, hp_key = f"enemy{slot}Flags", f"enemy{slot}Hp"
+                    if flags not in s or flags not in prev:
+                        break
+                    before, after = signed(prev.get(hp_key, 0), 16), signed(s.get(hp_key, 0), 16)
+                    if prev[flags] & 1 and before > 0 and after <= 0:
+                        enemy_type = s.get(f"enemy{slot}Type", -1)
+                        kills[enemy_type] = kills.get(enemy_type, 0) + 1
+                for detector, prefixes in FLAG_GROUPS.items():
+                    for key in s:
+                        if playing and key.startswith(prefixes) and key in prev and s[key] != prev[key]:
+                            flag_changes.setdefault(detector, set()).add(key)
                 if prev.get("maxHp", 0) > 0 and prev_hp > 0 and hp <= 0:
                     died = True
                     add("death", f"HP {prev_hp} → {hp}", True)
@@ -272,9 +397,9 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
                         before, after = prev[key] >> 8, s[key] >> 8
                         if after == before - 1 and s.get("equippedSlot") == i + 1:
                             add("fire_and_reload", f"weapon id 0x{s[key] & 0xFF:02X} fired (slot {i + 1})", False)
-                for i in range(4 if playing else 0):
-                    key = f"box{i}"
-                    if key in s and key in prev and s[key] != prev[key]:
+                for key in [k for k in s if k.startswith("box")] if playing else []:
+                    i = int(key[3:])
+                    if key in prev and s[key] != prev[key]:
                         add("item_box_changed", f"item box entry {i + 1}: 0x{prev[key]:04X} → 0x{s[key]:04X}", False)
             prev = s
         if room_changes >= 2:
@@ -297,6 +422,18 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
         if not build.get("ProfileId"):
             add("other_build", f"unsupported build {build.get('FileName')} {build.get('FileSize')} bytes, SHA-256 {str(build.get('Sha256'))[:16]}…", False)
 
+    def enemy_name(t: int) -> str:
+        return f"type {t} ({ENEMY_NAMES[t]}?)" if t in ENEMY_NAMES else f"type {t}"
+
+    for detector, types in ENEMY_GROUPS.items():
+        seen = sorted(t for t in enemies if t in types)
+        if seen:
+            add(detector, "; ".join(f"{enemy_name(t)} in {' '.join(sorted(enemies[t]))}" for t in seen), False)
+    if kills:
+        add("enemy_killed", ", ".join(f"{enemy_name(t)} ×{n}" for t, n in sorted(kills.items())), False)
+    for detector, keys in flag_changes.items():
+        add(detector, f"{len(keys)} flag word(s) changed: {', '.join(sorted(keys)[:8])}{' …' if len(keys) > 8 else ''}", False)
+
     if capture.trainer_writes:
         for key, finding in list(found.items()):
             found[key] = Finding(finding.detector, finding.text + " (capture includes trainer writes)", False)
@@ -304,6 +441,8 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
     facts["rooms"] = {stage + 1: sorted(r) for stage, r in sorted(rooms.items())}
     facts["item_ids"] = sorted(item_ids)
     facts["new_item_ids"] = sorted(item_ids - KNOWN_ITEM_IDS)
+    facts["enemies"] = {enemy_name(t): sorted(rs) for t, rs in sorted(enemies.items())}
+    facts["kills"] = {enemy_name(t): n for t, n in sorted(kills.items())}
     facts["builds"] = capture.builds
     facts["sessions"] = len(capture.sessions)
     facts["samples"] = sum(len(s.states) for s in capture.sessions)
@@ -338,6 +477,10 @@ def report(data: dict, capture: Capture, findings: dict[str, Finding], facts: di
     rooms = facts["rooms"] or {}
     if rooms:
         lines += ["", "**Rooms seen:** " + "; ".join(f"stage {s}: " + " ".join(f"{s}{r:02X}" for r in rs) for s, rs in rooms.items())]
+    if facts.get("enemies"):
+        lines.append("**Enemies seen:** " + "; ".join(f"{t} in {' '.join(rs)}" for t, rs in facts["enemies"].items()))
+    if facts.get("kills"):
+        lines.append("**Enemies killed:** " + ", ".join(f"{t} ×{n}" for t, n in facts["kills"].items()))
     if facts["item_ids"]:
         new = ", ".join(f"0x{i:02X}" for i in facts["new_item_ids"]) or "none"
         lines.append(f"**Item ids seen:** {', '.join(f'0x{i:02X}' for i in facts['item_ids'])} (new: {new})")

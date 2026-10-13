@@ -46,6 +46,9 @@ public interface IGameSession
 {
     VersionProfile Profile { get; }
 
+    /// <summary>When true, <see cref="Read"/> also copies the profile's capture regions into the snapshot.</summary>
+    bool CaptureRegions { get; set; }
+
     /// <summary>Reads the current state. Must not throw for ordinary read failures; failed fields are marked instead.</summary>
     GameSnapshot Read(long sequence, DateTimeOffset now);
 }

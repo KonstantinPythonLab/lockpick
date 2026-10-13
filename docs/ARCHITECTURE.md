@@ -138,6 +138,13 @@ from data), so it never re-triggers by accident and new steps can be shown to ex
 per-poll `Polled` event (raw fields change without normalized state changing, e.g. ammo). `CaptureSession` writes
 per-attachment trace/recording/event files and zips them; there is no separate tool.
 
+**ADR-013 — Captures record memory, not just fields.** Each capture logs the profile's capture regions (the whole
+game-state block and a system block) as a keyframe plus changed byte runs (`memory-N.bin`, 10 Hz, keyframe every 60 s),
+alongside the readable trace. Any value can be decoded from old captures later, so bounties don't depend on Lockpick
+having identified a field before the capture was made. The format is pinned by a golden file shared by the C# writer
+and the Python analyzer. Field reads are grouped into a few block reads per poll (fallback to per-field reads when a
+block can't be read), which keeps 130+ fields cheap.
+
 **ADR-009 — Responsive UI.** The window switches to an icon-rail + single-column layout below 760 px
 (window) / 780 px (dashboard content), for portrait monitors and side-by-side use with the game.
 Icons are Lucide (ISC) path data rendered with Lucide's stroke style.

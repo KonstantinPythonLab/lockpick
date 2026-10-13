@@ -288,31 +288,36 @@
           "status": "partial",
           "evidence": [
             "zombie damage seen; enemy array not yet read"
-          ]
+          ],
+          "detector": "enemies_zombie"
         },
         {
           "id": "B311",
           "task": "Encounter **dogs (Cerberus)** and **crows**",
           "verifies": "Enemy type ids",
-          "status": "needed"
+          "status": "needed",
+          "detector": "enemies_dog_crow"
         },
         {
           "id": "B312",
           "task": "Encounter **Hunters** and **Chimeras**",
           "verifies": "Enemy type ids",
-          "status": "needed"
+          "status": "needed",
+          "detector": "enemies_hunter_chimera"
         },
         {
           "id": "B313",
           "task": "Encounter **spiders**, **wasps** and **sharks**",
           "verifies": "Enemy type ids",
-          "status": "needed"
+          "status": "needed",
+          "detector": "enemies_spider_wasp_shark"
         },
         {
           "id": "B314",
           "task": "Boss fights: **Yawn** (both), **Plant 42**, **Neptune**, **Black Tiger**, **Tyrant** (both)",
           "verifies": "Boss ids and HP",
-          "status": "needed"
+          "status": "needed",
+          "detector": "enemies_boss"
         }
       ]
     },
@@ -345,25 +350,29 @@
           "id": "B501",
           "task": "Unlock doors with keys and the lockpick",
           "verifies": "Lock flags bank `0xBE9874`",
-          "status": "needed"
+          "status": "needed",
+          "detector": "lock_flags"
         },
         {
           "id": "B502",
           "task": "Solve puzzles (piano, statues, armor room, crests, V-Jolt, computer/MO disk)",
           "verifies": "Scenario flag banks",
-          "status": "needed"
+          "status": "needed",
+          "detector": "scenario_flags"
         },
         {
           "id": "B503",
           "task": "Kill each enemy type",
           "verifies": "Enemy death, kill flags",
-          "status": "needed"
+          "status": "needed",
+          "detector": "enemy_killed"
         },
         {
           "id": "B504",
           "task": "Push/move objects (statues, shelves, boxes)",
           "verifies": "Object state",
-          "status": "needed"
+          "status": "needed",
+          "detector": "room_flags"
         }
       ]
     },
@@ -375,7 +384,8 @@
           "id": "B601",
           "task": "Pick up items, leave the room and come back",
           "verifies": "Per-room item pickup flags `0xBE989C`",
-          "status": "needed"
+          "status": "needed",
+          "detector": "room_item_flags"
         },
         {
           "id": "B602",

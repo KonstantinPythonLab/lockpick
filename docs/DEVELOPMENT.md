@@ -80,6 +80,9 @@ submission issue. The `capture-triage` workflow analyzes it and comments with wh
 
 Bounty data lives in `data/bounties.json`; `docs/CAPTURE_BOUNTIES.md` is generated (`render --check` runs in CI).
 
+Captures contain `memory-N.bin` (the game-state memory, see ARCHITECTURE ADR-013); the analyzer decodes every profile
+field from it — add a field to the profile and old captures can be re-analyzed for it.
+
 1. `python tools/bounties/bounties.py analyze LockpickCapture-*.zip` — review the report (also posted on the issue).
 2. `python tools/bounties/bounties.py apply LockpickCapture-*.zip --source "issue #N"` — records findings in
    `data/bounties.json` and regenerates the doc. Unambiguous results are checked off; everything else becomes
@@ -102,6 +105,12 @@ Bounty data lives in `data/bounties.json`; `docs/CAPTURE_BOUNTIES.md` is generat
   `[Bnnn]` issues. When a capture verifies one, check it off in the file and close the issue.
 - **Pinned:** the capture-bounties tracker issue. **Discussions** for questions, ideas and announcements (no wiki:
   documentation lives in `docs/`).
+
+## Golden files
+
+`tests/Lockpick.Tests/Fixtures/region-log-sample.bin` pins the memory-log format between the C# writer and the Python
+analyzer. After an intentional format change: `LOCKPICK_UPDATE_GOLDEN=1 dotnet test --filter RegionLogTests`, then bump
+the format version and keep the analyzer able to read old captures.
 
 ## Coding conventions
 

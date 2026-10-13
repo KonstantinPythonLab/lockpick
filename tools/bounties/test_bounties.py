@@ -56,6 +56,40 @@ class ItemBoxSessionTests(unittest.TestCase):
         self.assertIn(0x0B, facts["rooms"][2])  # room 20B
 
 
+class MemoryLogTests(unittest.TestCase):
+    """region-log-sample.bin is written by the C# RegionLogWriter (RegionLogTests); this pins the shared format."""
+
+    def setUp(self):
+        payload = (FIXTURES / "region-log-sample.bin").read_bytes()
+        self.session = bounties.parse_memory("sample", payload, bounties.load_profile_fields("re1-gog-usa-hotfix4"))
+
+    def test_decodes_profile_fields_from_the_memory_log(self):
+        first = self.session.states[0]
+        self.assertEqual((first["room"], first["hp"], first["maxHp"], first["character"]), (6, 96, 96, 1))
+        self.assertEqual((first["enemy0Flags"], first["enemy0Type"], first["enemy0Hp"]), (1, 2, 30))
+        self.assertEqual(self.session.states[-1]["box5"], 0)
+
+    def test_enemies_kills_flags_and_item_box_are_detected(self):
+        capture = bounties.Capture("sample.zip", [self.session])
+        found, facts = bounties.detect(capture)
+        self.assertIn("Cerberus", found["enemies_dog_crow"].text)
+        self.assertIn("106", found["enemies_dog_crow"].text)
+        self.assertIn("×1", found["enemy_killed"].text)
+        self.assertIn("flagLocks0", found["lock_flags"].text)
+        self.assertIn("item box entry 6", found["item_box_changed"].text)
+        self.assertTrue(all(not f.auto for k, f in found.items() if k.startswith(("enemies", "enemy_", "lock"))))
+
+    def test_capture_zip_prefers_the_memory_log(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as z:
+            z.writestr("trace-1.txt", "")
+            z.writestr("memory-1.bin", (FIXTURES / "region-log-sample.bin").read_bytes())
+            z.writestr("capture-info.json", json.dumps({"Builds": [{"ProfileId": "re1-gog-usa-hotfix4"}]}))
+        capture = bounties.read_capture_zip("with-memory.zip", buffer.getvalue())
+        self.assertGreater(len(capture.sessions[0].states), 1)
+        self.assertIn("enemy0Type", capture.sessions[0].states[0])
+
+
 class AttractDemoTests(unittest.TestCase):
     def test_attract_mode_demo_produces_no_evidence(self):
         # Live capture (2026-10-13) of the title-screen demo: Chris in room 107 with a preset inventory and item box,

@@ -19,6 +19,9 @@ public sealed class ReplaySource(RecordingHeader header, IReadOnlyList<RecordedF
 
     public event EventHandler<GameEvent>? EventRaised;
 
+    /// <summary>Recordings don't contain memory regions; replay ignores this.</summary>
+    public bool RecordRegions { get; set; }
+
     public MonitorStatus Status { get; private set; } = MonitorStatus.Stopped(DateTimeOffset.UtcNow);
 
     public GameSnapshot? Latest { get; private set; }

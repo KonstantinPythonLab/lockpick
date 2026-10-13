@@ -67,6 +67,8 @@ public sealed class GameMonitor : IGameStateSource
 
     public MonitorStatus Status { get; private set; }
 
+    public bool RecordRegions { get; set; }
+
     public GameSnapshot? Latest { get; private set; }
 
     public bool IsAttached => _session is not null;
@@ -267,6 +269,7 @@ public sealed class GameMonitor : IGameStateSource
         }
 
         var started = Stopwatch.GetTimestamp();
+        session.CaptureRegions = RecordRegions;
         var snapshot = session.Read(++_sequence, now);
         var elapsedMs = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 

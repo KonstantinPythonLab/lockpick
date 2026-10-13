@@ -145,6 +145,17 @@ public enum ValueType
 
 public static class ValueTypeExtensions
 {
+    /// <summary>Decodes a little-endian value of this type from the start of <paramref name="bytes"/>.</summary>
+    public static long Decode(this ValueType type, ReadOnlySpan<byte> bytes) => type switch
+    {
+        ValueType.U8 => bytes[0],
+        ValueType.U16 => BinaryPrimitives.ReadUInt16LittleEndian(bytes),
+        ValueType.I16 => BinaryPrimitives.ReadInt16LittleEndian(bytes),
+        ValueType.U32 => BinaryPrimitives.ReadUInt32LittleEndian(bytes),
+        ValueType.I32 => BinaryPrimitives.ReadInt32LittleEndian(bytes),
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown value type."),
+    };
+
     public static int SizeOf(this ValueType type) => type switch
     {
         ValueType.U8 => 1,

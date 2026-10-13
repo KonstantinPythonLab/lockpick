@@ -22,6 +22,9 @@ public sealed record CaptureInfo(string LockpickVersion, string Os, DateTimeOffs
 
     public long Events { get; set; }
 
+    /// <summary>Records written to the memory logs (memory-N.bin) of the latest attachment.</summary>
+    public long MemoryRecords { get; set; }
+
     public DateTimeOffset? EndedAt { get; set; }
 }
 
@@ -36,6 +39,12 @@ public sealed class CaptureSession : IDisposable
     private static readonly JsonSerializerOptions InfoJson = new() { WriteIndented = true };
     private static readonly IReadOnlyDictionary<string, Field<long>> NoRawFields = new Dictionary<string, Field<long>>();
     private static readonly TimeSpan MinTimerOnlyInterval = TimeSpan.FromSeconds(1);
+
+    /// <summary>
+    /// Memory regions are logged at 10 Hz: persistent state (flags, items, enemy HP, rooms) is still captured, and
+    /// per-frame churn (animation, positions) costs a third. Fields are still traced at the full poll rate.
+    /// </summary>
+    private static readonly TimeSpan RegionInterval = TimeSpan.FromMilliseconds(100);
 
     /// <summary>Raw fields that change continuously; printed as context on every trace line instead of as changes.</summary>
     public static readonly IReadOnlySet<string> ContextFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -52,6 +61,8 @@ public sealed class CaptureSession : IDisposable
     private StreamWriter? _trace;
     private StreamWriter? _events;
     private SessionRecorder? _recorder;
+    private RegionLogWriter? _regionLog;
+    private DateTimeOffset _lastRegionAt;
     private IReadOnlyDictionary<string, Field<long>>? _lastRaw;
     private GameSnapshot? _lastRecorded;
     private DateTimeOffset _lastFlush;
@@ -70,6 +81,8 @@ public sealed class CaptureSession : IDisposable
         _info = new CaptureInfo(appVersion, RuntimeInformation.OSDescription, now);
         WriteInfo();
 
+        // Ask the source for raw memory regions while capturing (see RegionLogWriter).
+        _source.RecordRegions = true;
         _source.StatusChanged += OnStatus;
         _source.Polled += OnPolled;
         _source.SnapshotChanged += OnSnapshot;
@@ -169,6 +182,7 @@ public sealed class CaptureSession : IDisposable
 
     private void Unsubscribe()
     {
+        _source.RecordRegions = false;
         _source.StatusChanged -= OnStatus;
         _source.Polled -= OnPolled;
         _source.SnapshotChanged -= OnSnapshot;
@@ -201,7 +215,7 @@ public sealed class CaptureSession : IDisposable
             var recordable = status.State is ConnectionState.Attached or ConnectionState.Replaying;
             if (recordable && _trace is null)
             {
-                OpenAttachment(status.Profile?.Id);
+                OpenAttachment(status.Profile);
             }
             else if (!recordable && _trace is not null)
             {
@@ -231,6 +245,12 @@ public sealed class CaptureSession : IDisposable
 
             _lastRaw = raw;
             _info.Samples++;
+            if (_regionLog is not null && snapshot.Regions.Count > 0 && snapshot.CapturedAt - _lastRegionAt >= RegionInterval)
+            {
+                _regionLog.Append(snapshot.CapturedAt, snapshot.Regions);
+                _lastRegionAt = snapshot.CapturedAt;
+                _info.MemoryRecords = _regionLog.Records;
+            }
 
             // Keep files usable if the app is killed; at most one flush per second.
             var now = _time.GetUtcNow();
@@ -239,6 +259,7 @@ public sealed class CaptureSession : IDisposable
                 _trace.Flush();
                 _events?.Flush();
                 _recorder?.Flush();
+                _regionLog?.Flush();
                 _lastFlush = now;
             }
         }
@@ -292,12 +313,18 @@ public sealed class CaptureSession : IDisposable
         }
     }
 
-    private void OpenAttachment(string? profileId)
+    private void OpenAttachment(Profiles.VersionProfile? profile)
     {
         var n = ++_info.Attachments;
         _trace = new StreamWriter(Path.Combine(Directory, $"trace-{n}.txt"));
         _events = new StreamWriter(Path.Combine(Directory, $"events-{n}.txt"));
-        _recorder = SessionRecorder.Create(Path.Combine(Directory, $"recording-{n}.jsonl"), _gameId, profileId, _time.GetUtcNow());
+        _recorder = SessionRecorder.Create(Path.Combine(Directory, $"recording-{n}.jsonl"), _gameId, profile?.Id, _time.GetUtcNow());
+        if (profile is { CaptureRegions.Count: > 0 })
+        {
+            _regionLog = new RegionLogWriter(File.Create(Path.Combine(Directory, $"memory-{n}.bin")), profile.CaptureRegions);
+            _lastRegionAt = DateTimeOffset.MinValue;
+        }
+
         _lastRaw = null;
 
         // Started mid-session: record the current state first, or a quiet session would leave the recording empty.
@@ -315,6 +342,8 @@ public sealed class CaptureSession : IDisposable
         _trace?.Dispose();
         _events?.Dispose();
         _recorder?.Dispose();
+        _regionLog?.Dispose();
+        _regionLog = null;
         _trace = null;
         _events = null;
         _recorder = null;

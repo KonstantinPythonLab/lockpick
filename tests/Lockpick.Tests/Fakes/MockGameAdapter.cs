@@ -85,6 +85,8 @@ public sealed class MockGameAdapter : IGameAdapter
 
         public VersionProfile Profile { get; } = profile;
 
+        public bool CaptureRegions { get; set; }
+
         public GameSnapshot Read(long sequence, DateTimeOffset now)
         {
             if (owner.Script.TryDequeue(out var next))

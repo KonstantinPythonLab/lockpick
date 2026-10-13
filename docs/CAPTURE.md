@@ -17,12 +17,14 @@ If you close Lockpick while capturing, the capture is saved automatically.
 
 ## What is recorded
 
-- Game values only: room/camera, HP, character, timer, position, inventory slots, equipped slot, item box entries
-  and internal state flags, sampled 30 times per second (changes only).
+- The game's own state memory: its main state block (~22 KB: player, all enemies, inventory, item box, puzzle and
+  event flags, rooms) and a small system block (timer, menus), recorded 10 times per second as changes only. Because
+  the whole block is kept, captures can be re-checked later for things Lockpick doesn't understand yet.
+- A readable trace of the values Lockpick already knows, 30 times per second (changes only).
 - The game executable's fingerprint (file name, size, SHA-256, PE header fields), so unsupported builds can be added.
 - Lockpick version and OS version.
 
-Not recorded: screenshots, audio, input, file paths, computer or user names.
+Not recorded: screenshots, audio, input, anything outside the game's memory, file paths, computer or user names.
 
 Capturing is read-only — it never writes to the game's memory or files, the same way a LiveSplit autosplitter works.
 If you submit runs to a leaderboard, check that leaderboard's rules for external tools.

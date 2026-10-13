@@ -93,6 +93,28 @@ Stage/room note: walking up the main-hall stairs goes to `stage=1, room=0x03` (r
 Bits with support: `0x00800000` Jill RDT variant (static + live), `0x01000000` player dead (static + live),
 `0x04000000` door transition (live), `0x00008000` menu (live). `0x02000000` is **not** a gameplay flag.
 
+## Capture regions (recorded verbatim by captures)
+
+| Region | Address | Length | Contents |
+|---|---|---|---|
+| `gameState` | `0xBE41C0` | `0x587C` | State flags, player entity, 30 enemy slots, save card (stage/room/camera, inventory, item box, flag banks) |
+| `system` | `0xD21380` | `0x1400` | Item-use flags, game timer, inventory pointer, main-menu flag and nearby menu state |
+
+## Diagnostic fields (unverified — decoded from captures to verify them)
+
+| Fields | Address | Meaning (decomp / Mod SDK layout) |
+|---|---|---|
+| `enemy0..7Flags/Type/Hp` | `0xBE6464 + 0x18C·i` (+0, +1, +0x88) | Enemy slot: active bit, type id, HP |
+| `flagScenarioB0..7` | `0xBE9854` (32 B) | Scenario flag bank 1 |
+| `flagLocks0..1` | `0xBE9874` (8 B) | Door lock flags |
+| `flagEnemies0..7` | `0xBE987C` (32 B) | Enemy flags |
+| `flagRoomItems0..7` | `0xBE989C` (32 B) | Per-room item pickup flags |
+| `flagScenarioA0..3` | `0xBE98C0` (16 B) | Scenario flag bank 0 |
+| `flagRoom0..4` | `0xBE98D0` (20 B) | Room flags |
+| `box4..47` | `0xBE98EC`… | Remaining item-box entries (layout verified on entries 1–4) |
+
+The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box starts — consistent with the layout.
+
 ## Structures (leads for later milestones)
 
 From the decomp (GPL-3.0; facts only, no code used) and the RE1 Mod SDK layout, consistent with each other:
