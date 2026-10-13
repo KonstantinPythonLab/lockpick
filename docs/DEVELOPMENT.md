@@ -119,6 +119,22 @@ python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil"
 python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil" --dump 105   # one room
 ```
 
+## Voice transcripts (local research)
+
+`tools/voice/transcribe.py` transcribes the game's English voice-over (`USA\Voice`, 563 WAVs) and optionally its videos
+with Whisper. Output goes to `%LOCALAPPDATA%\Lockpick\research\voice\` and stays there: transcripts are the game's
+script and are never committed. Set up once (ffmpeg must be on PATH; `PIP_CONFIG_FILE=nul` (lowercase) keeps machine-wide pip
+settings such as extra package mirrors out of the way):
+
+```powershell
+python -m venv $env:LOCALAPPDATA\Lockpick\research\.venv
+$py = "$env:LOCALAPPDATA\Lockpick\research\.venv\Scripts\python.exe"
+$env:PIP_CONFIG_FILE = "nul"
+& $py -m pip install torch --index-url https://download.pytorch.org/whl/cu128   # CUDA 12.8 (RTX 50xx)
+& $py -m pip install openai-whisper
+& $py tools/voice/transcribe.py "G:\GOG Games\Resident Evil" [--movies]
+```
+
 ## Golden files
 
 `tests/Lockpick.Tests/Fixtures/region-log-sample.bin` pins the memory-log format between the C# writer and the Python
