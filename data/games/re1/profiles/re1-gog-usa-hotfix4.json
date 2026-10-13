@@ -70,7 +70,7 @@
       "type": "u8",
       "verification": "runtime",
       "description": "Player maximum HP (player entity +0x175).",
-      "evidence": "Live GOG session 2026-10-12: 0 at boot, 140 after starting a Chris game. Static: Heal clamp at 0x401285 loads it and compares with HP; partner-swap code writes 0x8C (140) at 0x477938.",
+      "evidence": "Live GOG session 2026-10-12: 0 at boot, 140 after starting a Chris game, 96 after starting a Jill game. Static: Heal clamp at 0x401285 loads it and compares with HP; partner-swap code writes 0x8C (140) at 0x477938.",
       "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h g_PlayerMaxHealth"]
     },
     {
@@ -80,7 +80,7 @@
       "mask": "0x03",
       "verification": "runtime",
       "description": "Player character id (player entity +0x01). After masking: 0 Chris, 1 Jill, 3 Rebecca. Bit 0x08 = alternate costume.",
-      "evidence": "Live GOG session 2026-10-12: 0 (Chris) in a Chris game; Jill/Rebecca values not yet observed live. Static: New-game setup at 0x4817B1 stores the select-screen choice here; the room loader copies the character byte from 0xBE9829 (0x4778BD); id 3 triggers the Rebecca swap path (cmp al,3 at 0x4778C2).",
+      "evidence": "Live GOG session 2026-10-12: 0 (Chris) in a Chris game; 1 (Jill) in a Jill game. Rebecca (3) not yet observed live. Static: New-game setup at 0x4817B1 stores the select-screen choice here; the room loader copies the character byte from 0xBE9829 (0x4778BD); id 3 triggers the Rebecca swap path (cmp al,3 at 0x4778C2).",
       "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Types.h CHAR_CHRIS/CHAR_JILL/CHAR_REBECCA"]
     },
     {
@@ -98,7 +98,7 @@
       "type": "u32",
       "verification": "static",
       "description": "Main state bitfield (diagnostics only). 0x00800000 = Jill RDT variant. 0x02000000 is NOT a gameplay flag: live it is set only around game start and door transitions. 0x04000000 is set during door transitions, 0x00008000 while menus are open.",
-      "evidence": "0x2000000 is OR-ed in by game start (0x480B53, 0x41B5AA); 0x1000000 at 0x481906; 0x800000 selects ROOMxxx1.RDT in the room loader (0x477DE6) and is set when a non-Chris character is chosen (0x4817CE). Live 2026-10-12: free movement 0x8011000C/0x8013000C (room 106) and 0x80000000 (room 105); menus 0x80400000 -> 0x60400000 -> 0x80008000 -> 0x40000000; door 0x6601000C -> 0x46010000; title 0x0/0x40000000/0x80000000; death 0x8100000C (0x01000000 set at HP -10).",
+      "evidence": "0x2000000 is OR-ed in by game start (0x480B53, 0x41B5AA); 0x1000000 at 0x481906; 0x800000 selects ROOMxxx1.RDT in the room loader (0x477DE6) and is set when a non-Chris character is chosen (0x4817CE). Live 2026-10-12: free movement 0x8011000C/0x8013000C (room 106) and 0x80000000 (room 105); menus 0x80400000 -> 0x60400000 -> 0x80008000 -> 0x40000000; door 0x6601000C -> 0x46010000; title 0x0/0x40000000/0x80000000; death 0x8100000C (0x01000000 set at HP -10); Jill game start 0x4080000C (0x00800000 Jill RDT bit set).",
       "sources": ["static analysis of this executable", "ecruells/resident-evil-pc-decomp Globals.h g_main_state_flags", "Gemini-Loboto3/RE1-Mod-SDK STFLG_JILL"]
     },
     {

@@ -8,7 +8,7 @@ Status legend: ✅ done and verified · 🟡 done, partially verified · ⬜ not
 
 | Version | Milestone | Status |
 |---|---|---|
-| 0.1.0 | Game detection, memory reading, application foundation | 🟡 see checklist below |
+| 0.1.0 | Game detection, memory reading, application foundation | ✅ released 2026-10-12 |
 | 0.2.0 | Core trainer functionality and memory modification | ⬜ |
 | 0.3.0 | Real-time overlay and customizable HUD | ⬜ |
 | 0.4.0 | Room, camera, item and enemy database | ⬜ |
@@ -24,7 +24,7 @@ RE2 and RE3 adapters are deliberately out of scope until RE1 reaches 1.0, but th
 
 ---
 
-## 0.1.0 — Foundation (current)
+## 0.1.0 — Foundation (done)
 
 Goal: identify Resident Evil 1 (GOG), attach safely and read-only, expose live verified game state.
 
@@ -37,25 +37,26 @@ Goal: identify Resident Evil 1 (GOG), attach safely and read-only, expose live v
 | 3 | Game detection works | ✅ | Running `ResidentEvil.exe` found by name and full path; GOG install located via registry |
 | 4 | Executable fingerprinting works | ✅ | SHA-256 + PE header of the real GOG exe matched profile `re1-gog-usa-hotfix4` |
 | 5 | Process attachment is safe | ✅ | Read-only handle (`PROCESS_VM_READ`, query, synchronize); in-memory PE header and 9 code anchors verified before any read; reads confined to the image range |
-| 6 | Verified memory values are readable and correctly displayed | 🟡 | Stage, room, camera, HP, max HP, character (Chris), timer, position, main-menu flag observed live. **Jill/Rebecca character ids and Jill's max HP not yet observed live.** |
+| 6 | Verified memory values are readable and correctly displayed | ✅ | Stage, room, camera, HP, max HP, character, timer, position, main-menu flag observed live in Chris and Jill games (Jill: id 1, max HP 96, Jill RDT bit). Rebecca id remains static-only (documented). |
 | 7 | Game-state changes update the interface | ✅ | Live: camera cuts, door transitions, damage, death, return to title, restart |
 | 8 | The application safely handles game termination | ✅ | Live: game closed → `Detached: Game process exited`; relaunch → re-attached automatically |
 | 9 | Unsupported builds are rejected | ✅ | Hash mismatch never opens the process (unit tests); elevated game reports a clear access message (observed live) |
 | 10 | Mock adapter tests pass | ✅ | 70+ tests incl. mock adapter, fake memory, live-trace fixture playback, Win32 integration |
 | 11 | Known limitations are documented | ✅ | README, COMPATIBILITY, this file |
 
-**Release decision:** 0.1.0 can be tagged once criterion 6 is closed by one live Jill session
-(New Game as Jill: expect character id 1, max HP 96, `stateFlags & 0x00800000` set). Everything else is verified.
+**Release decision:** all criteria met; tagged `v0.1.0` on 2026-10-12 after a live Jill session confirmed
+character id 1, max HP 96 and the Jill RDT bit.
 
-### Remaining 0.1.x tasks
+### Follow-ups (0.1.x, non-blocking)
 
-- [ ] Live-verify Jill (character id, max HP 96, Jill RDT bit) and, opportunistically, Rebecca.
+- [x] Live-verify Jill (character id 1, max HP 96, Jill RDT bit).
+- [ ] Live-verify the Rebecca partner swap (character id 3).
 - [ ] Live-verify loading a save from the title screen (session rule: `mainMenu == 0 && maxHp > 0 && hp > 0`).
-- [ ] Tag `v0.1.0` and let `release.yml` publish the build.
+- [ ] Push to GitHub so `release.yml` publishes the tagged build.
 
 ---
 
-## 0.2.0 — Core trainer
+## 0.2.0 — Core trainer (next)
 
 Goal: deliberate, validated memory modification in Trainer Mode, with Challenge Mode enforcing no writes.
 

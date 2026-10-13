@@ -7,7 +7,7 @@ unsupported and never opened.
 
 | Game | Store / build | Executable | Size | SHA-256 | Profile | Status |
 |---|---|---|---|---|---|---|
-| Resident Evil (1996) | GOG, USA data, "1.0 hotfix4" (GOG build 59172465945261369) | `ResidentEvil.exe` | 1,004,112 | `205BD6FE…CAEEE4A78` | `re1-gog-usa-hotfix4` | Live-verified (Chris); Jill/Rebecca pending |
+| Resident Evil (1996) | GOG, USA data, "1.0 hotfix4" (GOG build 59172465945261369) | `ResidentEvil.exe` | 1,004,112 | `205BD6FE…CAEEE4A78` | `re1-gog-usa-hotfix4` | Live-verified (Chris and Jill games); Rebecca swap pending |
 
 ## Known other builds (not supported yet)
 

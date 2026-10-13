@@ -39,7 +39,8 @@ Research date: 2026-10-12. No third-party code was copied into Lockpick.
 
 - **Confirmed (live):** HP i16 at player+0x88 (`0xBE636C`), max HP u8 at +0x175, position int32 at
   +0x34/+0x3C, character at +0x01 (Chris = 0).
-- **Hypothesis:** Jill = 1 with max HP 96 (decomp: `maxHealth = (id & 1) * -44 + 140`), Rebecca = 3.
+- **Confirmed (live):** Jill = 1 with max HP 96 (decomp: `maxHealth = (id & 1) * -44 + 140`); a Jill game sets
+  `stateFlags & 0x00800000`. **Hypothesis:** Rebecca = 3.
 - **Hypothesis:** Enemy array of 30 × 0x18C at `0xBE6464` (decomp; the Mod SDK declares 32 but the USA
   code clamps to 30). The autosplitter's EnglishGOG enemy addresses are JP values copied unchanged and are
   wrong for GOG (no code references).

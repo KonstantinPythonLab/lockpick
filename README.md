@@ -7,8 +7,8 @@ on PC, starting with **Resident Evil (1996), GOG release**. It reads live game s
 which build it is talking to, and is designed to grow into a trainer, overlay, world explorer and
 speedrun/challenge suite.
 
-> **Status: 0.1.0 (foundation), not yet tagged.** Detection, fingerprinting, safe read-only attachment
-> and live state are working and validated against the real GOG game. See [docs/ROADMAP.md](docs/ROADMAP.md).
+> **Status: 0.1.0 (foundation).** Detection, fingerprinting, safe read-only attachment and live state
+> are working and validated against the real GOG game (Chris and Jill games). See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## What works in 0.1
 
@@ -84,7 +84,8 @@ docs/                          architecture, roadmap, research, compatibility, m
 ## Known limitations
 
 - Only the GOG USA 1.0 hotfix4 build is supported.
-- Jill and Rebecca character ids are implemented from static analysis but not yet observed live.
+- The Rebecca character id (partner swap) is implemented from static analysis but not yet observed live.
+- Loading a save from the title screen has not been observed live yet.
 - After a death, values are hidden until the next game initializes (the dead game's data lingers in memory).
 - The game stops rendering when unfocused, and its window can't be dragged — original game behavior.
 - If the game runs elevated, Lockpick must also run elevated to read it.

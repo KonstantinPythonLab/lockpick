@@ -60,6 +60,32 @@ public class Re1AdapterTests
         Assert.All(new[] { s.Location.Status, s.Camera.Status, s.Health.Status, s.Character.Status, s.GameTime.Status }, st => Assert.Equal(FieldStatus.Valid, st));
     }
 
+    [Fact]
+    public void Live_jill_game_start_is_read_correctly()
+    {
+        // Raw values observed live at the start of a Jill game (2026-10-12).
+        _memory.WriteU8(Addr("stage"), 0)
+            .WriteU8(Addr("room"), 0x06)
+            .WriteU8(Addr("camera"), 0)
+            .WriteI16(Addr("hp"), 0x60)
+            .WriteU8(Addr("maxHp"), 0x60)
+            .WriteU8(Addr("character"), 0x01)
+            .WriteU32(Addr("gameTimer"), 0)
+            .WriteU32(Addr("stateFlags"), 0x4080000C)
+            .WriteI32(Addr("positionX"), 0x4844)
+            .WriteI32(Addr("positionZ"), 0x9C4)
+            .WriteU8(Addr("mainMenu"), 0);
+
+        var s = _session.Read(1, T0);
+
+        Assert.True(s.InGameplay.Value);
+        Assert.Equal(PlayableCharacter.Jill, s.Character.Value);
+        Assert.Equal(new Health(96, 96), s.Health.Value);
+        Assert.Equal("106", s.Location.Value.Id);
+        Assert.Equal(new Position(18500, 0, 2500), s.Position.Value);
+        Assert.NotEqual(0, s.RawFields["stateFlags"].Value & 0x00800000); // Jill RDT variant bit
+    }
+
     [Theory]
     [InlineData(0x00, PlayableCharacter.Chris)]
     [InlineData(0x01, PlayableCharacter.Jill)]

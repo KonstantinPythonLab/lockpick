@@ -6,7 +6,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-Planned as **0.1.0 — Foundation**. Release is pending one live Jill session (see docs/ROADMAP.md).
+## [0.1.0] - 2026-10-12
+
+**Foundation.** Verified live against GOG `ResidentEvil.exe` 1.0 hotfix4 in Chris and Jill games.
 
 ### Added
 - Game-agnostic core: `GameSnapshot` with quality-tagged `Field<T>` values (valid / stale / unavailable / unsupported),

@@ -18,8 +18,8 @@ from a third-party source, diagnostics only.
 | `0xBE9821` | u8 | room | Room within stage (two hex digits of `ROOMsRRp.RDT`) | runtime |
 | `0xBE9822` | u8 | camera | Current camera (cut) | runtime |
 | `0xBE636C` | i16 | hp | Player HP (player entity +0x88); goes negative at death | runtime |
-| `0xBE6459` | u8 | maxHp | Player max HP (entity +0x175); 0 until a game starts | runtime |
-| `0xBE62E5` | u8 & 3 | character | 0 Chris, 1 Jill, 3 Rebecca (entity +0x01; bit 0x08 = alt costume) | runtime (Chris only) |
+| `0xBE6459` | u8 | maxHp | Player max HP (entity +0x175); 0 until a game starts; Chris 140, Jill 96 | runtime |
+| `0xBE62E5` | u8 & 3 | character | 0 Chris, 1 Jill, 3 Rebecca (entity +0x01; bit 0x08 = alt costume) | runtime (Chris, Jill; Rebecca static) |
 | `0xD22730` | u32 | gameTimer | In-game time, frames at 30/s; frozen in menus and door transitions | runtime |
 | `0xD22777` | u8 | mainMenu | 1 while the title/main menu is shown | runtime |
 | `0xBE41C0` | u32 | stateFlags | Main state bitfield (diagnostics only, see below) | static |
@@ -64,8 +64,9 @@ from a third-party source, diagnostics only.
 | Menu open/close | `0x80400000 → 0x60400000 → 0x80008000 → 0x60008000 → 0x40008000 → 0x40000000` |
 | Door transition | `0x8201000C → 0x6601000C → 0x46010000 → 0x46000000 → 0x42000000 → 0x82000000` |
 | Death | `0x8100000C` (`0x01000000` set when HP reached −10) |
+| Jill game, main hall | `0x4080000C` (`0x00800000` = Jill RDT variant) |
 
-Bits with support: `0x00800000` Jill RDT variant (static), `0x01000000` player dead (static + live),
+Bits with support: `0x00800000` Jill RDT variant (static + live), `0x01000000` player dead (static + live),
 `0x04000000` door transition (live), `0x00008000` menu (live). `0x02000000` is **not** a gameplay flag.
 
 ## Structures (leads for later milestones)
