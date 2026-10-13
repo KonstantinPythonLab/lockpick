@@ -50,6 +50,7 @@ CONTEXT_FIELDS = {"gameTimer", "positionX", "positionY", "positionZ", "yaw"}
 ENEMY_NAMES = {0: "Zombie", 1: "Zombie (naked)", 2: "Cerberus (dog)", 3: "Web spinner", 4: "Black Tiger", 5: "Crow",
                6: "Hunter", 7: "Wasp", 8: "Plant 42", 9: "Chimera", 10: "Snake (Yawn)", 11: "Neptune / shark",
                12: "Tyrant", 13: "Yawn", 16: "Tyrant (final)", 17: "Zombie (researcher)", 18: "Yawn (2nd)"}
+CONFIRMED_ENEMY_TYPES = {0, 2, 5, 17}  # identified by behavior in live captures (docs/MEMORY_MAP.md)
 ENEMY_GROUPS = {"enemies_zombie": {0, 1, 17}, "enemies_dog_crow": {2, 5}, "enemies_hunter_chimera": {6, 9},
                 "enemies_spider_wasp_shark": {3, 7, 11}, "enemies_boss": {4, 8, 10, 12, 13, 16, 18}}
 FLAG_GROUPS = {"lock_flags": ("flagLocks",), "scenario_flags": ("flagScenarioA", "flagScenarioB"),
@@ -432,7 +433,9 @@ def detect(capture: Capture) -> tuple[dict[str, Finding], dict[str, object]]:
             add("other_build", f"unsupported build {build.get('FileName')} {build.get('FileSize')} bytes, SHA-256 {str(build.get('Sha256'))[:16]}…", False)
 
     def enemy_name(t: int) -> str:
-        return f"type {t} ({ENEMY_NAMES[t]}?)" if t in ENEMY_NAMES else f"type {t}"
+        if t not in ENEMY_NAMES:
+            return f"type {t}"
+        return f"type {t} ({ENEMY_NAMES[t]})" if t in CONFIRMED_ENEMY_TYPES else f"type {t} ({ENEMY_NAMES[t]}?)"
 
     for detector, types in ENEMY_GROUPS.items():
         seen = sorted(t for t in enemies if t in types)

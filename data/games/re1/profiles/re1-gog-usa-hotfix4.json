@@ -564,7 +564,7 @@
       "address": "0xBE987C",
       "type": "u32",
       "verification": "unverified",
-      "evidence": "Live session 4 (2026-10-13): one bit set per zombie killed (crow kills set none).",
+      "evidence": "Live sessions 4-5 (2026-10-13): one bit set per zombie or dog killed (crow kills set none); a new game clears it.",
       "description": "Enemy flags (killed/spawned), word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -694,6 +694,7 @@
       "address": "0xBE98C0",
       "type": "u32",
       "verification": "unverified",
+      "evidence": "Live sessions 4-5 (2026-10-13): bit 0x100000 set when the statue in room 202 falls (Jill and Chris); 0x10000 and 0x40000 at the lion head in 10D (blue gem in, wind crest out).",
       "description": "Scenario flag bank 0 (g_ScenarioFlags), word 0 (bytes 0-3).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },
@@ -760,7 +761,7 @@
       "address": "0xBE98E0",
       "type": "u32",
       "verification": "unverified",
-      "evidence": "Live session 4 (2026-10-13): bit 0x4000 set when the statue in room 206 was pushed off (it drops the blue gem).",
+      "evidence": "Live session 5 (2026-10-13): bit 0x4000 set at a timer-pausing event in room 206 with no inventory change (probably reading a document; not identified).",
       "description": "Room flags, word 4 (bytes 16-19).",
       "sources": ["ecruells/resident-evil-pc-decomp docs/SCENARIO_FLAGS.md", "Gemini-Loboto3/RE1-Mod-SDK (layout)"]
     },

@@ -72,12 +72,13 @@ from a third-party source, diagnostics only.
 | `0x11` | Loaded into an empty `0x07` (×6), which became `0x08` ×6 — not shotgun shells | Bazooka rounds |
 | `0x08` | `0x07` after loading `0x11` rounds; −1 per shot | Bazooka with other rounds? (BioRand id 8) |
 | `0x47` | Made from two `0x44`; consumed while HP went 71 → 96 (max) | Mixed herb (green + green)? |
-| `0x21` | Dropped by the statue pushed in 206, picked up in 105, placed in the lion head in 10D (scenario flag A0 `0x10000`) | **Blue gem** (owner-confirmed) |
+| `0x21` | Dropped by the statue pushed in 202, picked up in 105, placed in the lion head in 10D (scenario flag A0 `0x10000`) | **Blue gem** (owner-confirmed) |
 | `0x29` | Received from the lion head in 10D for the blue gem | **Wind crest** (owner-confirmed) |
-| `0x1F`, `0x23`, `0x26`, `0x2D` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
+| `0x1F`, `0x23`, `0x26` | Picked up / stored in the item box (0x23 has quantity 0: a key item?) | unknown |
+| `0x2D` | Received in the gallery (117) after a puzzle flag, used in 11A like the wind crest | A crest? |
 | `0x05` | In the attract-mode demo inventory, quantity 5 | unknown |
 | `0x0E` | In the attract-mode demo inventory, quantity 144 | unknown (ammo-like quantity) |
-| `0x2F` | In the attract-mode demo inventory, quantity 2 | Ink ribbon? (id 47 in BioRand's table) |
+| `0x2F` | Chris picked up 3; each typewriter save used one (3 → 2, 5 → 4) | **Ink ribbon** (owner + capture) |
 
 Names are not shown in the UI until an item table is verified (0.2/0.4).
 
@@ -91,6 +92,7 @@ Stage/room note: walking up the main-hall stairs goes to `stage=1, room=0x03` (r
 | Free movement, room 106 | `0x8011000C`, `0x8013000C` |
 | Free movement, room 105 | `0x80000000` |
 | Menu open/close | `0x80400000 → 0x60400000 → 0x80008000 → 0x60008000 → 0x40008000 → 0x40000000` |
+| Pushing an object | `0x40` set while pushing (statue in 202) |
 | Door transition | `0x8201000C → 0x6601000C → 0x46010000 → 0x46000000 → 0x42000000 → 0x82000000` |
 | Death | `0x8100000C` (`0x01000000` set when HP reached −10) |
 | Jill game, main hall | `0x4080000C` (`0x00800000` = Jill RDT variant) |
@@ -131,8 +133,13 @@ The flag banks tile `0xBE9854`–`0xBE98E4` exactly and end where the item box s
 - **`flagRoom0`/`flagRoom1`**: rooms visited, one word per stage, room *n* = bit 31 − *n* (e.g. 100 → `0x80000000`,
   118 → `0x80`, 212 → `0x2000`); every first entry into a room set its bit.
 - **`flagLocks0`**: one bit set per door unlocked (4 doors).
-- **`flagRoom4`** bit `0x4000` set (and `flagRoomItems7` bit `0x100` cleared) when the statue in 206 was pushed off;
-  the game timer paused for 4.5 s while it fell. So the room-flag bank also holds object state, not only visits.
+- **Statue push (202)**, seen three times (session 4 and both new games in session 5): `stateFlags` bit `0x40` is set
+  while pushing; when the statue falls, `flagScenarioA0` bit `0x100000` and `stateFlags` `0x100000` (camera cut) are set.
+  It drops the blue gem in the dining room.
+- **Room 206** (Jill): the timer paused 4.5 s, `flagRoom4` bit `0x4000` set and `flagRoomItems7` bit `0x100` cleared, with
+  no inventory change — probably reading a document (not identified).
+- **Enemy types confirmed by behavior:** 0 and 17 zombies, 2 dogs (Cerberus), 5 crows. Dog kills set `flagEnemies` bits
+  like zombie kills; a new game clears every flag bank.
 
 ## Structures (leads for later milestones)
 

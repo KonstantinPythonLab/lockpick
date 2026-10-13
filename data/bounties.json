@@ -177,17 +177,18 @@
           "verifies": "Key item ids → item name table",
           "status": "partial",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): blue gem = id 0x21, wind crest = id 0x29 (both owner-confirmed): gem picked up in 105, placed in the lion head in 10D, crest received"
+            "2026-10-13 (live session 4, Jill, memory log): blue gem = id 0x21, wind crest = id 0x29 (both owner-confirmed): gem from the dining room 105, placed in the lion head in 10D, crest received",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): id 0x2D received in the gallery 117 and used in 11A like the wind crest — likely another crest"
           ]
         },
         {
           "id": "B112",
           "task": "Save at a typewriter (a few times, different slots)",
           "verifies": "Save detection; ink ribbon use (Chris's game uses them, Jill's didn't)",
-          "status": "partial",
+          "status": "done",
           "evidence": [
-            "2026-10-13 (Jill): 3 saves (savedat1–3.dat written) with no inventory change — no ink ribbon used; memory shows only a frozen timer, so save detection needs the save-file watcher (issue #37)",
-            "Owner: Chris's game does use ink ribbons. A Chris save with a ribbon in the inventory is still needed to confirm the ribbon id (attract-mode demo, a Chris game, holds id 0x2F ×2 — BioRand: Ink Ribbon)"
+            "2026-10-13 (Jill): 3 saves with no inventory change — Jill's game used no ink ribbon",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): ink ribbon = id 0x2F — Chris picked up 3, each of his two saves used one (3 → 2, 5 → 4) as savedat7/8.dat were written. Memory shows nothing else during a save, so saves are detected from the save files (issue #37)"
           ]
         },
         {
@@ -305,10 +306,11 @@
           "id": "B311",
           "task": "Encounter **dogs (Cerberus)** and **crows**",
           "verifies": "Enemy type ids",
-          "status": "partial",
+          "status": "done",
           "detector": "enemies_dog_crow",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): crows are type 5 — six idle in 117; in 212 they attacked (3 HP per peck) and three were shot down. Dogs not seen in this capture"
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): dogs are type 2 — two in 108 and one in 11A, all shot down (Jill)",
+            "2026-10-13 (live session 4, Jill, memory log): crows are type 5 — six idle in 117; in 212 they attacked (3 HP per peck) and three were shot down"
           ]
         },
         {
@@ -376,7 +378,8 @@
           "status": "partial",
           "detector": "scenario_flags",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): blue gem chain — statue pushed in 206 (flagRoom4 0x4000), gem (id 0x21) picked up in the dining room 105, placed in the lion head in 10D (scenario A0 bit 0x10000), wind crest (id 0x29) received (A0 bit 0x40000); other scenario bits set at events in 203, 106, 202 and 212"
+            "2026-10-13 (live session 4, Jill, memory log) and 2026-10-13 (live session 5: new Jill game, then new Chris game): blue gem chain — statue pushed in 202 (A0 bit 0x100000), gem (id 0x21) picked up in the dining room 105, placed in the lion head in 10D (A0 bit 0x10000), wind crest (id 0x29) received (A0 bit 0x40000), wind crest used in 11A (A3 bit 0x80000)",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): gallery in 117 — A0 bit 0x10000000 set, then id 0x2D picked up there and used in 11A (A3 bit 0x200000); likely the painting puzzle and its crest (unconfirmed)"
           ]
         },
         {
@@ -386,7 +389,8 @@
           "status": "partial",
           "detector": "enemy_killed",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): 13 zombie kills, each set exactly one new bit in flagEnemies (kill flags persist); 3 crows killed in 212 set no kill flag (crows don't stay dead). Other enemy types not yet killed"
+            "2026-10-13 (live session 4, Jill, memory log): 13 zombie kills, each set exactly one new bit in flagEnemies (kill flags persist); crow kills set none",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): 21 zombie and 3 dog kills (Jill and Chris), each setting one flagEnemies bit; a new game clears them all. Other enemy types not yet killed"
           ]
         },
         {
@@ -396,7 +400,7 @@
           "status": "partial",
           "detector": "room_flags",
           "evidence": [
-            "2026-10-13 (live session 4, Jill, memory log): statue pushed in room 206 (owner: it gave the blue gem) — game timer paused 4.5 s while it fell; flagRoom4 bit 0x4000 set and flagRoomItems7 bit 0x100 cleared at that moment. The push itself isn't visible in the player data. Shelves/boxes and other statues not yet seen",
+            "2026-10-13 (live session 5: new Jill game, then new Chris game): statue push in room 202, seen three times (session 4, and both new games in session 5): stateFlags bit 0x40 is set while pushing (slow straight-line movement), then scenario flag A0 bit 0x100000 and stateFlags 0x100000 (camera cut) as the statue falls; it drops the blue gem in the dining room (105). Shelves/boxes not yet seen",
             "2026-10-13 (live session 4, Jill, memory log): flagRoom0/1 are rooms-visited bits (bit 31 − room number, one word per stage), not object state"
           ]
         }
