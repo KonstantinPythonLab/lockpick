@@ -22,6 +22,31 @@ OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER T
 OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
+### BioRand and biohazard-utils (IntelOrca) — MIT License
+The RE1 item and enemy id names in `data/games/re1/names.json` come from BioRand's `Re1ItemIds` / `Re1EnemyIds`, and
+the room-script opcode sizes and field offsets used by `tools/rdt/rdt_index.py` follow biohazard-utils
+(`Rdt1`, `Bio1ConstantTable`, item/door/enemy opcodes). https://github.com/IntelOrca/biorand,
+https://github.com/IntelOrca/biohazard-utils
+
+```
+MIT License
+
+Copyright (c) 2022-2026 Ted John
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
+
 ### NuGet packages (referenced, not vendored)
 
 | Package | License |
@@ -44,7 +69,8 @@ verified independently against the GOG executable. No source code from them is i
 | ecruells/resident-evil-pc-decomp | GPL-3.0 | Global addresses and entity layout for the GOG USA build |
 | Gemini-Loboto3/RE1-Mod-SDK | CC BY-NC-ND 4.0 | Struct layout cross-check |
 | deserteagle417/RE1-Autosplitter | No license file | Address leads (credited) |
-| biorand/classic, biorand/biohazard-utils | MIT | RDT format and id tables (future use with attribution) |
+| pmandin/reevengi | GPL-2.0 | RDT opcode list cross-check (facts only) |
+| speedrun.com Resident Evil guides (SHiiDO damage chart, SephJul notes) | none stated | Facts used as leads with credit |
 | shadwork/Windows-ResidentEvil1-MODS | MIT | Layout cross-check |
 
 Resident Evil is a trademark of Capcom Co., Ltd. Lockpick is not affiliated with Capcom or GOG and does

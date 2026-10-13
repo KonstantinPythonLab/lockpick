@@ -46,7 +46,7 @@ MEMBER_PATTERN = re.compile(r"^(?:[^/]+/)?(trace-\d+\.txt|events-\d+\.txt|memory
 MAX_REPORTED_MARKERS = 50
 PROFILES = ROOT / "data" / "games" / "re1" / "profiles"
 # Values that change continuously; a new state is only recorded when something else changes.
-CONTEXT_FIELDS = {"gameTimer", "positionX", "positionY", "positionZ", "yaw"}
+CONTEXT_FIELDS = {"gameTimer", "positionX", "positionY", "positionZ", "yaw", "_ms"}  # _ms: memory-log timestamp
 # Enemy type ids as used by BioRand (MIT) for RE1 RDT enemy entries; names are hints until verified by captures.
 ENEMY_NAMES = {0: "Zombie", 1: "Zombie (naked)", 2: "Cerberus (dog)", 3: "Web spinner", 4: "Black Tiger", 5: "Crow",
                6: "Hunter", 7: "Wasp", 8: "Plant 42", 9: "Chimera", 10: "Snake (Yawn)", 11: "Neptune / shark",
@@ -198,7 +198,8 @@ def parse_memory(name: str, payload: bytes, fields: list[dict]) -> Session:
     last_key = None
     while pos < len(view):
         kind = view[pos]
-        pos += 9  # kind + i64 timestamp
+        (at_ms,) = struct.unpack_from("<q", view, pos + 1)  # Unix milliseconds
+        pos += 9
         if kind == 0:
             for index, (_, _, size) in enumerate(regions):
                 flag = view[pos]
@@ -219,7 +220,7 @@ def parse_memory(name: str, payload: bytes, fields: list[dict]) -> Session:
                 pos += length
         else:
             raise ValueError("corrupt memory log")
-        values = {}
+        values = {"_ms": at_ms}
         for f, index, offset in located:
             if present[index]:
                 (v,) = struct.unpack_from(FORMATS[f["type"]], state[index], offset)
@@ -269,6 +270,7 @@ def parse_markers(text: str) -> list[dict]:
         markers.append({
             "number": m["number"],
             "at": str(m.get("at", ""))[11:19],  # HH:mm:ss of the ISO timestamp
+            "atFull": str(m.get("at", ""))[:40],
             "room": str(m["room"])[:8] if m.get("room") else None,
             "gameSeconds": float(seconds) if isinstance(seconds, (int, float)) else None,
             "note": " ".join(str(m.get("note", "")).split())[:200],

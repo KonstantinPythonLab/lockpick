@@ -15,6 +15,21 @@ Research date: 2026-10-12. No third-party code was copied into Lockpick.
 | [shadwork/Windows-ResidentEvil1-MODS](https://github.com/shadwork/Windows-ResidentEvil1-MODS) | REbirth mods (HUD, health bars, door skip) | REbirth `Bio.exe` | MIT | Layout cross-check only |
 | [deserteagle417/RE1-Autosplitter](https://github.com/deserteagle417/RE1-Autosplitter) | LiveSplit ASL | JP REbirth, JP GOG, English GOG (earlier revision) | none (all rights reserved) | Addresses used as leads with credit; no code |
 | [biorand/classic](https://github.com/biorand/classic) | Randomizer for RE1–3 | RE1: Sourcenext/Mediakite JP exe + Classic REbirth | MIT | RDT format notes, item/enemy ids (future, with attribution) |
+| [IntelOrca/biorand](https://github.com/IntelOrca/biorand), [IntelOrca/biohazard-utils](https://github.com/IntelOrca/biohazard-utils) | Randomizer / RE file library | RE1 PC data files | MIT | Item and enemy id names (`data/games/re1/names.json`), RDT script format for `tools/rdt` (credited in THIRD_PARTY_NOTICES) |
+| [pmandin/reevengi](https://github.com/pmandin/reevengi) | RE engine re-implementation | PC data files | GPL-2.0 | Opcode list cross-check only (it differs on 0x17/0x28/0x33; the fixed sizes parse every retail room) |
+| [speedrun.com guides](https://www.speedrun.com/residentevil/guides) | Speedrun community guides | JP PC / PS1 mostly | none stated | Leads: green herb heals 32 (Jill) / 46 (Chris), G+G 64 / 93; zombie HP rerolled 18–99 on room entry; Richard's 421 s timer |
+
+## 0. Room files (RDT) — what each game flag means
+
+The game's room files (`USA\Stage1..7\ROOMsrrv.RDT`, s = stage, rr = room, v = 0 Chris / 1 Jill) contain init and
+main scripts with `item_aot_set` (item id, quantity, pickup flag), `em_set` (enemy type, kill flag) and
+`door_aot_set` (target room, lock flag, key item) opcodes. `tools/rdt/rdt_index.py` walks every retail room file
+(320 files, no desync) and writes `data/games/re1/room-index.json` — ids and flag numbers only.
+
+**Confirmed (live, 2026-10-13):** flag *n* of a bank is bit `31 − n % 32` of word `n / 32` (bit 31 of the first word
+is flag 0). The ITEM group is the `flagRoomItems` bank (a set bit = still in the world), ENEMY is `flagEnemies`
+(set = killed), LOCK is `flagLocks` (set = unlocked). Checked against captures: blue jewel flag 44, 1F map 145, wind
+crest 174, the two dogs in 108 (0, 1), the door 206→207 (lock 21), the document in 206 (247).
 
 ## 1. Identifying the running game
 

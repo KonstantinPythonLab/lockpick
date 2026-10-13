@@ -89,6 +89,9 @@ field from it — add a field to the profile and old captures can be re-analyzed
    "evidence — needs review": confirm it against the trace, then set `status` to `done` by hand (and update the
    profile evidence / MEMORY_MAP for new addresses).
 3. `capture-info.json`: if `Builds[].ProfileId` is null, the SHA-256/PE fields identify a new build to profile.
+   `python tools/bounties/timeline.py LockpickCapture-*.zip` prints what the player did, in order: rooms, pickups and
+   documents (named via the room index), kills, enemies getting back up, unlocks, pushes, item box, item use and
+   saves, and the player's markers.
 4. Convert interesting sessions to fixtures: `python tools/fixtures/trace_to_fixture.py trace-1.txt tests/Lockpick.Tests/Fixtures/<name>.jsonl`
    (keep the trace beside it), then add playback assertions.
 5. Add new bounties to `data/bounties.json` when a roadmap item needs data nobody has captured yet (give them a
@@ -105,6 +108,16 @@ field from it — add a field to the profile and old captures can be re-analyzed
   `[Bnnn]` issues. When a capture verifies one, check it off in the file and close the issue.
 - **Pinned:** the capture-bounties tracker issue. **Discussions** for questions, ideas and announcements (no wiki:
   documentation lives in `docs/`).
+
+## Room index
+
+`data/games/re1/room-index.json` maps game flags to the items, enemies and doors that use them. It is generated from
+a local install (ids and numbers only; the game files themselves are never committed):
+
+```powershell
+python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil"
+python tools/rdt/rdt_index.py "G:\GOG Games\Resident Evil" --dump 105   # one room
+```
 
 ## Golden files
 
