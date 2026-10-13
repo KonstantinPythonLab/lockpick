@@ -67,7 +67,8 @@ Never guess an offset. If a value cannot be verified, leave it unsupported.
 
 ## Recording fixtures
 
-- In the app: Diagnostics → Start/Stop recording (writes `%LOCALAPPDATA%\Lockpick\recordings\*.jsonl`).
+- In the app: Debug → Start capture / Stop and save (the zip in `%LOCALAPPDATA%\Lockpick\captures\` contains
+  `recording-N.jsonl` and `trace-N.txt`).
 - From a raw trace: `python tools/fixtures/trace_to_fixture.py trace.txt out.jsonl` (applies the same
   normalization rules as the RE1 session; keep the trace beside the fixture as provenance).
 - Fixtures under `tests/Lockpick.Tests/Fixtures/` are played back through the real event detector in tests.
