@@ -138,6 +138,12 @@ from data), so it never re-triggers by accident and new steps can be shown to ex
 per-poll `Polled` event (raw fields change without normalized state changing, e.g. ammo). `CaptureSession` writes
 per-attachment trace/recording/event files and zips them; there is no separate tool.
 
+**ADR-014 — Capture markers and a registered hotkey, not a keyboard hook.** Players mark moments while capturing
+(`markers.jsonl`: wall-clock time, attachment, room, game time, a note that can be added later). The hotkey uses
+`RegisterHotKey` on a dedicated message-loop thread, so Windows reports only that key combination — Lockpick never
+sees other keystrokes (a low-level hook would, and looks like a keylogger to security tools). The game reads the
+keyboard directly and still sees the keys, so only combinations that mean nothing to it are offered (F9 closes RE1).
+
 **ADR-013 — Captures record memory, not just fields.** Each capture logs the profile's capture regions (the whole
 game-state block and a system block) as a keyframe plus changed byte runs (`memory-N.bin`, 10 Hz, keyframe every 60 s),
 alongside the readable trace. Any value can be decoded from old captures later, so bounties don't depend on Lockpick

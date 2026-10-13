@@ -19,6 +19,24 @@ public sealed record RawFieldRow(string Name, string Address, string Type, strin
 
 public sealed record LogRow(string Time, string Level, string Category, string Message, bool IsWarning);
 
+/// <summary>A capture marker; editing the note writes it into the running capture.</summary>
+public sealed partial class MarkerRow(CaptureMarker marker, Func<int, string, bool> setNote) : ObservableObject
+{
+    public int Number { get; } = marker.Number;
+
+    public string Label { get; } = string.Create(
+        CultureInfo.InvariantCulture,
+        $"#{marker.Number} · {marker.At:HH:mm:ss}{(marker.Room is { } room ? $" · room {room}" : string.Empty)}{(marker.GameSeconds is { } t ? $" · game {TimeSpan.FromSeconds(t):h\\:mm\\:ss}" : string.Empty)}");
+
+    [ObservableProperty]
+    public partial string Note { get; set; } = marker.Note;
+
+    [ObservableProperty]
+    public partial bool IsEditable { get; set; } = true;
+
+    partial void OnNoteChanged(string value) => setNote(Number, value);
+}
+
 /// <summary>Debug page: session capture for research, monitor statistics, raw profile fields and the live log.</summary>
 public sealed partial class DebugViewModel : PageViewModel, IDisposable
 {
@@ -43,6 +61,8 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
         }
 
         services.LogProvider.EntryLogged += entry => Dispatcher.UIThread.Post(() => AddLog(entry), DispatcherPriority.Background);
+        services.MarkerHotkeyPressed += (_, _) => Dispatcher.UIThread.Post(OnMarkerHotkey);
+        RefreshHotkeyInfo();
         state.PropertyChanged += OnStateChanged;
 
         // Capture status ticks even while the page is hidden so the nav badge stays current.
@@ -61,11 +81,19 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
 
     public ObservableCollection<LogRow> LogRows { get; } = [];
 
+    public ObservableCollection<MarkerRow> Markers { get; } = [];
+
+    [ObservableProperty]
+    public partial string HotkeyInfo { get; private set; } = string.Empty;
+
+    [ObservableProperty]
+    public partial string MarkerNote { get; set; } = string.Empty;
+
     [ObservableProperty]
     public partial string PollStats { get; private set; } = "—";
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(StartCaptureCommand), nameof(StopCaptureCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartCaptureCommand), nameof(StopCaptureCommand), nameof(AddMarkerCommand))]
     public partial bool IsCapturing { get; private set; }
 
     [ObservableProperty]
@@ -81,6 +109,7 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
         IsVisible = visible;
         if (visible)
         {
+            RefreshHotkeyInfo();
             RefreshStats();
             RefreshRawFields();
         }
@@ -94,6 +123,7 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
             _capture = new CaptureSession(_services.Source, AppPaths.Captures, _services.Adapter.GameId, _services.AppVersion);
             IsCapturing = true;
             LastCaptureZip = null;
+            Markers.Clear();
             _logger.LogInformation("Capture started: {Directory}", _capture.Directory);
             UpdateCaptureStatus();
         }
@@ -116,6 +146,11 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
 
         _capture = null;
         IsCapturing = false;
+        foreach (var row in Markers)
+        {
+            row.IsEditable = false;
+        }
+
         CaptureStatus = "Saving capture...";
         try
         {
@@ -131,6 +166,34 @@ public sealed partial class DebugViewModel : PageViewModel, IDisposable
         finally
         {
             capture.Dispose();
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(IsCapturing))]
+    private void AddMarker()
+    {
+        if (_capture is not { } capture)
+        {
+            return;
+        }
+
+        var marker = capture.AddMarker(MarkerNote);
+        Markers.Insert(0, new MarkerRow(marker, capture.SetMarkerNote));
+        MarkerNote = string.Empty;
+    }
+
+    private void RefreshHotkeyInfo() =>
+        HotkeyInfo = _services.MarkerHotkeyName is { } key
+            ? $"Press {key} while playing to mark a moment, then describe it here (e.g. \"pushed the statue\"). Change the key in Settings."
+            : "No marker hotkey (choose one in Settings); markers can be added here.";
+
+    private void OnMarkerHotkey()
+    {
+        if (_capture is { } capture)
+        {
+            var marker = capture.AddMarker();
+            Markers.Insert(0, new MarkerRow(marker, capture.SetMarkerNote));
+            _logger.LogInformation("Marker {Number} added by hotkey", marker.Number);
         }
     }
 

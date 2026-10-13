@@ -15,6 +15,19 @@ item box, Rebecca, more rooms and game builds) get verified. Capture is built in
 
 If you close Lockpick while capturing, the capture is saved automatically.
 
+## Markers (tell Lockpick what just happened)
+
+Markers tie a moment in the capture to what happened on screen, which turns guesses into facts ("this flag is the
+statue falling"). While capturing:
+
+- press **Ctrl+Shift+M** in the game (the key can be changed in **Settings → Capture markers**; avoid F9, which closes
+  Resident Evil), or type a note on the Debug page and press **Add marker**;
+- each marker records the time, room and game time; describe it on the Debug page whenever convenient — e.g.
+  "pushed the statue", "picked up the map", "zombie got back up".
+
+Markers are saved in `markers.jsonl` inside the zip and listed in the analysis report. Notes are whatever you type, so
+don't put personal information in them.
+
 ## What is recorded
 
 - The game's own state memory: its main state block (~22 KB: player, all enemies, inventory, item box, puzzle and

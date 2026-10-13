@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Capture markers: press **Ctrl+Shift+M** while playing (configurable in Settings) or use **Add marker** on the Debug
+  page to mark a moment, then describe it. Markers record the time, room and game time, are saved in the capture
+  (`markers.jsonl`) and are listed in the bounty analysis report.
+- A "buy me a coffee" link in the README and the repository's Sponsor button (optional; it doesn't buy features or
+  bounties).
+
 ### Fixed
 - Bounty analyzer: enemy encounters and kills are only counted once a room has settled; for about a frame after a
   door the enemy slots still hold the previous room's values, which were reported as phantom enemies and kills.

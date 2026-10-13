@@ -22,6 +22,8 @@ public sealed partial class SettingsViewModel : PageViewModel
         GameExecutablePath = current.GameExecutablePath ?? string.Empty;
         CheckForUpdates = current.CheckForUpdates;
         IncludePrereleases = current.IncludePrereleases;
+        MarkerHotkey = MarkerHotkeyChoices.Contains(current.MarkerHotkey) ? current.MarkerHotkey : "Off";
+        MarkerHotkeyStatus = services.MarkerHotkeyName is null && MarkerHotkey != "Off" ? $"{MarkerHotkey} is used by another program." : string.Empty;
         var gog = GogInstallLocator.Find(Re1Adapter.GogProductId);
         DetectedInstall = gog is null
             ? "No GOG install of Resident Evil found in the registry."
@@ -62,6 +64,14 @@ public sealed partial class SettingsViewModel : PageViewModel
 
     [ObservableProperty]
     public partial bool IncludePrereleases { get; set; }
+
+    public IReadOnlyList<string> MarkerHotkeyChoices { get; } = [.. GlobalHotkey.Choices.Keys, "Off"];
+
+    [ObservableProperty]
+    public partial string MarkerHotkey { get; set; }
+
+    [ObservableProperty]
+    public partial string MarkerHotkeyStatus { get; private set; }
 
     [RelayCommand]
     public void CheckInstalledBuild()
@@ -106,6 +116,18 @@ public sealed partial class SettingsViewModel : PageViewModel
         {
             Persist(s => s with { IncludePrereleases = value });
         }
+    }
+
+    partial void OnMarkerHotkeyChanged(string value)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        var ok = _services.SetMarkerHotkey(value);
+        MarkerHotkeyStatus = ok ? string.Empty : $"{value} is used by another program; choose another key.";
+        Persist(s => s with { MarkerHotkey = value });
     }
 
     private bool Persist(Func<AppSettings, AppSettings> change)

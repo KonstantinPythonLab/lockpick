@@ -37,6 +37,37 @@
           </Button>
         </WrapPanel>
         <TextBlock Classes="mono" Text="{Binding CaptureStatus}" TextWrapping="Wrap" Classes.warning="{Binding IsCapturing}" />
+
+        <!-- Markers: tie moments in the capture to what happened on screen -->
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" IsVisible="{Binding IsCapturing}">
+          <TextBox Text="{Binding MarkerNote}" PlaceholderText="What just happened? (optional)" AutomationProperties.Name="Marker note">
+            <TextBox.KeyBindings>
+              <KeyBinding Gesture="Enter" Command="{Binding AddMarkerCommand}" />
+            </TextBox.KeyBindings>
+          </TextBox>
+          <Button Grid.Column="1" Command="{Binding AddMarkerCommand}" AutomationProperties.Name="Add marker">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <c:LucideIcon Data="{StaticResource Icon.Flag}" Width="14" Height="14" />
+              <TextBlock Text="Add marker" />
+            </StackPanel>
+          </Button>
+        </Grid>
+        <TextBlock Text="{Binding HotkeyInfo}" TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}" IsVisible="{Binding IsCapturing}" />
+        <ItemsControl ItemsSource="{Binding Markers}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="6" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:MarkerRow">
+              <StackPanel Spacing="2">
+                <TextBlock Classes="mono" Text="{Binding Label}" />
+                <TextBox Text="{Binding Note}" IsEnabled="{Binding IsEditable}" PlaceholderText="Describe this moment" AutomationProperties.Name="{Binding Label}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <SelectableTextBlock Classes="mono" Text="{Binding LastCaptureZip}" IsVisible="{Binding LastCaptureZip, Converter={x:Static ObjectConverters.IsNotNull}}" TextWrapping="Wrap" />
       </StackPanel>
     </Border>

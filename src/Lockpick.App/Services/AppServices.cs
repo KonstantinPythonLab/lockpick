@@ -13,6 +13,8 @@ namespace Lockpick.App.Services;
 public sealed class AppServices : IAsyncDisposable
 {
     private readonly HighResolutionWaitStrategy? _wait;
+    private readonly ILogger _log;
+    private GlobalHotkey? _markerHotkey;
 
     private AppServices(
         JsonLinesLoggerProvider logProvider,
@@ -32,6 +34,8 @@ public sealed class AppServices : IAsyncDisposable
         Source = source;
         Fingerprints = fingerprints;
         _wait = wait;
+        _log = loggerFactory.CreateLogger("Lockpick");
+        SetMarkerHotkey(settings.Current.MarkerHotkey);
         ReplayPath = replayPath;
     }
 
@@ -48,6 +52,32 @@ public sealed class AppServices : IAsyncDisposable
     public FileFingerprintProvider Fingerprints { get; }
 
     public UpdateService Updates { get; }
+
+    /// <summary>Raised (on a background thread) when the marker hotkey is pressed, whichever window has focus.</summary>
+    public event EventHandler? MarkerHotkeyPressed;
+
+    /// <summary>The registered marker hotkey's name, or null when it is off or Windows refused it.</summary>
+    public string? MarkerHotkeyName => _markerHotkey is { IsRegistered: true } hotkey ? hotkey.Name : null;
+
+    /// <summary>Replaces the marker hotkey; returns false if Windows refused it (another program may use it).</summary>
+    public bool SetMarkerHotkey(string name)
+    {
+        _markerHotkey?.Dispose();
+        _markerHotkey = GlobalHotkey.Create(name);
+        if (_markerHotkey is null)
+        {
+            return name == "Off";
+        }
+
+        if (!_markerHotkey.IsRegistered)
+        {
+            _log.LogWarning("Marker hotkey {Key} is unavailable (error {Error}); another program may use it", name, _markerHotkey.Error);
+            return false;
+        }
+
+        _markerHotkey.Pressed += (_, _) => MarkerHotkeyPressed?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
 
     public string AppVersion => Updates.CurrentVersion;
 
@@ -104,6 +134,7 @@ public sealed class AppServices : IAsyncDisposable
     {
         await Source.DisposeAsync();
         Updates.Dispose();
+        _markerHotkey?.Dispose();
         _wait?.Dispose();
         LoggerFactory.Dispose();
         LogProvider.Dispose();

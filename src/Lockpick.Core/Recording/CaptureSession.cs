@@ -11,6 +11,12 @@ namespace Lockpick.Core.Recording;
 /// <summary>Build identity recorded in a capture (no paths: the folder may contain a user name).</summary>
 public sealed record CapturedBuild(string FileName, long FileSize, string Sha256, string? PeTimestamp, string? SizeOfImage, string? ProfileId, string Result, DateTimeOffset SeenAt);
 
+/// <summary>
+/// A moment the player marked while capturing (markers.jsonl), so the data around it can be matched to what happened
+/// on screen. <see cref="At"/> is the wall clock the memory log and traces also use.
+/// </summary>
+public sealed record CaptureMarker(int Number, DateTimeOffset At, int Attachment, double? GameSeconds, string? Room, string Note);
+
 /// <summary>Contents of capture-info.json.</summary>
 public sealed record CaptureInfo(string LockpickVersion, string Os, DateTimeOffset StartedAt)
 {
@@ -25,18 +31,25 @@ public sealed record CaptureInfo(string LockpickVersion, string Os, DateTimeOffs
     /// <summary>Records written to the memory logs (memory-N.bin) of the latest attachment.</summary>
     public long MemoryRecords { get; set; }
 
+    public int Markers { get; set; }
+
     public DateTimeOffset? EndedAt { get; set; }
 }
 
 /// <summary>
 /// Records a play session for research: every raw profile-field change (trace-N.txt, the same format as
 /// <c>lockpick-probe trace</c>), the normalized recording (recording-N.jsonl), events (events-N.txt) and the build
-/// fingerprints seen (capture-info.json), one set of files per game attachment. <see cref="Stop"/> zips the session.
+/// fingerprints seen (capture-info.json), one set of files per game attachment, plus the player's markers
+/// (markers.jsonl). <see cref="Stop"/> zips the session.
 /// Records no machine names, user names or paths.
 /// </summary>
 public sealed class CaptureSession : IDisposable
 {
     private static readonly JsonSerializerOptions InfoJson = new() { WriteIndented = true };
+    private static readonly JsonSerializerOptions MarkerJson = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+    /// <summary>Longest marker note kept; notes are single lines.</summary>
+    public const int MaxMarkerNoteLength = 200;
     private static readonly IReadOnlyDictionary<string, Field<long>> NoRawFields = new Dictionary<string, Field<long>>();
     private static readonly TimeSpan MinTimerOnlyInterval = TimeSpan.FromSeconds(1);
 
@@ -57,6 +70,7 @@ public sealed class CaptureSession : IDisposable
     private readonly TimeProvider _time;
     private readonly object _gate = new();
     private readonly CaptureInfo _info;
+    private readonly List<CaptureMarker> _markers = [];
 
     private StreamWriter? _trace;
     private StreamWriter? _events;
@@ -142,6 +156,59 @@ public sealed class CaptureSession : IDisposable
         }
     }
 
+    public IReadOnlyList<CaptureMarker> Markers
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return [.. _markers];
+            }
+        }
+    }
+
+    /// <summary>
+    /// Marks the current moment, with the game time and room when a game is being recorded. The note can be empty
+    /// (e.g. from a hotkey while playing) and filled in later with <see cref="SetMarkerNote"/>.
+    /// </summary>
+    public CaptureMarker AddMarker(string? note = null)
+    {
+        lock (_gate)
+        {
+            ObjectDisposedException.ThrowIf(_stopped, this);
+            var latest = _trace is not null ? _source.Latest : null;
+            var marker = new CaptureMarker(
+                _markers.Count + 1,
+                _time.GetLocalNow(),
+                _trace is not null ? _info.Attachments : 0,
+                latest is not null && latest.GameTime.TryGet(out var gameTime) ? Math.Round(gameTime.TotalSeconds, 2) : null,
+                latest is not null && latest.Location.TryGet(out var location) ? location.Id : null,
+                CleanNote(note));
+            _markers.Add(marker);
+            _events?.WriteLine($"[{marker.At.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)}] Marker {marker.Number}{(marker.Note.Length > 0 ? ": " + marker.Note : string.Empty)}");
+            _events?.Flush();
+            WriteMarkers();
+            return marker;
+        }
+    }
+
+    /// <summary>Sets the note of an earlier marker. Returns false if there is no such marker or the capture has stopped.</summary>
+    public bool SetMarkerNote(int number, string? note)
+    {
+        lock (_gate)
+        {
+            var index = _markers.FindIndex(m => m.Number == number);
+            if (_stopped || index < 0)
+            {
+                return false;
+            }
+
+            _markers[index] = _markers[index] with { Note = CleanNote(note) };
+            WriteMarkers();
+            return true;
+        }
+    }
+
     /// <summary>Same line format as <c>lockpick-probe trace</c>; tools/fixtures/trace_to_fixture.py reads it.</summary>
     public static string TraceLine(DateTime at, IReadOnlyDictionary<string, Field<long>> raw, IEnumerable<string> changed) =>
         $"[{at.ToString("HH:mm:ss.fff", CultureInfo.InvariantCulture)}] "
@@ -176,6 +243,19 @@ public sealed class CaptureSession : IDisposable
             _info.EndedAt = _time.GetLocalNow();
             WriteInfo();
         }
+    }
+
+    private static string CleanNote(string? note)
+    {
+        var line = string.Join(' ', (note ?? string.Empty).Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        return line.Length > MaxMarkerNoteLength ? line[..MaxMarkerNoteLength] : line;
+    }
+
+    private void WriteMarkers()
+    {
+        _info.Markers = _markers.Count;
+        File.WriteAllLines(Path.Combine(Directory, "markers.jsonl"), _markers.Select(m => JsonSerializer.Serialize(m, MarkerJson)));
+        WriteInfo();
     }
 
     private static string Hex(Field<long> f) => f.HasValue ? $"0x{f.Value:X}" : f.Status.ToString();

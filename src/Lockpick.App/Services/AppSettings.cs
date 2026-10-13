@@ -35,6 +35,9 @@ public sealed record AppSettings
 
     /// <summary>Also offer pre-release versions.</summary>
     public bool IncludePrereleases { get; init; }
+
+    /// <summary>Hotkey that adds a capture marker while the game has focus (a GlobalHotkey.Choices name, or "Off").</summary>
+    public string MarkerHotkey { get; init; } = "Ctrl+Shift+M";
 }
 
 public sealed class SettingsStore(string path, ILogger logger)

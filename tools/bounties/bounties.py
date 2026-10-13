@@ -42,7 +42,8 @@ KNOWN_ITEM_IDS = {0x01, 0x02, 0x03, 0x05, 0x07, 0x08, 0x0B, 0x0E, 0x11, 0x1F, 0x
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_TOTAL_BYTES = 256 * 1024 * 1024
 MAX_DOWNLOAD_BYTES = 100 * 1024 * 1024
-MEMBER_PATTERN = re.compile(r"^(?:[^/]+/)?(trace-\d+\.txt|events-\d+\.txt|memory-\d+\.bin|capture-info\.json)$")
+MEMBER_PATTERN = re.compile(r"^(?:[^/]+/)?(trace-\d+\.txt|events-\d+\.txt|memory-\d+\.bin|markers\.jsonl|capture-info\.json)$")
+MAX_REPORTED_MARKERS = 50
 PROFILES = ROOT / "data" / "games" / "re1" / "profiles"
 # Values that change continuously; a new state is only recorded when something else changes.
 CONTEXT_FIELDS = {"gameTimer", "positionX", "positionY", "positionZ", "yaw"}
@@ -149,6 +150,8 @@ class Capture:
     builds: list[dict] = field(default_factory=list)
     # Number of trainer memory writes recorded in the capture (0.2+ captures record this; older ones can't write).
     trainer_writes: int = 0
+    # Moments the player marked while capturing (markers.jsonl): number, at, room, gameSeconds, note.
+    markers: list[dict] = field(default_factory=list)
 
 
 def load_profile_fields(profile_id: str | None) -> list[dict]:
@@ -252,6 +255,27 @@ def read_capture(path: Path) -> Capture:
     return read_capture_zip(path.name, path.read_bytes())
 
 
+def parse_markers(text: str) -> list[dict]:
+    """Player markers (one JSON object per line); malformed lines are skipped, notes are single short lines."""
+    markers = []
+    for line in text.splitlines():
+        try:
+            m = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(m, dict) or not isinstance(m.get("number"), int):
+            continue
+        seconds = m.get("gameSeconds")
+        markers.append({
+            "number": m["number"],
+            "at": str(m.get("at", ""))[11:19],  # HH:mm:ss of the ISO timestamp
+            "room": str(m["room"])[:8] if m.get("room") else None,
+            "gameSeconds": float(seconds) if isinstance(seconds, (int, float)) else None,
+            "note": " ".join(str(m.get("note", "")).split())[:200],
+        })
+    return markers
+
+
 def read_capture_zip(name: str, payload: bytes) -> Capture:
     capture = Capture(name)
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
@@ -272,6 +296,8 @@ def read_capture_zip(name: str, payload: bytes) -> Capture:
                     capture.trainer_writes = int(info_json.get("TrainerWrites", 0) or 0)
                 except (json.JSONDecodeError, AttributeError, TypeError, ValueError):
                     capture.builds = []
+            elif base == "markers.jsonl":
+                capture.markers = parse_markers(text)
             elif base.startswith("trace-"):
                 traces[base] = text
             elif base.startswith("events-"):
@@ -496,6 +522,20 @@ def report(data: dict, capture: Capture, findings: dict[str, Finding], facts: di
     if facts["item_ids"]:
         new = ", ".join(f"0x{i:02X}" for i in facts["new_item_ids"]) or "none"
         lines.append(f"**Item ids seen:** {', '.join(f'0x{i:02X}' for i in facts['item_ids'])} (new: {new})")
+    if capture.markers:
+        lines += ["", "**Markers:**"]
+        for m in capture.markers[:MAX_REPORTED_MARKERS]:
+            where = [m["at"]]
+            if m["room"]:
+                where.append(f"room {m['room']}")
+            if m["gameSeconds"] is not None:
+                t = int(m["gameSeconds"])
+                where.append(f"game {t // 3600}:{t // 60 % 60:02}:{t % 60:02}")
+            # Notes are player text: shown as code so they can't mention people, link or format the comment.
+            note = m["note"].replace("`", "'")
+            lines.append(f"- #{m['number']} {' · '.join(where)}" + (f" — `{note}`" if note else ""))
+        if len(capture.markers) > MAX_REPORTED_MARKERS:
+            lines.append(f"- … and {len(capture.markers) - MAX_REPORTED_MARKERS} more")
     if not matched and not rooms:
         reason = ("it only contains the title screen or attract-mode demos — start or load a game while capturing"
                   if facts["samples"] else "no game data was recorded — was the game running while capturing?")

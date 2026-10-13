@@ -82,6 +82,24 @@ class MemoryLogTests(unittest.TestCase):
         self.assertIn("item box entry 6", found["item_box_changed"].text)
         self.assertTrue(all(not f.auto for k, f in found.items() if k.startswith(("enemies", "enemy_", "lock"))))
 
+    def test_markers_are_listed_safely_in_the_report(self):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as z:
+            z.writestr("memory-1.bin", (FIXTURES / "region-log-sample.bin").read_bytes())
+            z.writestr("capture-info.json", json.dumps({"Builds": [{"ProfileId": "re1-gog-usa-hotfix4"}]}))
+            z.writestr("markers.jsonl", "\n".join([
+                json.dumps({"number": 1, "at": "2026-10-13T10:23:51.5-07:00", "attachment": 1, "gameSeconds": 678.4,
+                            "room": "204", "note": "pushed the `statue` @someone"}),
+                "not json",
+                json.dumps({"number": 2, "at": "2026-10-13T10:24:00-07:00", "attachment": 0, "gameSeconds": None,
+                            "room": None, "note": ""}),
+            ]))
+        capture = bounties.read_capture_zip("markers.zip", buffer.getvalue())
+        found, facts = bounties.detect(capture)
+        text = bounties.report(bounties.load_data(), capture, found, facts)
+        self.assertIn("- #1 10:23:51 · room 204 · game 0:11:18 — `pushed the 'statue' @someone`", text)
+        self.assertIn("- #2 10:24:00\n", text)
+
     def test_capture_zip_prefers_the_memory_log(self):
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w") as z:

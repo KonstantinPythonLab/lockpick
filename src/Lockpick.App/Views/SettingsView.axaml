@@ -36,6 +36,23 @@
         </StackPanel>
       </Border>
 
+      <!-- Capture -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <StackPanel Classes="cardhead">
+            <c:LucideIcon Data="{StaticResource Icon.Flag}" />
+            <TextBlock Classes="caption" Text="CAPTURE MARKERS" />
+          </StackPanel>
+          <TextBlock TextWrapping="Wrap" Foreground="{StaticResource LpMutedBrush}"
+                     Text="While a capture is running, this key marks the current moment even while the game has focus. Pick a key that does nothing in your game (F9 closes Resident Evil)." />
+          <WrapPanel ItemSpacing="8" LineSpacing="8">
+            <TextBlock Classes="label" Text="Marker hotkey" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding MarkerHotkeyChoices}" SelectedItem="{Binding MarkerHotkey}" MinWidth="160" AutomationProperties.Name="Marker hotkey" />
+          </WrapPanel>
+          <TextBlock Text="{Binding MarkerHotkeyStatus}" Classes="warning" TextWrapping="Wrap" IsVisible="{Binding MarkerHotkeyStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+      </Border>
+
       <!-- Game -->
       <Border Classes="card">
         <StackPanel Spacing="8">

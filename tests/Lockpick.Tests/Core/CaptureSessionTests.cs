@@ -13,6 +13,8 @@ public sealed class CaptureSessionTests : IDisposable
 {
     private const string ExePath = @"C:\Users\someone\Games\Resident Evil\ResidentEvil.exe";
 
+    private static readonly JsonSerializerOptions WebJson = new(JsonSerializerDefaults.Web);
+
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"lockpick-capture-test-{Guid.NewGuid():N}");
     private readonly Re1Adapter _adapter = new();
     private readonly FakeProcessHost _host = new();
@@ -200,6 +202,51 @@ public sealed class CaptureSessionTests : IDisposable
         Assert.Equal(4, states.Count);
         var game = profile.CaptureRegions.Single(r => r.Name == "gameState");
         Assert.Equal(3, states[^1].State[0][(int)(enemyType - game.Address)]);
+    }
+
+    [Fact]
+    public void Markers_record_the_moment_room_and_game_time_and_notes_can_be_added_later()
+    {
+        var profile = _adapter.Profiles[0];
+        _fingerprints.ByPath[ExePath] = FakeFingerprintProvider.For(profile, ExePath);
+        var memory = new FakeMemory().WithVerifiedImage(profile);
+        memory.WriteU8(profile.FindField("room")!.Address, 0x06)
+            .WriteI16(profile.FindField("hp")!.Address, 96)
+            .WriteU8(profile.FindField("maxHp")!.Address, 96)
+            .WriteU32(profile.FindField("gameTimer")!.Address, 300);
+        var monitor = new GameMonitor(_adapter, _host, _fingerprints, time: _time);
+        using var capture = new CaptureSession(monitor, _root, "re1", "9.9.9");
+
+        var early = capture.AddMarker("before the game started");
+        Assert.Equal((0, null, null), (early.Attachment, early.Room, early.GameSeconds));
+
+        _host.Launch(9, ExePath, memory, new ModuleImage(0x400000, 0x49B2000, ExePath));
+        _time.Advance(TimeSpan.FromSeconds(2));
+        monitor.Tick();
+        var hotkey = capture.AddMarker();
+        Assert.Equal((2, 1, "106", 10.0, ""), (hotkey.Number, hotkey.Attachment, hotkey.Room, hotkey.GameSeconds, hotkey.Note));
+
+        Assert.True(capture.SetMarkerNote(2, "  pushing the\nstatue  "));
+        Assert.False(capture.SetMarkerNote(3, "no such marker"));
+        Assert.Equal(CaptureSession.MaxMarkerNoteLength, capture.AddMarker(new string('x', 500)).Note.Length);
+        var zip = capture.Stop();
+        Assert.Throws<ObjectDisposedException>(() => capture.AddMarker("after stop"));
+
+        using var archive = ZipFile.OpenRead(zip);
+        string Read(string name)
+        {
+            using var reader = new StreamReader(archive.GetEntry(name)!.Open());
+            return reader.ReadToEnd();
+        }
+
+        var markers = Read("markers.jsonl").Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => JsonSerializer.Deserialize<CaptureMarker>(line, WebJson)!)
+            .ToList();
+        Assert.Equal(3, markers.Count);
+        Assert.Equal("pushing the statue", markers[1].Note);
+        Assert.Equal("106", markers[1].Room);
+        Assert.Contains("Marker 2", Read("events-1.txt"), StringComparison.Ordinal);
+        Assert.Equal(3, JsonSerializer.Deserialize<CaptureInfo>(Read("capture-info.json"))!.Markers);
     }
 
     [Fact]
