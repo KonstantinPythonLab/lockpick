@@ -170,6 +170,16 @@ What changes during play but isn't explained yet — candidates for markers in f
   (224-byte table, single bytes change at a few moments — door/map state?), and the system block `0xD213A1–0xD21503`
   (arrays with a 0x24 stride).
 
+## Leads (unverified)
+
+| Address | Observation (live, 2026-10-13) | Lead |
+|---|---|---|
+| `0xD226A0` (u8) | Changes on room entry and when enemies appear (e.g. `0x08 → 0x20` as the dogs burst into 108, back after the kill) | Current music track |
+| `0xD226A4` (u32) | Set to `0xD91AF4` from the first message shown onwards | Pointer to the on-screen text buffer — recorded as capture region `textBuffer` (`0xD91A00`, 1 KB) to find the message shown |
+
+Room files keep their text in the MSG section (`offsets[11]`: u16 offset table, then text in the game's own encoding
+with control codes), so a message number plus the player's install is enough to show the text without recording it.
+
 ## Structures (leads for later milestones)
 
 From the decomp (GPL-3.0; facts only, no code used) and the RE1 Mod SDK layout, consistent with each other:

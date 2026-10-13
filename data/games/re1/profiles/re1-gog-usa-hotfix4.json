@@ -39,6 +39,12 @@
       "address": "0xD21380",
       "length": "0x1400",
       "description": "System globals: item-use flags (0xD213A0), game timer (0xD22730), inventory pointer (0xD22768), main-menu flag (0xD22777) and neighbouring menu state."
+    },
+    {
+      "name": "textBuffer",
+      "address": "0xD91A00",
+      "length": "0x400",
+      "description": "Research (unverified): 0xD226A4 holds the pointer 0xD91AF4 from the first message shown onwards - probably the on-screen text buffer. Recorded so captures can show which message (item found, examine, document) was on screen."
     }
   ],
   "fields": [
